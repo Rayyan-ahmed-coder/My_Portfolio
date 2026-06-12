@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="description" content="Rayyan Ahmad's personal portfolio showcasing front-end development work, skills, and projects.">
+	<title>Rayyan Portfolio</title>
+	<link rel="stylesheet preload" href="css/style.css" as="style">
+	<link rel="icon" href="images/favicon.png" type="image/png">
+</head>
+<body>
+	<header>
+		<nav>
+			<!-- NAVBAR -->
+			<div class="logo">Rayyan Ahmad</div>
+
+			<ul>
+				<li><a href="#home">Home</a></li>
+				<li><a href="#about">About</a></li>
+				<li><a href="#skills">Skills</a></li>
+				<li><a href="#projects">Projects</a></li>
+				<li><button id="contact-button" type="button">Contact</button></li>
+			</ul>
+		</nav>
+	</header>
+
+	<main>
+		<div id="progress-bar"></div>
+
+		<!-- HERO SECTION -->
+		<section class="hero" id="home">
+
+			<!-- Hero Badge -->
+			<div class="hero_badge">
+    			Frontend Developer
+			</div>
+
+			<div class="hero_text">
+				<h3>Hello, I Am</h3>
+				<h1>Rayyan <span>Web Developer</span> </h1>
+				<p>
+					I love creating modern websites with clean UI,
+					beautiful styles and responsive / interactive layouts.
+				</p>
+				<div class="hero_buttons">
+					<button class="btn primary_btn" type="button">Hire</button>
+					<button class="btn secondary_btn" type="button">View Projects</button>
+				</div>
+			</div>
+
+			<div class="hero_image">
+				<div class="glow_box">
+					<div class="inner_box">
+						<div class="inner-text">R</div>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<!-- ABOUT -->
+		<section class="about" id="about">
+			<h1 class="section_title">About Me</h1>
+			<div class="about_container">
+				<div class="about_card">
+					<h2>Who Am I?</h2>
+
+					<p>
+						I am a young Self thought front-end developer with a great
+						passion for understanding and writing code.
+						My passion started from the age of 10 and
+						I started coding at 11 years old. I love building
+						amazing futuristic websites with smooth effects,
+						clean UI, gradients and animations.
+					</p>
+
+					<div class="goal_card">
+						<h2>My Goal</h2>
+
+						<p>
+							My goal is to Become a Full-stack Web Developer
+							and create awesome web apps that people enjoy using.
+							And my dream is to work with a company and
+							create large web apps or websites together.
+						</p>
+					</div>
+				</div>
+				
+			</div>
+		</section>
+
+		<!-- SKILLS -->
+		<section class="skills" id="skills">
+			<h1 class="section_title">Professional Skillset</h1>
+
+			<div class="skills_grid">
+				<div class="skill_box">
+					<h2>HTML 5</h2>
+					<p>Semantic and clean website structure.</p>
+				</div>
+
+				<div class="skill_box">
+					<h2>CSS 3</h2>
+					<p>Modern styling, fluid animations, stunning UI and responsiveness.</p>
+				</div>
+
+				<div class="skill_box">
+					<h2>JavaScript</h2>
+					<p>Interactive and dynamic websites.</p>
+				</div>
+
+				<div class="skill_box">
+					<h2>Github</h2>
+					<p>Publish My Web sites and improve based on my clients needs</p>
+				</div>
+
+				<div class="skill_box">
+					<h2>VScode</h2>
+					<p>The Latest and most popular IDE with many great features</p>
+				</div>
+			</div>
+		</section>
+
+		<!-- PROJECTS -->
+		<section class="projects" id="projects">
+			<h1 class="section_title">Most Recommended Projects</h1>
+			<div class="project_grid">
+
+				<div class="project_card">
+					<div class="project_image">Modern Landing <br> Page</div>
+
+					<div class="project_content" title="Modern Landing Page">
+						<h2>Modern Landing Page</h2>
+
+						<p>
+							A responsive futuristic landing page with glowing effects.
+						</p>
+						<button class="project_btn">View Project</button>
+					</div>
+				</div>
+
+				<div class="project_card" title="Personl Portfolio">
+					<div class="project_image">Portfolio</div>
+
+					<div class="project_content">
+						<h2>Personal Portfolio</h2>
+
+						<p>
+							A portfolio with glassmorphism, clean UI, and modern effects.
+						</p>
+						<button class="project_btn">View Project</button>
+					</div>
+				</div>
+
+				<div class="project_card" title="Calculator">
+					<div class="project_image">Calculator</div>
+
+					<div class="project_content">
+						<h2>Calculator</h2>
+
+						<p>
+							A calculator with keyboard support, history handling, and polished styles.
+						</p>
+						<button class="project_btn">View Project</button>
+					</div>
+				</div>
+
+				<div class="project_card" title="To do List Tracker">
+					<div class="project_image">To do List tracker</div>
+
+					<div class="project_content">
+						<h2>To do List tracker</h2>
+
+						<p>
+							A task tracker with add/remove features, JSON storage, and a modern glassmorphism design.
+						</p>
+						<button class="project_btn">View Project</button>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<section class="stats">
+			<div class="stat">
+				<h2>6+</h2>
+				<p>Projects</p>
+			</div>
+
+			<div class="stat">
+				<h2>2+</h2>
+				<p>Years Learning</p>
+			</div>
+
+			<div class="stat">
+				<h2>5</h2>
+				<p>Experties</p>
+			</div>
+		</section>
+
+		<!-- CONTACT -->
+		<section id="dialog-section">
+			<dialog id="contact-dialog">
+				<button id="close-dialog">
+					×
+				</button>
+
+				<div class="contact" id="contact">
+					<h1 class="contact_title">Contact Me</h1>
+
+					<form class="contact_box" novalidate>
+						<label for="name">Name:</label>
+						<input type="text" name="name" id="name" placeholder="Your Name" required>
+						
+						<label for="email">Email:</label>
+						<input type="email" name="email" id="email" placeholder="Your Email" required>
+						
+						<label for="message">Send message</label>
+						<textarea name="message" id="message" placeholder="Your Message" required></textarea>
+						
+						<button class="submit_btn" type="submit">Send Message</button>
+					</form>
+				</div>
+			</dialog>
+
+		</section>
+
+		<div class="cursor"></div>
+	</main>
+
+	<!-- FOOTER -->
+	<footer><p>© 2026 <span class="footer-span">Rayyan Ahmed</span> Portfolio</p></footer>
+
+	<script src="js/script.js"></script>
+</body>
+</html>
