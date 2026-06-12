@@ -31,8 +31,7 @@
 
 body {
 	font-family: 'Poppins', sans-serif;
-	/* background: linear-gradient(135deg,#050816,#0f172a,#111827); */
-	background-image: url(../images/space.jfif);
+	background: linear-gradient(135deg,#050816,#0f172a,#111827);
 	color: var(--white);
 	min-height: 100vh;
 	overflow-x: hidden;
