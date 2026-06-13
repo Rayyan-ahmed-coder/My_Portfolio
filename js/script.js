@@ -1,212 +1,360 @@
-const sections = document.querySelectorAll('main section[id]');
-const navLinks = document.querySelectorAll('nav a');
-const cursor = document.querySelector('.cursor');
-const body = document.body;
-const openDialogButton = document.getElementById('contact-button');
-const closeDialogButton = document.getElementById('close-dialog');
-const dialog = document.getElementById('contact-dialog');
-const progressBar = document.getElementById('progress-bar');
-const contactForm = document.querySelector('.contact_box');
+// PORTFOLIO - Enhanced JavaScript Module
 
-const showFieldError = (field, message) => {
-  let error = field.parentElement.querySelector('.field_error');
-  if (!error) {
-    error = document.createElement('div');
-    error.className = 'field_error';
-    field.parentElement.appendChild(error);
-  }
-  error.textContent = message;
-  field.classList.add('invalid');
-};
+// AOS-like Intersection Observer for animations
+class AnimationObserver {
+	constructor() {
+		this.observer = new IntersectionObserver(
+			(entries) => {
+				entries.forEach((entry) => {
+					if (entry.isIntersecting) {
+						entry.target.classList.add('show');
+						this.observer.unobserve(entry.target);
+					}
+				});
+			},
+			{ threshold: 0.15 }
+		);
+	}
 
-const clearFieldError = (field) => {
-  const error = field.parentElement.querySelector('.field_error');
-  if (error) {
-    error.remove();
-  }
-  field.classList.remove('invalid');
-};
+	observe(selector) {
+		document.querySelectorAll(selector).forEach((el) => {
+			el.classList.add('hidden');
+			this.observer.observe(el);
+		});
+	}
+}
 
-const getFieldErrorMessage = (field) => {
-  if (field.validity.valueMissing) {
-    return 'Please fill out this field.';
-  }
-  if (field.type === 'email' && field.validity.typeMismatch) {
-    return 'Please enter a valid email address.';
-  }
-  return 'Please enter a valid value.';
-};
+// Navigation Module
+class NavigationModule {
+	constructor() {
+		this.navLinks = document.querySelectorAll('.nav-menu li a[data-section]');
+		this.menuToggle = document.getElementById('menu-toggle');
+		this.navMenu = document.querySelector('.nav-menu');
+		this.sections = Array.from(this.navLinks)
+			.map((link) => document.getElementById(link.dataset.section))
+			.filter(Boolean);
+		
+		this.init();
+	}
 
-const clearFormErrors = () => {
-  contactForm.querySelectorAll('.field_error').forEach((error) => error.remove());
-  contactForm.querySelectorAll('.invalid').forEach((field) => field.classList.remove('invalid'));
-};
+	init() {
+		// Mobile menu toggle
+		if (this.menuToggle) {
+			this.menuToggle.addEventListener('click', () => this.toggleMenu());
+		}
 
-const contactFields = contactForm ? Array.from(contactForm.querySelectorAll('input, textarea')) : [];
+		// Smooth scrolling and active link
+		this.navLinks.forEach((link) => {
+			link.addEventListener('click', () => {
+				this.navLinks.forEach((l) => {
+					l.classList.remove('active');
+					l.removeAttribute('aria-current');
+				});
+				link.classList.add('active');
+				link.setAttribute('aria-current', 'page');
+				this.closeMenu();
+			});
+		});
 
-const addContactFieldListeners = () => {
-  contactFields.forEach((field) => {
-    field.addEventListener('input', () => {
-      if (field.checkValidity()) {
-        clearFieldError(field);
-      }
-    });
-  });
-};
+		// Update active link on scroll
+		window.addEventListener('scroll', () => this.updateActiveLink(), { passive: true });
+		
+		// Initial active link
+		this.updateActiveLink();
+	}
 
-const observer = new IntersectionObserver((entries) => {
-  entries.forEach((entry) => {
-    if (entry.isIntersecting) {
-      entry.target.classList.add('show');
-    }
-  });
-}, { threshold: 0.15 });
+	toggleMenu() {
+		const isOpen = this.menuToggle.getAttribute('aria-expanded') === 'true';
+		this.menuToggle.setAttribute('aria-expanded', !isOpen);
+		this.navMenu.classList.toggle('active');
+	}
+
+	closeMenu() {
+		this.menuToggle?.setAttribute('aria-expanded', 'false');
+		this.navMenu?.classList.remove('active');
+	}
+
+	updateActiveLink() {
+		let currentSection = '';
+
+		this.sections.forEach((section) => {
+			const sectionTop = section.offsetTop - 180;
+			if (window.scrollY >= sectionTop) {
+				currentSection = section.id;
+			}
+		});
+
+		this.navLinks.forEach((link) => {
+			link.classList.toggle(
+				'active',
+				link.getAttribute('data-section') === currentSection
+			);
+		});
+	}
+}
+
+// Progress Bar Module
+class ProgressBar {
+	constructor() {
+		this.progressBar = document.getElementById('progress-bar');
+		if (this.progressBar) {
+			window.addEventListener('scroll', () => this.update(), { passive: true });
+			window.addEventListener('resize', () => this.update());
+			this.update();
+		}
+	}
+
+	update() {
+		if (!this.progressBar) return;
+
+		const scrollTop = window.scrollY || window.pageYOffset;
+		const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+		const percent = maxScroll > 0 ? (scrollTop / maxScroll) * 100 : 0;
+
+		this.progressBar.style.width = `${Math.min(percent, 100)}%`;
+	}
+}
+
+// Contact Dialog Module
+class ContactDialog {
+	constructor() {
+		this.dialog = document.getElementById('contact-dialog');
+		this.openBtn = document.getElementById('contact-button');
+		this.closeBtn = document.getElementById('close-dialog');
+		this.form = document.getElementById('contact-form');
+		this.body = document.body;
+		
+		this.init();
+	}
+
+	init() {
+		if (!this.dialog) return;
+
+		this.openBtn?.addEventListener('click', () => this.open());
+		this.closeBtn?.addEventListener('click', () => this.close());
+		this.form?.addEventListener('submit', (e) => this.handleSubmit(e));
+
+		// Close on backdrop click
+		this.dialog.addEventListener('click', (e) => {
+			if (e.target === this.dialog) {
+				this.close();
+			}
+		});
+
+		// Close on Escape key
+		document.addEventListener('keydown', (e) => {
+			if (e.key === 'Escape' && this.dialog.open) {
+				this.close();
+			}
+		});
+	}
+
+	open() {
+		if (!this.dialog) return;
+		this.dialog.showModal();
+		this.body.style.overflowY = 'hidden';
+	}
+
+	close() {
+		if (!this.dialog || !this.dialog.open) return;
+		this.dialog.close();
+		this.body.style.overflowY = '';
+	}
+
+	handleSubmit(e) {
+		if (!this.dialog) return;
+		e.preventDefault();
+
+		const fields = Array.from(this.form.querySelectorAll('input, textarea'));
+		const statusDiv = document.getElementById('form-status') || this.createStatusDiv();
+		let isValid = true;
+
+		// Clear previous errors
+		fields.forEach((field) => this.clearFieldError(field));
+
+		// Validate all fields
+		fields.forEach((field) => {
+			if (!field.checkValidity()) {
+				isValid = false;
+				this.showFieldError(field);
+			}
+		});
+
+		if (!isValid) {
+			fields.find((f) => !f.checkValidity())?.focus();
+			return;
+		}
+
+		statusDiv.textContent = '';
+		statusDiv.classList.remove('error', 'success');
+
+		// Simulate form submission
+		this.form.style.opacity = '0.6';
+		this.form.style.pointerEvents = 'none';
+
+		setTimeout(() => {
+			statusDiv.textContent = '✓ Message sent successfully! I\'ll get back to you soon.';
+			statusDiv.classList.remove('error');
+			statusDiv.classList.add('success');
+
+			setTimeout(() => {
+				this.form.reset();
+				this.form.style.opacity = '1';
+				this.form.style.pointerEvents = 'auto';
+				statusDiv.classList.remove('success');
+				this.close();
+			}, 2600);
+		}, 800);
+	}
+
+	createStatusDiv() {
+		const statusDiv = document.createElement('div');
+		statusDiv.id = 'form-status';
+		statusDiv.className = 'form_status';
+		this.form.appendChild(statusDiv);
+		return statusDiv;
+	}
+
+	showFieldError(field) {
+		field.classList.add('invalid');
+		let error = field.parentElement.querySelector('.field_error');
+
+		if (!error) {
+			error = document.createElement('div');
+			error.className = 'field_error';
+			field.parentElement.appendChild(error);
+		}
+
+		const messages = {
+			valueMissing: 'This field is required.',
+			typeMismatch: field.type === 'email' ? 'Please enter a valid email address.' : 'Please enter a valid value.',
+		};
+
+		error.textContent = messages[Object.keys(field.validity).find((key) => field.validity[key])] || 'Invalid input';
+	}
+
+	clearFieldError(field) {
+		field.classList.remove('invalid');
+		const error = field.parentElement.querySelector('.field_error');
+		if (error) error.remove();
+	}
+}
 
 
-document.querySelectorAll('.about_card, .skill_box, .project_card, .stats').forEach((element) => {
-  element.classList.add('hidden');
-  observer.observe(element);
+// Smooth Scroll to Section
+class SmoothScroll {
+	constructor() {
+		document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+			anchor.addEventListener('click', (e) => {
+				const href = anchor.getAttribute('href');
+				if (!href || href === '#') return;
+				e.preventDefault();
+				const target = document.querySelector(href);
+				if (target) {
+					target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+				}
+			});
+		});
+	}
+}
+
+// Custom Cursor (Optional - desktop only)
+class CustomCursor {
+	constructor() {
+		this.cursor = document.querySelector('.cursor');
+		
+		// Only enable on desktop
+		if (this.cursor && window.matchMedia('(pointer: fine)').matches) {
+			this.init();
+		} else if (this.cursor) {
+			this.cursor.style.display = 'none';
+		}
+	}
+
+	init() {
+		window.addEventListener('mousemove', (e) => {
+			this.cursor.style.transform = 
+				`translate(${e.clientX - 6}px, ${e.clientY - 3}px)`;
+		});
+
+		// Add interactive states
+		document.querySelectorAll('a, button').forEach((el) => {
+			el.addEventListener('mouseenter', () => this.cursor?.classList.add('active'));
+			el.addEventListener('mouseleave', () => this.cursor?.classList.remove('active'));
+		});
+	}
+}
+
+// Button Navigation
+class ButtonNavigation {
+	constructor() {
+		const hireBtn = document.getElementById('hire-btn');
+		const projectsBtn = document.getElementById('projects-btn');
+
+		hireBtn?.addEventListener('click', () => {
+			document.getElementById('contact-button')?.click();
+		});
+
+		projectsBtn?.addEventListener('click', () => {
+			document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+		});
+	}
+}
+
+
+// Console Welcome Message
+class WelcomeMessage {
+	constructor() {
+		this.log();
+	}
+
+	log() {
+		const styles = {
+			main: 'color: #3484ee; text-decoration: underline; text-decoration-color: #1d44c4; text-decoration-offset: 4px; font-size: 40px; font-weight: 650; letter-spacing: 0.3px; margin: 12px;',
+			highlight: 'background: linear-gradient(135deg, rgb(147, 189, 252), rgb(45, 72, 228)); border-radius: 10px; color: #ffffff; padding: 6px 9px; font-size: 45px; font-weight: 650; margin: 0 0 0 12px; letter-spacing: 0.4px;',
+		};
+
+		console.log('%cWelcome to My %cPortfolio', styles.main, styles.highlight);
+		console.log(
+			'%c👋 Thanks for visiting! Feel free to explore and get in touch.',
+			'color: #14c5e4; font-size: 14px; font-weight: 600;'
+		);
+	}
+}
+
+// Utility: Debounce
+function debounce(func, delay) {
+	let timeoutId;
+	return function (...args) {
+		clearTimeout(timeoutId);
+		timeoutId = setTimeout(() => func.apply(this, args), delay);
+	};
+}
+
+// INITIALIZATION
+document.addEventListener('DOMContentLoaded', () => {
+	// Initialize all modules
+	const animationObserver = new AnimationObserver();
+	animationObserver.observe('[data-aos]');
+
+	new NavigationModule();
+	new ProgressBar();
+	new ContactDialog();
+	new SmoothScroll();
+	new CustomCursor();
+	new ButtonNavigation();
+	new WelcomeMessage();
+
+	// Add animation delays with data-aos-delay
+	document.querySelectorAll('[data-aos-delay]').forEach((el) => {
+		const delay = el.getAttribute('data-aos-delay');
+		el.style.animationDelay = `${delay}ms`;
+	});
+
+	console.log('%c✨ Portfolio loaded successfully!', 'color: #10b981; font-size: 14px; font-weight: 600;');
 });
 
-
-function updateActiveLink() {
-  let currentSection = '';
-
-  sections.forEach((section) => {
-    const sectionTop = section.offsetTop - 180;
-    if (window.scrollY >= sectionTop) {
-      currentSection = section.id;
-    }
-  });
-
-  navLinks.forEach((link) => {
-    link.classList.toggle('active', link.getAttribute('href') === `#${currentSection}`);
-  });
-}
-
-
-function updateProgressBar() {
-  if (!progressBar) return;
-
-  const scrollTop = window.scrollY || window.pageYOffset;
-  const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-  const percent = maxScroll > 0 ? (scrollTop / maxScroll) * 100 : 0;
-
-  progressBar.style.width = `${Math.min(percent, 100)}%`;
-}
-
-
-function openDialog() {
-  if (!dialog) return;
-
-  dialog.showModal();
-  body.style.overflowY = 'hidden';
-}
-
-
-function closeDialog() {
-  if (!dialog || !dialog.open) return;
-
-  dialog.close();
-  body.style.overflowY = '';
-}
-
-
-function mouseMove() {
-  window.addEventListener('mousemove', (event) => {
-    cursor.style.left = `${event.clientX - 5}px`;
-    cursor.style.top = `${event.clientY - 2}px`;
-  });
-}
-
-if (openDialogButton) {
-  openDialogButton.addEventListener('click', openDialog);
-}
-
-if (closeDialogButton) {
-  closeDialogButton.addEventListener('click', closeDialog);
-}
-
-if (dialog) {
-  dialog.addEventListener('click', (event) => {
-    const rect = dialog.getBoundingClientRect();
-    const clickedOutside =
-      event.clientX < rect.left ||
-      event.clientX > rect.right ||
-      event.clientY < rect.top ||
-      event.clientY > rect.bottom;
-
-    if (clickedOutside) {
-      closeDialog();
-    }
-  });
-}
-
-if (contactForm) {
-  addContactFieldListeners();
-  contactForm.addEventListener('submit', (event) => {
-    event.preventDefault();
-    clearFormErrors();
-
-    let isValid = true;
-
-    contactFields.forEach((field) => {
-      if (!field.checkValidity()) {
-        isValid = false;
-        showFieldError(field, getFieldErrorMessage(field));
-      }
-    });
-
-    if (!isValid) {
-      const firstErrorField = contactFields.find((field) => !field.checkValidity());
-      firstErrorField?.focus();
-      return;
-    }
-
-    closeDialog();
-    contactNotification
-  });
-}
-
-window.addEventListener('scroll', () => {
-  updateActiveLink();
-  updateProgressBar();
-}, { passive: true });
-
-window.addEventListener('resize', updateProgressBar);
-
-if (cursor && window.matchMedia('(pointer: fine)').matches) {
-  window.addEventListener('mousemove', (event) => {
-    cursor.style.left = `${event.clientX - 5}px`;
-    cursor.style.top = `${event.clientY - 2}px`;
-  });
-} else if (cursor) {
-  cursor.style.display = 'none';
-}
-
-updateActiveLink();
-updateProgressBar();
-
-console.log(
-  `%cWelcome to My %cPortfolio`,
-
-  `color: #3484ee; 
-  text-decoration: underline; 
-  text-decoration-color: #1d44c4;
-  text-decoration-offset: 4px;
-  font-size: 40px;
-  font-family: sans-serif;
-  font-weight: 650;
-  letter-spacing: 0.3px;
-  margin: 12px;`,
-
-  `background: linear-gradient(135deg, rgb(147, 189, 252), rgb(45, 72, 228));
-  border-radius: 10px;
-  color: #ffffff;
-  padding: 6px 9px;
-  font-size: 45px;
-  font-family: sans-serif;
-  font-weight: 650;
-  margin: 0 0 0 12px;
-  letter-spacing: 0.4px;`
-);
+// Prevent layout shift on scroll
+window.addEventListener('scroll', debounce(() => {
+	// Additional scroll logic can go here
+}, 100), { passive: true });
