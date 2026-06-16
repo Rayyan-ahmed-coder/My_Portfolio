@@ -230,9 +230,14 @@ class ContactDialog {
 		this.openBtn = document.getElementById('contact-button');
 		this.closeBtn = document.getElementById('close-dialog');
 		this.form = document.getElementById('contact-form');
+
+		this.line1 = document.querySelector(".line-1");
+		this.line2 = document.querySelector(".line-2");
+		this.line3 = document.querySelector(".line-3");
 		this.body = document.body;
 		
 		this.init();
+		this.svgX();
 	}
 
 	init() {
@@ -240,7 +245,8 @@ class ContactDialog {
 
 		this.openBtn?.addEventListener('click', () => this.open());
 		this.closeBtn?.addEventListener('click', () => this.close());
-        this.closeBtn?.addEventListener(`mouseenter`, () => this.hoverSVG());
+        this.closeBtn?.addEventListener(`mouseenter`, () => this.svgArrow());
+		this.closeBtn?.addEventListener(`mouseleave`, () => this.svgX());
 		this.form?.addEventListener('submit', (e) => this.handleSubmit(e));
 
 		// Close on backdrop click
@@ -270,10 +276,41 @@ class ContactDialog {
 		this.body.style.overflowY = '';
 	}
 
-    hoverSVG() {
-        if (!this.closeBtn) return;
-        this.contactSVG = document.querySelector(".contact-svg");
-		this.SVGline2 = document.querySelector("line-2");
+    svgArrow() {
+		// top arrow wing
+		this.line1.setAttribute("x1", 52);
+		this.line1.setAttribute("y1", 22);
+		this.line1.setAttribute("x2", 80);
+		this.line1.setAttribute("y2", 50);
+
+		// arrow shaft
+		this.line2.setAttribute("x1", 10);
+		this.line2.setAttribute("y1", 50);
+		this.line2.setAttribute("x2", 80);
+		this.line2.setAttribute("y2", 50);
+
+		// bottom arrow wing
+		this.line3.setAttribute("x1", 52);
+		this.line3.setAttribute("y1", 78);
+		this.line3.setAttribute("x2", 80);
+		this.line3.setAttribute("y2", 50);
+	}
+
+	svgX() {
+		this.line1.setAttribute("x1", 20);
+		this.line1.setAttribute("y1", 20);
+		this.line1.setAttribute("x2", 80);
+		this.line1.setAttribute("y2", 80);
+
+		this.line2.setAttribute("x1", 50);
+		this.line2.setAttribute("y1", 50);
+		this.line2.setAttribute("x2", 50);
+		this.line2.setAttribute("y2", 50);
+
+		this.line3.setAttribute("x1", 20);
+		this.line3.setAttribute("y1", 80);
+		this.line3.setAttribute("x2", 80);
+		this.line3.setAttribute("y2", 20);
 	}
 
 	handleSubmit(e) {
