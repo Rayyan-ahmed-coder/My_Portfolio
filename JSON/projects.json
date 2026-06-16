@@ -1,0 +1,30 @@
+[
+    {
+        "title": "Modern Landing Page",
+        "description": "A responsive, futuristic landing page with glowing effects and smooth animations.",
+        "tags": ["HTML", "CSS", "JavaScript"],
+        "link": "",
+        "target": "_blank"
+    },
+    {
+        "title": "Personal Portfolio",
+        "description": "Modern portfolio website.",
+        "tags": ["JavaScript", "JSON", "DOM"],
+        "link": "#",
+        "target": "_self"
+    },
+    {
+        "title": "Calculator",
+        "description": "A fully functional calculator with keyboard support, history, and professional styling.",
+        "tags": ["JavaScript", "Localstorage", "DOM"],
+        "link": "",
+        "target": "_blank"
+    },
+    {
+        "title": "To do List Tracker",
+        "description": "A task management app with add/delete features, JSON storage, and modern design.",
+        "tags": ["JavaScript", "JSON"],
+        "link": "",
+        "target": "_blank"
+    }
+]

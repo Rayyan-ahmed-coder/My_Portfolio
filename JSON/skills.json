@@ -1,0 +1,32 @@
+[
+    {
+        "heading": "HTML 5",
+        "description": "Semantic and clean web site structure.",
+        "title": "HyperText Markup Langwage 5"
+    },
+    {
+        "heading": "CSS 3",
+        "description": "Modern styling, fluid animations, stunning UI and responsiveness.",
+        "title": "Cascading Style Sheet 3"
+    },
+    {
+        "heading": "JavaScript",
+        "description": "Interactive and dynamic web sites.",
+        "title": "JavaScript"
+    },
+    {
+        "heading": "Github",
+        "description": "Publish my web sites and improve based on my clients needs.",
+        "title": "Github"
+    },
+    {
+        "heading": "Git",
+        "description": "Update Github code from VScode and also use VScode features.",
+        "title": "Git"
+    },
+    {
+        "heading": "VScode",
+        "description": "The latest and most popular IDE with many great features.",
+        "title": "Visual Studio code"
+    }
+]
