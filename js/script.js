@@ -240,6 +240,7 @@ class ContactDialog {
 
 		this.openBtn?.addEventListener('click', () => this.open());
 		this.closeBtn?.addEventListener('click', () => this.close());
+        this.closeBtn?.addEventListener(`mouseenter`, () => this.hoverSVG());
 		this.form?.addEventListener('submit', (e) => this.handleSubmit(e));
 
 		// Close on backdrop click
@@ -267,6 +268,12 @@ class ContactDialog {
 		if (!this.dialog || !this.dialog.open) return;
 		this.dialog.close();
 		this.body.style.overflowY = '';
+	}
+
+    hoverSVG() {
+        if (!this.closeBtn) return;
+        this.contactSVG = document.querySelector(".contact-svg");
+		this.SVGline2 = document.querySelector("line-2");
 	}
 
 	handleSubmit(e) {
