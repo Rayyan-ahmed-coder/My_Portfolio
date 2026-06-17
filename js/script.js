@@ -116,6 +116,9 @@ class ContentLoader {
 			let html = "";
 
 			projects.forEach(project => {
+				console.log(`${project.link}`);
+				console.log(project.title, project.link);
+
 				html += `
 					<div class="project_card" data-aos="fade-up" title="${project.title}">
 						<div class="project_image">${project.title}</div>
@@ -126,7 +129,7 @@ class ContentLoader {
 							<div class="project_tags">
 								${project.tags
 									.map(tag =>
-										`<span class="tag">${tag}</span>`
+										`<span class="tagv">${tag}</span>`
 									)
 									.join("")}
 							</div>
@@ -139,7 +142,7 @@ class ContentLoader {
 				`;
 			});
 
-			this.projectGrid.innerHTML += html;
+			this.projectGrid.innerHTML = html;
 		}
 		catch (error) {
 			console.error("Error: ", error);
@@ -199,7 +202,6 @@ class ContentLoader {
 		}
 	}
 }
-
 
 // Progress Bar Module
 class ProgressBar {

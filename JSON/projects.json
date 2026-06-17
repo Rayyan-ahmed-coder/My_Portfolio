@@ -10,14 +10,14 @@
         "title": "Personal Portfolio",
         "description": "Modern portfolio website.",
         "tags": ["JavaScript", "JSON", "DOM"],
-        "link": "#",
-        "target": "_self"
+        "link": "https://rayyan-ahmed-coder.github.io/My_Portfolio/",
+        "target": "_blank"
     },
     {
         "title": "Calculator",
         "description": "A fully functional calculator with keyboard support, history, and professional styling.",
         "tags": ["JavaScript", "Localstorage", "DOM"],
-        "link": "",
+        "link": "https://rayyan-ahmed-coder.github.io/Calculator/",
         "target": "_blank"
     },
     {

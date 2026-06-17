@@ -892,6 +892,7 @@ nav #contact-button:hover {
 	justify-content: center;
 	align-items: center;
 	color: #f0fdff;
+	pointer-events: none;
 	background: rgba(0,0,0,.55);
 	opacity: 0;
 	font-size: 2.2em;
@@ -1436,7 +1437,6 @@ footer{
 	}
 
 	.hero{
-		flex-direction: column;
 		text-align: center;
 	}
 
@@ -1456,6 +1456,8 @@ footer{
 }
 
 @media(max-width:700px){
+	.hero {
+	}
 
 	nav{
 		padding: 18px 16px;
@@ -1496,6 +1498,10 @@ footer{
 }
 
 @media (max-width:490px) {
+	.hero {
+		flex-direction: column;
+	}
+
 	nav {
 		flex-direction: column;
 	}
