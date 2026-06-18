@@ -166,7 +166,6 @@ class ContentLoader {
 
 		try {
 			const response = await fetch("JSON/skills.json");
-
 			if (!response.ok) {
 				throw new Error("Failed to fetch skills.");
 			}
@@ -179,6 +178,9 @@ class ContentLoader {
 					<div class="skill_box" data-aos="fade-up" title="${skill.title}">
 						<h2>${skill.heading}</h2>
 						<p>${skill.description}</p>
+						<div class="skill-progress">
+							<div style="width:${skill.progress}"></div>
+						</div>
 					</div>
 				`;
 			});

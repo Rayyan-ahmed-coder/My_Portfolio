@@ -2,31 +2,37 @@
     {
         "heading": "HTML 5",
         "description": "Semantic and clean web site structure.",
-        "title": "HyperText Markup Langwage 5"
+        "title": "HyperText Markup Langwage 5",
+        "progress": "97%"
     },
     {
         "heading": "CSS 3",
         "description": "Modern styling, fluid animations, stunning UI and responsiveness.",
-        "title": "Cascading Style Sheet 3"
+        "title": "Cascading Style Sheet 3",
+        "progress": "93%"
     },
     {
         "heading": "JavaScript",
         "description": "Interactive and dynamic web sites.",
-        "title": "JavaScript"
+        "title": "JavaScript",
+        "progress": "54%"
     },
     {
         "heading": "Github",
         "description": "Publish my web sites and improve based on my clients needs.",
-        "title": "Github"
+        "title": "Github",
+        "progress": "98%"
     },
     {
         "heading": "Git",
         "description": "Update Github code from VScode and also use VScode features.",
-        "title": "Git"
+        "title": "Git",
+        "progress": "95%"
     },
     {
         "heading": "VScode",
         "description": "The latest and most popular IDE with many great features.",
-        "title": "Visual Studio code"
+        "title": "Visual Studio code",
+        "progress": "100%"
     }
 ]
