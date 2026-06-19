@@ -11,7 +11,7 @@
 	<link rel="preconnect" href="https://fonts.gstatic.com" as="font" type="font/woff2" crossorigin>
 	<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;700&family=Poppins:wght@300;400;500;600;700&display=swap">
 	<link rel="preload" href="css/style.css" as="style" type="text/css">
-	<link rel="stylesheet" href="css/style.css">
+	<link rel="stylesheet" href="css/style.css" type="text/css">
 	<link rel="icon" href="images/favicon.png" type="image/png">
 </head>
 <body>
@@ -135,42 +135,44 @@
 		</section>
 
 
-		<section class="time-line">
-			<h1 class="section_title" id="time-title">How much I have learnd</h1>
+		<section class="learnd">
+			<div class="larnd-wrapper">
+				<h1 class="section_title" id="learnd-title">How much I have learnd</h1>
 
-			<div class="time-line-content">
-				<select name="time-selector" id="time-line-select">
-					<option disabled>Select filter</option>
-					<option value="all" selected>All</option>
-					<option value="most_learnd">Most learnd</option>
-					<option value="least_learnd">Least learnd</option>
-				</select>
+				<div class="learnd-content">
+					<select name="learnd-selector" id="learnd-select">
+						<option disabled>Select filter</option>
+						<option value="all" selected>All</option>
+						<option value="most_learnd">Most learnd</option>
+						<option value="least_learnd">Least learnd</option>
+					</select>
 
-				<div class="time-card" data-aos="fade-up">
-					<div class="time-header">
-						<h2>HTML</h2>
-						<span>Advance</span>
+					<div class="learnd-card" data-aos="fade-up">
+						<div class="learnd-header">
+							<h2>HTML</h2>
+							<span>Advance</span>
+						</div>
 					</div>
-				</div>
 
-				<div class="time-card" data-aos="fade-up">
-					<div class="time-header">
-						<h2>CSS</h2>
-						<span>Advance</span>
+					<div class="learnd-card" data-aos="fade-up">
+						<div class="learnd-header">
+							<h2>CSS</h2>
+							<span>Advance</span>
+						</div>
 					</div>
-				</div>
 
-				<div class="time-card" data-aos="fade-up">
-					<div class="time-header">
-						<h2>JavaScript</h2>
-						<span>Intermediate</span>
+					<div class="learnd-card" data-aos="fade-up">
+						<div class="learnd-header">
+							<h2>JavaScript</h2>
+							<span>Intermediate</span>
+						</div>
 					</div>
-				</div>
 
-				<div class="time-card" data-aos="fade-up">
-					<div class="time-header">
-						<h2>Python</h2>
-						<span>Beginner</span>
+					<div class="learnd-card" data-aos="fade-up">
+						<div class="learnd-header">
+							<h2>Python</h2>
+							<span>Beginner</span>
+						</div>
 					</div>
 				</div>
 			</div>

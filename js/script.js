@@ -92,117 +92,125 @@ class NavigationModule {
 }
 
 class ContentLoader {
-	constructor() {
-		this.projectGrid = document.getElementById("projects-grid");
-		this.skillsGrid = document.querySelector(".skills_grid");
+    constructor(animationObserver) {
+        this.animationObserver = animationObserver;
+        this.projectGrid = document.getElementById("projects-grid");
+        this.skillsGrid = document.querySelector(".skills_grid");
 
-		Promise.all([
-			this.loadProjects(),
-			this.loadSkills()
-		])
-	}
+        // Execute initialization sequentially to handle observer attachment safely
+        this.init();
+    }
 
-	async loadProjects() {
-		if (!this.projectGrid) return;
+    async init() {
+        await Promise.all([
+            this.loadProjects(),
+            this.loadSkills()
+        ]);
+    }
 
-		try {
-			const response = await fetch("JSON/projects.json");
+    async loadProjects() {
+        if (!this.projectGrid) return;
 
-			if (!response.ok) {
-				throw new Error("Failed to fetch projects.");
-			}
+        try {
+            const response = await fetch("JSON/projects.json");
 
-			const projects = await response.json();
-			let html = "";
+            if (!response.ok) {
+                throw new Error("Failed to fetch projects.");
+            }
 
-			projects.forEach(project => {
-				console.log(`${project.link}`);
-				console.log(project.title, project.link);
+            const projects = await response.json();
+            let html = "";
 
-				html += `
-					<div class="project_card" data-aos="fade-up" title="${project.title}">
-						<div class="project_image">${project.title}</div>
+            projects.forEach(project => {
+                html += `
+                    <div class="project_card" data-aos="fade-up" title="${project.title}">
+                        <div class="project_image">${project.title}</div>
 
-						<div class="project_content">
-							<h2>${project.title}</h2>
-							<p>${project.description}</p>
-							<div class="project_tags">
-								${project.tags
-									.map(tag =>
-										`<span class="tagv">${tag}</span>`
-									)
-									.join("")}
-							</div>
+                        <div class="project_content">
+                            <h2>${project.title}</h2>
+                            <p>${project.description}</p>
 
-							<a class="project_btn" href="${project.link}" target="${project.target}" title="Let's go explore">
-								View Project
-							</a>
-						</div>
-					</div>
-				`;
-			});
+                            <div class="project-non-content">
+                                <div class="project_tags">
+                                    ${project.tags
+                                        .map(tag => `<span class="tag">${tag}</span>`)
+                                        .join("")}
+                                </div>
 
-			this.projectGrid.innerHTML = html;
-		}
-		catch (error) {
-			console.error("Error: ", error);
+                                <a 
+                                    class="project_btn" 
+                                    href="${project.link}" 
+                                    target="${project.target}" 
+                                    title="Let's go explore" >
+                                    View Project
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
 
-			this.projectGrid.innerHTML = `
-				<div class="project_fallback">
-					Server is currently down.<br>
+            this.projectGrid.innerHTML = html;
+            
+            // Observe the newly created elements
+            this.animationObserver?.observe("#projects-grid [data-aos]");
+        }
+        catch (error) {
+            console.error("Error: ", error);
 
-					<span>
-						Projects are unable to load!
-					</span>
+            this.projectGrid.innerHTML = `
+                <div class="project_fallback">
+                    Server is currently down.<br>
+                    <span>Projects are unable to load!</span>
+                    :(
+                </div>
+            `;
+        }
+    }
 
-					:(
-				</div>
-			`;
-		}
-	}
+    async loadSkills() {
+        if (!this.skillsGrid) return;
 
-	async loadSkills() {
-		if (!this.skillsGrid) return;
+        try {
+            const response = await fetch("JSON/skills.json");
+            if (!response.ok) {
+                throw new Error("Failed to fetch skills.");
+            }
 
-		try {
-			const response = await fetch("JSON/skills.json");
-			if (!response.ok) {
-				throw new Error("Failed to fetch skills.");
-			}
+            const skills = await response.json();
+            let html = "";
 
-			const skills = await response.json();
-			let html = "";
+            skills.forEach(skill => {
+                html += `
+                    <div class="skill_box" data-aos="fade-up" title="${skill.title}">
+                        <div class="skill-content">
+                            <h2>${skill.heading}</h2>
+                            <p>${skill.description}</p>
+                        </div>
 
-			skills.forEach(skill => {
-				html += `
-					<div class="skill_box" data-aos="fade-up" title="${skill.title}">
-						<h2>${skill.heading}</h2>
-						<p>${skill.description}</p>
-						<div class="skill-progress">
-							<div style="width:${skill.progress}"></div>
-						</div>
-					</div>
-				`;
-			});
+                        <div class="skill-progress">
+                            <div style="width:${skill.progress}"></div>
+                        </div>
+                    </div>
+                `;
+            });
 
-			this.skillsGrid.innerHTML += html;
-		}
-		catch (error) {
-			console.error("Error: ", error);
+            this.skillsGrid.innerHTML = html;
+            // Observe the newly created elements
+            this.animationObserver?.observe(".skills_grid [data-aos]");
+        }
+        catch (error) {
+            console.error("Error: ", error);
 
-			this.skillsGrid.innerHTML = `
-				<div class="skill_fallback">
-					Server is currently down.<br>
-
-					<span>
-						Skills are unable to load!
-					</span>
-
-					:(
-				</div>
-			`;
-		}
-	}
+            this.skillsGrid.innerHTML = `
+                <div class="skill_fallback">
+                    Server is currently down.<br>
+                    <span>Skills are unable to load!</span>
+                    :(
+                </div>
+            `;
+        }
+    }
 }
 
 // Progress Bar Module
@@ -490,27 +498,28 @@ function debounce(func, delay) {
 }
 
 // INITIALIZATION
+// INITIALIZATION
 document.addEventListener('DOMContentLoaded', () => {
-	// Initialize all modules
-	const animationObserver = new AnimationObserver();
-	animationObserver.observe('[data-aos]');
+    // Initialize all modules
+    const animationObserver = new AnimationObserver();
+    animationObserver.observe('[data-aos]'); // Observes static HTML elements
 
-	new NavigationModule();
-	new ProgressBar();
-	new ContactDialog();
-	new SmoothScroll();
-	new ContentLoader();
-	new CustomCursor();
-	new ButtonNavigation();
-	new WelcomeMessage();
+    new NavigationModule();
+    new ProgressBar();
+    new ContactDialog();
+    new SmoothScroll();
+    new ContentLoader(animationObserver); // <-- PASS THE OBSERVER HERE
+    new CustomCursor();
+    new ButtonNavigation();
+    new WelcomeMessage();
 
-	// Add animation delays with data-aos-delay
-	document.querySelectorAll('[data-aos-delay]').forEach((el) => {
-		const delay = el.getAttribute('data-aos-delay');
-		el.style.animationDelay = `${delay}ms`;
-	});
+    // Add animation delays with data-aos-delay
+    document.querySelectorAll('[data-aos-delay]').forEach((el) => {
+        const delay = el.getAttribute('data-aos-delay');
+        el.style.animationDelay = `${delay}ms`;
+    });
 
-	console.log('%c✨ Portfolio loaded successfully!', 'color: #10b981; font-size: 14px; font-weight: 600;');
+    console.log('%c✨ Portfolio loaded successfully!', 'color: #10b981; font-size: 14px; font-weight: 600;');
 });
 
 // Prevent layout shift on scroll
