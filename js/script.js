@@ -248,7 +248,7 @@ class ContentLoader {
                     <div class="learnd-card" data-aos="fade-up" title="${learnd.title}">
 						<div class="learnd-header">
 							<h2>${learnd.heading}</h2>
-							<span>${learnd.advanciy}</span>
+							<span>${learnd.advancity}</span>
 						</div>
 					</div>
                 `;
