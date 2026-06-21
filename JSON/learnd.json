@@ -1,0 +1,22 @@
+[
+    {
+        "heading": "HTML",
+        "advancity": "Advance",
+        "title": "Hyper Text Markup Language"
+    },
+    {
+        "heading": "CSS",
+        "advancity": "Advance",
+        "title": "Cascading Style Sheet"
+    },
+    {
+        "heading": "JavaScript",
+        "advancity": "Intermediate",
+        "title": "JavaScript"
+    },
+    {
+        "heading": "Python",
+        "advancity": "Beginner",
+        "title": "Python"
+    }
+]

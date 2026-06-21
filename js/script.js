@@ -96,6 +96,7 @@ class ContentLoader {
         this.animationObserver = animationObserver;
         this.projectGrid = document.getElementById("projects-grid");
         this.skillsGrid = document.querySelector(".skills_grid");
+		this.learndCard = document.querySelector(".learnd-content");
 
         // Execute initialization sequentially to handle observer attachment safely
         this.init();
@@ -104,7 +105,8 @@ class ContentLoader {
     async init() {
         await Promise.all([
             this.loadProjects(),
-            this.loadSkills()
+            this.loadSkills(),
+			this.loadLearnd()
         ]);
     }
 
@@ -139,6 +141,7 @@ class ContentLoader {
 
                                 <a 
                                     class="project_btn" 
+									rel="noopener noreferrer"
                                     href="${project.link}" 
                                     target="${project.target}" 
                                     title="Let's go explore" >
@@ -151,7 +154,6 @@ class ContentLoader {
             });
 
             this.projectGrid.innerHTML = html;
-            
             // Observe the newly created elements
             this.animationObserver?.observe("#projects-grid [data-aos]");
         }
@@ -181,6 +183,11 @@ class ContentLoader {
             let html = "";
 
             skills.forEach(skill => {
+				this.style = `
+					--obj-width: ${skill.progress};
+					width: ${skill.progress};
+				`;
+
                 html += `
                     <div class="skill_box" data-aos="fade-up" title="${skill.title}">
                         <div class="skill-content">
@@ -189,15 +196,15 @@ class ContentLoader {
                         </div>
 
                         <div class="skill-progress">
-                            <div style="width:${skill.progress}"></div>
+                            <div style="${this.style}"></div>
                         </div>
                     </div>
                 `;
-            });
+			});
 
-            this.skillsGrid.innerHTML = html;
-            // Observe the newly created elements
-            this.animationObserver?.observe(".skills_grid [data-aos]");
+			this.skillsGrid.innerHTML = html;
+			// Observe the newly created elements
+			this.animationObserver?.observe(".skills_grid [data-aos]");
         }
         catch (error) {
             console.error("Error: ", error);
@@ -211,7 +218,99 @@ class ContentLoader {
             `;
         }
     }
+
+	async loadLearnd() {
+		if (!this.learndCard) return;
+
+        try {
+            const response = await fetch("JSON/learnd.json");
+            if (!response.ok) {
+                throw new Error("Failed to fetch skills proficiency.");
+            }
+
+            const LearndJSON = await response.json();
+			const selectHTML = `
+				<div class="learnd-controls">
+					<label for="learnd-select">
+						Sort Skills
+					</label>
+
+					<select name="learnd-selector" id="learnd-select">
+						<option value="descending" selected>Decending Proficiency</option>
+						<option value="ascending">Ascending Proficiency</option>
+					</select>
+				</div>
+			`;
+            let html = "";
+
+            LearndJSON.forEach(learnd => {
+                html += `
+                    <div class="learnd-card" data-aos="fade-up" title="${learnd.title}">
+						<div class="learnd-header">
+							<h2>${learnd.heading}</h2>
+							<span>${learnd.advanciy}</span>
+						</div>
+					</div>
+                `;
+			});
+
+			this.learndCard.innerHTML = selectHTML + html;
+			// Observe the newly created elements
+			this.animationObserver?.observe(".learnd-content [data-aos]");
+        }
+        catch (error) {
+            console.error("Error: ", error);
+
+            this.skillsGrid.innerHTML = `
+                <div class="learnd_fallback">
+                    Server is currently down.<br>
+                    <span>Skills are unable to load!</span>
+                    :(
+                </div>
+            `;
+        }
+	}
 }
+
+
+// Learnd section
+class LearnedSorter {
+	constructor() {
+		this.select = document.getElementById("learnd-select");
+		this.container = document.querySelector(".learnd-content");
+
+		if (!this.select || !this.container) return;
+
+		this.select.addEventListener("change", () => {
+			this.sortCards(this.select.value);
+		});
+
+		// Initial sort
+		this.sortCards(this.select.value);
+	}
+
+	sortCards(order) {
+		const levels = {
+			Advance: 3,
+			Intermediate: 2,
+			Beginner: 1
+		};
+
+		const cards = [...this.container.querySelectorAll(".learnd-card")];
+
+		cards.sort((a, b) => {
+			const levelA = levels[a.querySelector("span").textContent.trim()] || 0;
+			const levelB = levels[b.querySelector("span").textContent.trim()] || 0;
+
+			return order === "ascending"
+				? levelA - levelB
+				: levelB - levelA;
+		});
+
+		cards.forEach(card => this.container.appendChild(card));
+	}
+}
+
 
 // Progress Bar Module
 class ProgressBar {
@@ -325,51 +424,64 @@ class ContactDialog {
 		this.line3.setAttribute("y2", 20);
 	}
 
-	handleSubmit(e) {
-		if (!this.dialog) return;
-		e.preventDefault();
+		handleSubmit(e) {
+			if (!this.dialog) return;
+			e.preventDefault();
 
-		const fields = Array.from(this.form.querySelectorAll('input, textarea'));
-		const statusDiv = document.getElementById('form-status') || this.createStatusDiv();
-		let isValid = true;
+			const fields = Array.from(this.form.querySelectorAll('input, textarea'));
+			const statusDiv = document.getElementById('form-status') || this.createStatusDiv();
+			let isValid = true;
 
-		// Clear previous errors
-		fields.forEach((field) => this.clearFieldError(field));
+			// Clear previous errors
+			fields.forEach((field) => this.clearFieldError(field));
 
-		// Validate all fields
-		fields.forEach((field) => {
-			if (!field.checkValidity()) {
-				isValid = false;
-				this.showFieldError(field);
+			// Validate all fields
+			fields.forEach((field) => {
+				if (!field.checkValidity()) {
+					isValid = false;
+					this.showFieldError(field);
+				}
+			});
+
+			if (!isValid) {
+				fields.find((f) => !f.checkValidity())?.focus();
+				return;
 			}
-		});
 
-		if (!isValid) {
-			fields.find((f) => !f.checkValidity())?.focus();
-			return;
-		}
+			statusDiv.textContent = '';
+			statusDiv.classList.remove('error', 'success');
 
-		statusDiv.textContent = '';
-		statusDiv.classList.remove('error', 'success');
+			// --- NEW: Scroll to the bottom of the form smoothly ---
+			this.form.scrollTo({
+				top: this.form.scrollHeight,
+				behavior: 'smooth'
+			});
 
-		// Simulate form submission
-		this.form.style.opacity = '0.6';
-		this.form.style.pointerEvents = 'none';
-
-		setTimeout(() => {
-			statusDiv.textContent = '✓ Message sent successfully! I\'ll get back to you soon.';
-			statusDiv.classList.remove('error');
-			statusDiv.classList.add('success');
+			// Simulate form submission
+			this.form.style.opacity = '0.6';
+			this.form.style.pointerEvents = 'none';
 
 			setTimeout(() => {
-				this.form.reset();
-				this.form.style.opacity = '1';
-				this.form.style.pointerEvents = 'auto';
-				statusDiv.classList.remove('success');
-				this.close();
-			}, 2600);
-		}, 800);
-	}
+				statusDiv.textContent = '✓ Message sent successfully! I\'ll get back to you soon.';
+				statusDiv.classList.remove('error');
+				statusDiv.classList.add('success');
+
+				// --- NEW: Scroll again if the success text height expands the container ---
+				this.form.scrollTo({
+					top: this.form.scrollHeight,
+					behavior: 'smooth'
+				});
+
+				setTimeout(() => {
+					this.form.reset();
+					this.form.style.opacity = '1';
+					this.form.style.pointerEvents = 'auto';
+					statusDiv.classList.remove('success');
+					this.close();
+				}, 2600);
+			}, 800);
+		}
+
 
 	createStatusDiv() {
 		const statusDiv = document.createElement('div');
@@ -508,7 +620,8 @@ document.addEventListener('DOMContentLoaded', () => {
     new ProgressBar();
     new ContactDialog();
     new SmoothScroll();
-    new ContentLoader(animationObserver); // <-- PASS THE OBSERVER HERE
+    new ContentLoader(animationObserver);
+	new LearnedSorter();
     new CustomCursor();
     new ButtonNavigation();
     new WelcomeMessage();
