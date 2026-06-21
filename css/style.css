@@ -1144,12 +1144,14 @@ nav #contact-button:hover {
 }
 
 #learnd-select {
+	appearance: base-select;
 	position: relative;
 	height: fit-content;
 	width: min(460px, 25vw);
-	background: #181e3b;
+	background: hsl(230, 43%, 18%);
+	border: 0.3px solid rgb(10, 104, 211);
 	border-radius: 8px;
-	padding: 0.4em;
+	padding: 0.45em 0.55em;
 	font-size: 1rem;
 	font-family: 
 		system-ui, -apple-system, BlinkMacSystemFont, 
@@ -1157,8 +1159,24 @@ nav #contact-button:hover {
 		'Open Sans', 'Helvetica Neue', sans-serif;
 }
 
+#learnd-select::picker-icon{
+	color: #5675ff;
+}
+
 #learnd-select:hover {
-	scale: 1.02;
+	background: hsl(230, 42%, 16%);
+}
+
+#learnd-select:focus{
+	outline: none;
+}
+
+option {
+	background: inherit;
+}
+
+option:hover {
+	background: hsl(226, 83%, 28%);
 }
 
 .learnd-card {
