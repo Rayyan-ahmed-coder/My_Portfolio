@@ -183,9 +183,9 @@ class ContentLoader {
             let html = "";
 
             skills.forEach(skill => {
-				this.style = `
+				const style = `
 					--obj-width: ${skill.progress};
-					width: ${skill.progress};
+					width: ${parseInt(skill.progress) + `%`};
 				`;
 
                 html += `
@@ -196,7 +196,7 @@ class ContentLoader {
                         </div>
 
                         <div class="skill-progress">
-                            <div style="${this.style}"></div>
+                            <div style="${style || skill.progress}"></div>
                         </div>
                     </div>
                 `;
@@ -236,7 +236,7 @@ class ContentLoader {
 					</label>
 
 					<select name="learnd-selector" id="learnd-select">
-						<option value="descending" selected>Decending Proficiency</option>
+						<option value="descending" selected>Descending Proficiency</option>
 						<option value="ascending">Ascending Proficiency</option>
 					</select>
 				</div>
@@ -244,24 +244,31 @@ class ContentLoader {
             let html = "";
 
             LearndJSON.forEach(learnd => {
+				const percent = parseInt(learnd.percent);
+
                 html += `
-                    <div class="learnd-card" data-aos="fade-up" title="${learnd.title}">
+                    <div class="learnd-card" data-level="${percent}" title="${learnd.title}">
 						<div class="learnd-header">
 							<h2>${learnd.heading}</h2>
-							<span>${learnd.advancity}</span>
+
+							<div class="learnd-grouper">
+								<span>${learnd.advancity}</span>
+								<div class="learnd-percent" style="${`--learnd-bg: ` + learnd.style + `;`}">
+									${percent + "%"}
+								</div>
+							</div>
+
 						</div>
 					</div>
                 `;
 			});
-
 			this.learndCard.innerHTML = selectHTML + html;
-			// Observe the newly created elements
-			this.animationObserver?.observe(".learnd-content [data-aos]");
+			new LearnedSorter();
         }
         catch (error) {
             console.error("Error: ", error);
 
-            this.skillsGrid.innerHTML = `
+            this.learndCard.innerHTML = `
                 <div class="learnd_fallback">
                     Server is currently down.<br>
                     <span>Skills are unable to load!</span>
@@ -290,17 +297,11 @@ class LearnedSorter {
 	}
 
 	sortCards(order) {
-		const levels = {
-			Advance: 3,
-			Intermediate: 2,
-			Beginner: 1
-		};
-
 		const cards = [...this.container.querySelectorAll(".learnd-card")];
 
 		cards.sort((a, b) => {
-			const levelA = levels[a.querySelector("span").textContent.trim()] || 0;
-			const levelB = levels[b.querySelector("span").textContent.trim()] || 0;
+			const levelA = Number(a.dataset.level);
+			const levelB = Number(b.dataset.level);
 
 			return order === "ascending"
 				? levelA - levelB
@@ -621,7 +622,6 @@ document.addEventListener('DOMContentLoaded', () => {
     new ContactDialog();
     new SmoothScroll();
     new ContentLoader(animationObserver);
-	new LearnedSorter();
     new CustomCursor();
     new ButtonNavigation();
     new WelcomeMessage();

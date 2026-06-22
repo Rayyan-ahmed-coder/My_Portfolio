@@ -2,21 +2,29 @@
     {
         "heading": "HTML",
         "advancity": "Advance",
+        "percent": "97%",
+        "style": "linear-gradient(135deg, #35ff3f, #00ff15, #37c756);",
         "title": "Hyper Text Markup Language"
     },
     {
         "heading": "CSS",
         "advancity": "Advance",
+        "percent": "94%",
+        "style": "linear-gradient(135deg, #07E71A, #18C93E)",
         "title": "Cascading Style Sheet"
     },
     {
         "heading": "JavaScript",
         "advancity": "Intermediate",
+        "percent": "56%",
+        "style": "linear-gradient(130deg, #DBE913, #FFE602)",
         "title": "JavaScript"
     },
     {
         "heading": "Python",
         "advancity": "Beginner",
+        "percent": "12%",
+        "style": "linear-gradient(130deg, #DBA904, #dd7615)",
         "title": "Python"
     }
 ]
