@@ -1121,7 +1121,7 @@ nav #contact-button:hover {
 .learnd-content {
 	display: flex;
 	flex-direction: column;
-	gap: 12px;
+	gap: 18px;
 	width: 82vw;
 	background: linear-gradient(hsl(0, 6%, 9%), hsl(0, 4%, 6%));
 	border-radius: 25px;
@@ -1174,11 +1174,19 @@ nav #contact-button:hover {
 	box-shadow: 0 0 0 3px rgba(19, 218, 245, 0.25);
 }
 
-#learnd-select::picker(select) {
+#learnd-select:open::picker(select) {
 	display: flex;
 	flex-direction: column;
 	justify-content: space-between;
-	gap: 12px;
+	gap: 6px;
+}
+
+#learnd-select:open #learnd-select::picker(select) {
+	border: 1px solid hsl(231, 35%, 30%);
+	border-top: none;
+}
+
+#learnd-select::picker(select) {
 	appearance: base-select;
 	padding: 6px 3px;
 	background-color: hsl(230, 43%, 12%);
@@ -1187,25 +1195,27 @@ nav #contact-button:hover {
 	box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5), 
 				0 4px 12px rgba(0, 0, 0, 0.3);
 	margin-top: 6px;
-	animation: dropdownFade 2s cubic-bezier(0.4, 0, 0.2, 1);
+	animation: dropdownFade 0.8s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* 4. Style the menu option rows */
-#learnd-select::picker(select) option {
+#learnd-select::picker(select) option{
 	appearance: base-select;
 	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 	font-size: 18px;
 	font-weight: 500;
-	padding: 10px 14px;
+	padding: 14px 16px;
 	color: #b6f4ff;
-	background-color: transparent;
+	background: transparent;
+	border-bottom: 2px solid hsl(197, 100%, 64%) !important;
 	border-radius: 6px;
 	cursor: pointer;
 	transition: all 0.15s ease;
 }
 
-#learnd-select:open{
-	animation: dropdownFade 1s linear forwards;
+#learnd-select::picker(select) option:hover {
+	transform: translate(4px, 0);
+	background: hsl(253, 100%, 29%);
+	color: #13dbe9;
 }
 
 #learnd-select::picker-icon{
@@ -1242,33 +1252,40 @@ nav #contact-button:hover {
 }
 
 .learnd-card {
-	background: linear-gradient(140deg, hsl(0, 2%, 32%), hsl(0, 4%, 15%));
+	background: linear-gradient(140deg, hsl(225, 20%, 20%), hsl(212, 41%, 24%));
+	box-shadow: 0 3px 12px rgba(1, 44, 163, 0.514);
 	border-radius: 12px;
 	padding: 0.5rem 0.75rem;
-	transition: transform 0.2s ease;
+	transition: 
+		box-shadow 0.6s,
+		transform 0.4s ease;
 }
 
 .learnd-card:hover {
-	transform: translate(10px, 0);
+	transform: translate(16px, 0) scale(1.02);
+	box-shadow: -4px 5px 16px rgba(6, 97, 172, 0.452);
 }
 
 .learnd-header {
 	display: flex;
 	justify-content: space-between;
+	margin-bottom: 8px;
 }
 
-.learnd-content h2{
+.learnd-header h2{
 	display: inline;
 	font-size: 2.5rem;
 	font-weight: 500;
+	color: #d0d8e7;
 	letter-spacing: 0.4px;
+	text-decoration: 2px 3px 12px hsla(207, 60%, 61%, 0.959);
 }
 
 .learnd-grouper {
 	display: flex;
 	flex-direction: row;
 	justify-content: space-between;
-	align-items: flex-end;
+	align-items: center;
 	gap: 10px;
 	width: fit-content;
 	font-size: 1.8rem;
@@ -1281,6 +1298,10 @@ nav #contact-button:hover {
 .learnd-percent {
 	display: inline-block;
 	background: var(--learnd-bg);
+	text-decoration: underline;
+	text-decoration-color: var(--learnd-bg);
+	text-decoration-style: solid;
+	text-underline-offset: 4px;
 	font-size: 2rem;
 	font-weight: 620;
 	filter: contrast(140%);
@@ -1288,6 +1309,31 @@ nav #contact-button:hover {
 	background-clip: text;
 	-webkit-text-fill-color: transparent !important;
 	color: transparent;
+}
+
+.learnd-progress {
+	width: 100%;
+	height: 16px;
+	border-radius: 100vw;
+	border: 1px solid hsl(234, 28%, 58%);
+}
+
+.learnd-progress div{
+	height: 100%;
+	background: var(--learnd-bg);
+	border-radius: inherit;
+	filter: contrast(140%);
+	animation: pulseGlow 3s linear infinite;
+}
+
+@keyframes pulseGlow {
+	0%, 100% {
+		filter: brightness(94%);
+	}
+
+	50% {
+		filter: brightness(102%);
+	}
 }
 
 /* Stats */
@@ -1625,6 +1671,15 @@ footer{
 	text-decoration: underline;
 	text-decoration-color: #c2d3ff;
 	text-underline-offset: 3px;
+}
+
+/* Abbreviation tag */
+abbr {
+	text-decoration: underline;
+	text-decoration-style: dashed;
+	text-decoration-color: #18c7e6;
+	text-decoration-thickness: 1.5px;
+	text-underline-offset: 2.5px;
 }
 
 /* SCROLL ANIMATION */

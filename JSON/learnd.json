@@ -21,6 +21,13 @@
         "title": "JavaScript"
     },
     {
+        "heading": "JSON",
+        "advancity": "Mastered",
+        "percent": "100%",
+        "style": "linear-gradient(130deg, #4EFF08, #31FD16, #2AE012)",
+        "title": "JavaScript Object Notation"
+    },
+    {
         "heading": "Python",
         "advancity": "Beginner",
         "percent": "12%",

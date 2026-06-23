@@ -1,9 +1,9 @@
 [
     {
-        "title": "Modern Landing Page",
-        "description": "A responsive, futuristic landing page with glowing effects and smooth animations.",
+        "title": "Rock Paper Scissors",
+        "description": "A Game of Rock Paper and Scissors width awesome <abbr title='Cascading Style Sheet'>CSS</abbr> and JavaScript",
         "tags": ["HTML", "CSS", "JavaScript"],
-        "link": "https://rayyan-ahmed-coder.github.io/Modern_landing_page/",
+        "link": "https://rayyan-ahmed-coder.github.io/Chess_game/",
         "target": "_blank"
     },
     {

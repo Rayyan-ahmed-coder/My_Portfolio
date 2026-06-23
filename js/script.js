@@ -245,6 +245,9 @@ class ContentLoader {
 
             LearndJSON.forEach(learnd => {
 				const percent = parseInt(learnd.percent);
+				const styles = `
+					--learnd-bg: ${learnd.style};
+					`;
 
                 html += `
                     <div class="learnd-card" data-level="${percent}" title="${learnd.title}">
@@ -253,11 +256,15 @@ class ContentLoader {
 
 							<div class="learnd-grouper">
 								<span>${learnd.advancity}</span>
-								<div class="learnd-percent" style="${`--learnd-bg: ` + learnd.style + `;`}">
+								<div class="learnd-percent" style="${styles}">
 									${percent + "%"}
 								</div>
 							</div>
 
+						</div>
+
+						<div class="learnd-progress" style="${styles}">
+							<div style="width: ${percent + "%"};"></div>
 						</div>
 					</div>
                 `;
