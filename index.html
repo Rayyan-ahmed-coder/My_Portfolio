@@ -216,8 +216,9 @@
 							type="text" 
 							name="name" 
 							id="name" 
-							autocomplete="cc-name"
-							placeholder="Your Name" 
+							autocomplete="name"
+							placeholder="Your name" 
+							aria-required="true" 
 							required
 						>
 						
@@ -226,8 +227,9 @@
 							type="email" 
 							name="email" 
 							id="email" 
-							autocomplete="email""
-							placeholder="Your Email" 
+							autocomplete="email"
+							placeholder="Your Email e.g. email@example.com" 
+							aria-required="true" 
 							required
 						>
 						
@@ -237,11 +239,11 @@
 							id="message" 
 							autocapitalize="sentences" 
 							placeholder="Your Message" 
-							required>
-						</textarea>
+							aria-required="true" 
+							required></textarea>
 						
 						<button class="submit_btn" type="submit">Send Message</button>
-						<div id="form-status" class="form_status" aria-live="polite"></div>
+						<div id="form-status" class="form_status" aria-hidden="true" aria-live="polite"></div>
 					</form>
 				</div>
 			</dialog>
