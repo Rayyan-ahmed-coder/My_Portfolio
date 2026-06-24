@@ -8,7 +8,7 @@
     },
     {
         "title": "Personal Portfolio",
-        "description": "Modern portfolio website.",
+        "description": "Modern and Professional portfolio website.",
         "tags": ["JavaScript", "JSON", "DOM"],
         "link": "https://rayyan-ahmed-coder.github.io/My_Portfolio/",
         "target": "_blank"
@@ -22,7 +22,7 @@
     },
     {
         "title": "To do List Tracker",
-        "description": "A task management app with add/delete features, JSON storage, and modern design.",
+        "description": "A task management app with add/delete features, <abbr title='JavaScript Object Notation'>JSON</abbr> storage, and modern design.",
         "tags": ["JavaScript", "JSON"],
         "link": "https://rayyan-ahmed-coder.github.io/To-do_Tracker/",
         "target": "_blank"

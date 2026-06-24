@@ -212,13 +212,33 @@
 
 					<form id="contact-form" class="contact_box" novalidate>
 						<label for="name">Name:</label>
-						<input type="text" name="name" id="name" placeholder="Your Name" required>
+						<input 
+							type="text" 
+							name="name" 
+							id="name" 
+							autocomplete="cc-name"
+							placeholder="Your Name" 
+							required
+						>
 						
 						<label for="email">Email:</label>
-						<input type="email" name="email" id="email" placeholder="Your Email" required>
+						<input 
+							type="email" 
+							name="email" 
+							id="email" 
+							autocomplete="email""
+							placeholder="Your Email" 
+							required
+						>
 						
 						<label for="message">Send message</label>
-						<textarea name="message" id="message" placeholder="Your Message" required></textarea>
+						<textarea 
+							name="message" 
+							id="message" 
+							autocapitalize="sentences" 
+							placeholder="Your Message" 
+							required>
+						</textarea>
 						
 						<button class="submit_btn" type="submit">Send Message</button>
 						<div id="form-status" class="form_status" aria-live="polite"></div>
@@ -233,6 +253,6 @@
 	<!-- FOOTER -->
 	<footer><p>© 2026 <span class="footer-span">Rayyan Ahmed</span> Portfolio</p></footer>
 
-	<script src="js/script.js"></script>
+	<script src="js/script.js" defer></script>
 </body>
 </html>
