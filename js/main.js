@@ -1,8 +1,7 @@
 // AOS-like Intersection Observer for animations
-class AnimationObserver {
+export class AnimationObserver {
 	constructor() {
-		this.observer = new IntersectionObserver(
-			(entries) => {
+		this.observer = new IntersectionObserver((entries) => {
 				entries.forEach((entry) => {
 					if (entry.isIntersecting) {
 						entry.target.classList.add('show');
@@ -10,7 +9,7 @@ class AnimationObserver {
 					}
 				});
 			},
-			{ threshold: 0.15 }
+			{ threshold: 0.13 }
 		);
 	}
 
@@ -321,7 +320,7 @@ class LearnedSorter {
 
 
 // Progress Bar Module
-class ProgressBar {
+export class ProgressBar {
 	constructor() {
 		this.progressBar = document.getElementById('progress-bar');
 		if (this.progressBar) {
@@ -543,7 +542,7 @@ class SmoothScroll {
 }
 
 // Custom Cursor (Optional - desktop only)
-class CustomCursor {
+export class CustomCursor {
 	constructor() {
 		this.cursor = document.querySelector('.cursor');
 		

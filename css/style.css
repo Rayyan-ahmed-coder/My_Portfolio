@@ -644,16 +644,12 @@ nav #contact-button:hover {
 }
 
 @keyframes widthSizing {
-	0% {
+	0%, 100% {
 		width: 50%;
 	}
 
 	50% {
 		width: 96%;
-	}
-
-	100% {
-		width: 50%;
 	}
 }
 
@@ -1281,8 +1277,8 @@ nav #contact-button:hover {
 
 #progress-bar {
     position: fixed;
-    top:0;
-    left:0;
+    top: 0;
+    left: 0;
     width: 0%;
     height: 4px;
     background: linear-gradient(90deg,var(--cyan),var(--purple));
@@ -1559,9 +1555,9 @@ abbr {
 
 /* SCROLL ANIMATION */
 .hidden{
-	opacity:0;
-	transform:translateY(60px);
-	transition:1s;
+	opacity: 0;
+	transform: translateY(60px);
+	transition: 1s;
 }
 
 .show{
