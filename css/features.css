@@ -67,21 +67,47 @@ header {
 	margin: 1vh auto 10vh;
 }
 
-header h1{
-    background: var(--cyan-blue-gradient);
-    background-clip: text;
-    -webkit-background-clip: text;
-    color: transparent;
-	font-size: clamp(1.25rem + .25vw, 2.5rem + .8vw, 3rem + 1.6vw);
-    font-weight: 430;
-    letter-spacing: 2px;
+header h1 { 
+	position: relative; 
+	background: var(--cyan-blue-gradient); 
+	background-clip: text; 
+	-webkit-background-clip: text; 
+	color: transparent; 
+	font-size: clamp(1.25rem + .25vw, 2.5rem + .8vw, 3rem + 1.6vw); 
+	font-weight: 430; 
+	width: fit-content; 
+	margin: 0 auto; 
+	letter-spacing: 2px; 
+} 
+
+header h1::after { 
+	content: ""; 
+	position: absolute; 
+	bottom: 0; 
+	left: calc((100% - 58%) / 2); 
+	width: 68%; 
+	height: 3px; 
+	background: linear-gradient(90deg, #4ac3d3, #3089e7, #2745ec); 
+	animation: widthsizing 20s linear infinite; 
 }
+
+@keyframes widthsizing { 
+	0%, 100% { 
+		width: 58%; 
+		left: calc((100% - 58%) / 2);
+	} 
+	50% { 
+		width: 94%; 
+		left: calc((100% - 94%) / 2);
+	} 
+}
+
 
 .features-section{
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(320px,1fr));
     gap: 2.5vw;
-	padding: 0 10px;
+	padding: 0 10px 30px;
 }
 
 .features-card {
@@ -107,27 +133,6 @@ header h1{
 	width: fit-content;
 	margin-bottom: .5rem;
 	letter-spacing: .5px;
-}
-
-.features-card h2::after {
-	content: "";
-	position: absolute;
-	bottom: 0;
-	left: 0;
-	width: 68%;
-	height: 3px;
-	background: linear-gradient(90deg, #4ac3d3,  #3089e7, #2745ec);
-	animation: widthSizing 20s linear infinite;
-}
-
-@keyframes widthSizing {
-	0%, 100% {
-		width: 68%;
-	}
-
-	50% {
-		width: 94%;
-	}
 }
 
 .features-card ol{

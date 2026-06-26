@@ -1528,6 +1528,9 @@ textarea {
 
 /* FOOTER */
 footer{
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
 	padding: 2.5rem;
 	text-align: center;
 	color: var(--text);
