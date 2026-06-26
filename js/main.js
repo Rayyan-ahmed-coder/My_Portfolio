@@ -1,5 +1,5 @@
 // AOS-like Intersection Observer for animations
-export class AnimationObserver {
+class AnimationObserver {
 	constructor() {
 		this.observer = new IntersectionObserver((entries) => {
 				entries.forEach((entry) => {
@@ -9,7 +9,9 @@ export class AnimationObserver {
 					}
 				});
 			},
-			{ threshold: 0.13 }
+			{ 
+				threshold: 0.13 
+			}
 		);
 	}
 

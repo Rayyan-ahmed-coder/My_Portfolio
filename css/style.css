@@ -1293,6 +1293,7 @@ nav #contact-button:hover {
     position: fixed;
     pointer-events: none;
     background: rgba(59,130,246,.6);
+	box-shadow: 0 0 35px #57e6ffc5;
     backdrop-filter: blur(5px);
     z-index: 99999999999;
 }
