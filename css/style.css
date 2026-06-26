@@ -843,7 +843,9 @@ nav #contact-button:hover {
 	justify-content: space-around;
 	text-align: center;
 	border: 0.6px solid rgba(162, 165, 172, 0.329);
-	box-shadow: 0 6px 20px hsla(231, 74%, 38%, 0.42);
+	box-shadow: 
+		0 6px 20px hsla(231, 74%, 38%, 0.42),
+		8px 10px 4px hsl(224, 70%, 13%);
 	background: linear-gradient(135deg, rgba(30, 39, 165, 0.08), rgba(59, 130, 246, 0.05));
 	border-radius: 28px;
 	transition: all 0.4s ease;
@@ -868,14 +870,9 @@ nav #contact-button:hover {
         linear-gradient(90deg,
         #27e6ff,#1960f8);
 	filter: brightness(103%);
-	animation: LoadInWidth 0.55s ease-out 261.5ms 1;
-}
-
-@keyframes  LoadInWidth {
-	from {
-		width: 0%;
-		filter: brightness(96%);
-	}
+	animation: 
+		LoadInWidth 1s ease-out 261.5ms 1, 
+		pulseGlow 3s linear infinite;
 }
 
 /* PROJECTS */
@@ -1156,7 +1153,7 @@ nav #contact-button:hover {
 }
 
 .learnd-card {
-	background: linear-gradient(140deg, hsl(225, 20%, 20%), hsl(212, 41%, 24%));
+	background: linear-gradient(165deg, hsl(223, 17%, 33%), hsl(210, 33%, 13%));
 	box-shadow: 0 3px 12px rgba(1, 44, 163, 0.514);
 	border-radius: 12px;
 	padding: 0.5rem 0.75rem;
@@ -1177,7 +1174,7 @@ nav #contact-button:hover {
 	font-weight: 500;
 	color: #d0d8e7;
 	letter-spacing: 0.4px;
-	text-decoration: 2px 3px 12px hsla(207, 60%, 61%, 0.959);
+	text-shadow: 8px 4px 4px hsl(220, 4%, 15%);
 }
 
 .learnd-grouper {
@@ -1215,6 +1212,7 @@ nav #contact-button:hover {
 	height: 16px;
 	border-radius: 100vw;
 	border: 1px solid hsl(234, 28%, 58%);
+	box-shadow: 4px -3px 8px rgb(20, 23, 37);
 }
 
 .learnd-progress div{
@@ -1222,17 +1220,9 @@ nav #contact-button:hover {
 	background: var(--learnd-bg);
 	border-radius: inherit;
 	filter: contrast(140%);
-	animation: pulseGlow 3s linear infinite;
-}
-
-@keyframes pulseGlow {
-	0%, 100% {
-		filter: brightness(94%);
-	}
-
-	50% {
-		filter: brightness(102%);
-	}
+	animation: 
+		LoadInWidth 1s ease-out 261.5ms 1, 
+		pulseGlow 3s linear infinite;
 }
 
 /* Stats */
@@ -1537,6 +1527,11 @@ footer{
 	border-top: 1px solid rgba(255,255,255,.08);
 }
 
+footer a{
+	font-size: 1.15rem;
+	color: #06b6d4;
+}
+
 .footer-span {
 	font-family: "Dancing Script", cursive;
 	font-size: 1.4rem;
@@ -1560,16 +1555,32 @@ abbr {
 /* SCROLL ANIMATION */
 .hidden{
 	opacity: 0;
-	transform: translateY(60px);
-	transition: 1s;
+	transform: translate(-85px, 10px) scale(.85) rotate(-2deg);
+	transition: 0.75s;
 }
 
 .show{
-	opacity:1;
-	transform:translateY(0px);
+	opacity: 1;
+	transform: translate(0, 0) scale(1) rotate(0);
 }
 
 /* KEYFRAMES */
+@keyframes  LoadInWidth {
+	from {
+		width: 0%;
+	}
+}
+
+@keyframes pulseGlow {
+	0%, 100% {
+		filter: brightness(94%);
+	}
+
+	50% {
+		filter: brightness(102%);
+	}
+}
+
 @keyframes floatBlob{
 
 	0%{

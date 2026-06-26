@@ -10,7 +10,7 @@ class AnimationObserver {
 				});
 			},
 			{ 
-				threshold: 0.13 
+				threshold: 0.16
 			}
 		);
 	}
@@ -251,7 +251,7 @@ class ContentLoader {
 					`;
 
                 html += `
-                    <div class="learnd-card" data-level="${percent}" title="${learnd.title}">
+                    <div class="learnd-card" data-aos="fade-up" data-level="${percent}" title="${learnd.title}">
 						<div class="learnd-header">
 							<h2>${learnd.heading}</h2>
 
@@ -272,6 +272,7 @@ class ContentLoader {
 			});
 			this.learndCard.innerHTML = selectHTML + html;
 			new LearnedSorter();
+			this.animationObserver?.observe(".learnd-content [data-aos]");
         }
         catch (error) {
             console.error("Error: ", error);
