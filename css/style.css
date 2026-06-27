@@ -1,4 +1,6 @@
 :root{
+	color-scheme: only light;
+
 	--bg: #050816;
 	--card: rgba(255,255,255,.06);
 	--border: rgba(255,255,255,.08);
@@ -26,7 +28,6 @@
 
 * {
 	/* outline: 2.5px solid #06b6d4; */
-	color-scheme: dark;
 	margin: 0;
 	padding: 0;
 	box-sizing: border-box;
@@ -912,6 +913,7 @@ nav #contact-button:hover {
     display: flex;
     flex-direction: column;
     height: 100%;
+	box-shadow: 9px 12px 40px rgba(14, 70, 224, 0.363);
 	filter: brightness(110%);
 }
 
@@ -1226,11 +1228,11 @@ nav #contact-button:hover {
 }
 
 /* Stats */
-.stats{
+.stats {
     display: grid;
     grid-template-columns: repeat(auto-fit,minmax(220px,1fr));
-    gap: 1.8rem;
-    padding: 3em 8%;
+    gap: 2.5rem;
+    padding: 3em 6%;
 }
 
 .stat {
@@ -1255,10 +1257,11 @@ nav #contact-button:hover {
 }
 
 .stat h2 {
-	letter-spacing: 3px;
+	color: var(--cyan);
     font-size: 3rem;
 	margin-bottom: 4px;
-    color: var(--cyan);
+	text-shadow: 3px 2px 8px rgb(11, 110, 202);
+    letter-spacing: 3px;
 }
 
 .stat p {
@@ -1555,7 +1558,7 @@ abbr {
 /* SCROLL ANIMATION */
 .hidden{
 	opacity: 0;
-	transform: translate(-85px, 10px) scale(.85) rotate(-2deg);
+	transform: translate(-90px, 10px) scale(.8) rotate(-2deg);
 	transition: 0.75s;
 }
 
@@ -1679,8 +1682,8 @@ abbr {
 	.submit_btn:hover{
 		transform: translateY(-6px) scale(1.02);
 		box-shadow: 
-			0 0 40px rgba(8, 174, 216, 0.6),
-			0 0 60px rgba(4, 149, 233, 0.7);
+			0 0 40px rgba(8, 174, 216, 0.534),
+			0 0 60px rgba(4, 149, 233, 0.514);
 	}
 	
 	.learnd-card:hover {

@@ -1,4 +1,6 @@
 :root {
+	color-scheme: only light;
+
 	--white: #ffffff;
 	--text: #a8b4c7;
 	--text-light: #8b93a3;
@@ -17,7 +19,6 @@
 
 * {
 	/* outline: 2.5px solid #06b6d4; */
-	color-scheme: dark;
 	margin: 0;
 	padding: 0;
 	box-sizing: border-box;
@@ -197,6 +198,13 @@ header h1::after {
 .complete{
 	color: #22c55e;
 	font-weight: 700;
+}
+
+footer{
+	text-align: center;
+	font-size: 2.4rem;
+	border-top: 1px solid hsla(189, 51%, 69%, 0.479);
+	padding: 2rem 0;
 }
 
 #progress-bar {

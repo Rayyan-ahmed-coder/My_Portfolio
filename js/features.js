@@ -22,6 +22,34 @@ class AnimationObserver {
 	}
 }
 
+class CurrentTime {
+	constructor() {
+		this.timeElement = document.getElementById(`time`);
+
+		setInterval(() => {
+			this.getTime();
+		}, 0.01);
+	}
+
+	getTime() {
+		const time = new Date();
+		const timeFormatter = time.toLocaleString(`en-US`, {
+			year: "numeric",
+			month: "long",
+			day: "numeric",
+			weekday: "short",
+			hour: "2-digit",
+			minute: "2-digit",
+			second: "2-digit",
+			hour12: true
+		});
+
+		if (this.timeElement) {
+			this.timeElement.textContent = timeFormatter;
+		}
+	}
+}
+
 document.addEventListener("DOMContentLoaded", () => {
     const animationObserver = new AnimationObserver();
     animationObserver.observe('.features-cards'); // Observes static HTML elements
@@ -29,4 +57,5 @@ document.addEventListener("DOMContentLoaded", () => {
     new AnimationObserver(animationObserver);
     new CustomCursor();
     new ProgressBar();
+	new CurrentTime();
 });
