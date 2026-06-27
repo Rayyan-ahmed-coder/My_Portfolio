@@ -99,7 +99,6 @@ class ContentLoader {
         this.skillsGrid = document.querySelector(".skills_grid");
 		this.learndCard = document.querySelector(".learnd-content");
 
-        // Execute initialization sequentially to handle observer attachment safely
         this.init();
     }
 
@@ -155,7 +154,6 @@ class ContentLoader {
             });
 
             this.projectGrid.innerHTML = html;
-            // Observe the newly created elements
             this.animationObserver?.observe("#projects-grid [data-aos]");
         }
         catch (error) {
@@ -204,7 +202,6 @@ class ContentLoader {
 			});
 
 			this.skillsGrid.innerHTML = html;
-			// Observe the newly created elements
 			this.animationObserver?.observe(".skills_grid [data-aos]");
         }
         catch (error) {
@@ -287,9 +284,6 @@ class ContentLoader {
         }
 	}
 }
-
-
-// Learnd section
 class LearnedSorter {
 	constructor() {
 		this.select = document.getElementById("learnd-select");
@@ -320,9 +314,6 @@ class LearnedSorter {
 		cards.forEach(card => this.container.appendChild(card));
 	}
 }
-
-
-// Progress Bar Module
 export class ProgressBar {
 	constructor() {
 		this.progressBar = document.getElementById('progress-bar');
