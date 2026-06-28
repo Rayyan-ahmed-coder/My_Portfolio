@@ -28,7 +28,7 @@ class CurrentTime {
 
 		setInterval(() => {
 			this.getTime();
-		}, 0.01);
+		}, 1000);
 	}
 
 	getTime() {
@@ -50,9 +50,65 @@ class CurrentTime {
 	}
 }
 
+class ContentLoader {
+	constructor() {
+		this.featuresSection = document.querySelector(`.features-section`);
+
+		this.Init();
+	}
+
+	async Init() {
+		await this.LoadFeatures()
+	}
+
+	async LoadFeatures() {
+		if (!this.featuresSection) return;
+
+        try {
+            const response = await fetch("../JSON/features.json");
+
+            if (!response.ok) {
+                throw new Error("Failed to fetch features.");
+            }
+
+            const features = await response.json();
+            let html = "";
+
+            features.forEach(feature => {
+                html += `
+                    <div class="features-card">
+						<h2>${feature.heading}</h2>
+
+						${feature.lists.map(obj => 
+							`<div class="feature-row">
+								<span>✓</span>
+								<p>${obj.lists}</p>
+							</div>`
+						).join(``) }
+					</div>
+                `;
+            });
+
+            this.featuresSection.innerHTML = html;
+            this.animationObserver?.observe(".features-card");
+        }
+        catch (error) {
+            console.error("Error: ", error);
+
+            this.projectGrid.innerHTML = `
+                <div class="fallback">
+                    Server is currently down.<br>
+                    <span>Features are unable to load!</span>
+                    :(
+                </div>
+            `;
+        }
+	}
+}
+
 document.addEventListener("DOMContentLoaded", () => {
     const animationObserver = new AnimationObserver();
-    animationObserver.observe('.features-cards'); // Observes static HTML elements
+    animationObserver.observe('.features-card'); // Observes static HTML elements
 
     new AnimationObserver(animationObserver);
     new CustomCursor();

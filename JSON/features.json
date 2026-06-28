@@ -1,0 +1,17 @@
+[
+    {
+        "heading": "Navigation Features",
+		"lists": [
+            "Desktop / Laptop hover animations", 
+            "Smooth scroll navigation", 
+            "Current section highlighting", 
+            "Responsive navigation layouts", 
+            "Mobile menu support", 
+            "Keyboard navigation support", 
+            "Accessible focus indicators", "Back-to-top button"
+        ]
+    },
+    {
+        "heading": ""
+    }
+]

@@ -63,28 +63,52 @@ body{
 		BlinkMacSystemFont, "Segoe UI",sans-serif;
 }
 
+body::before{
+	content:"";
+	position: fixed;
+	inset: 0;
+	background:
+		radial-gradient(
+			circle at 20% 20%,
+			rgba(26,210,243,.12),
+			transparent 30%
+		),
+		radial-gradient(
+			circle at 80% 60%,
+			rgba(145,59,226,.15),
+			transparent 35%
+		);
+	pointer-events: none;
+	z-index: -1;
+}
+
 header {
 	text-align: center;
 	margin: 1vh auto 10vh;
 }
 
-header h1 { 
+.hero h1{ 
 	position: relative; 
 	background: var(--cyan-blue-gradient); 
 	background-clip: text; 
 	-webkit-background-clip: text; 
 	color: transparent; 
+	font-family: 
+		'Gill Sans', 'Gill Sans MT', Calibri, 
+		'Trebuchet MS', sans-serif;
 	font-size: clamp(1.25rem + .25vw, 2.5rem + .8vw, 3rem + 1.6vw); 
-	font-weight: 430; 
+	font-weight: 400; 
 	width: fit-content; 
-	margin: 0 auto; 
-	letter-spacing: 2px; 
+	padding: 0 6px;
+	margin: 0 auto 13vh; 
+	letter-spacing: 4px; 
+	line-height: 1.55;
 } 
 
-header h1::after { 
+.hero h1::after { 
 	content: ""; 
 	position: absolute; 
-	bottom: 0; 
+	bottom: -4px; 
 	left: calc((100% - 58%) / 2); 
 	width: 68%; 
 	height: 3px; 
@@ -103,27 +127,19 @@ header h1::after {
 	} 
 }
 
-
 .features-section{
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px,1fr));
-    gap: 2.5vw;
-	padding: 0 10px 30px;
+	display: flex;
+	flex-direction: column;
+	gap: 0;
+	background: hsl(251, 73%, 9%);
+	border-radius: 24px;
 }
 
 .features-card {
-    background:
-        linear-gradient(145deg,
-        rgba(255,255,255,.04), rgba(255,255,255,.02));
-	backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: .4px solid rgba(120, 182, 206, 0.459);
-    border-radius: 18px;
+	background: transparent;
+	border: 3px solid rgba(24, 16, 143, 0.733);
+	border-radius: inherit;
     padding: 1.4rem;
-    transition:
-        transform .3s ease,
-        border-color .3s ease,
-        box-shadow .3s ease;
 }
 
 .features-card h2{
@@ -143,45 +159,49 @@ header h1::after {
     gap: .55rem;
 }
 
-.features-card li{
-    color: var(--text);
-    transition:
-        color .15s ease,
-        transform .25s ease;
-}
-
-.features-card ol li::marker{
-	color: hsl(212, 100%, 60%);
-	font-weight: 600;
+.feature-row{
+	display: flex;
+	align-items: center;
+	gap: 1rem;
+	padding: 1rem 0;
+	border-bottom: 1px solid rgba(255,255,255,.06);
 }
 
 .stats {
     display: flex;
     justify-content: flex-start;
 	align-items: center;
-    gap: 2rem;
+    gap: 1.5rem;
 	width: 100%;
-	padding: 0 5vw;
-    margin-bottom: 2rem;
+	padding: 0;
+    margin-bottom: 2vw;
 }
 
-.stats div{
+.stats div {
 	display: flex;
 	align-items: flex-end;
-	flex-direction: row;
-	gap: .75rem;
+	flex-flow: row wrap;
+	gap: .25rem;
 }
 
-.stats div h3 {
-	display: inline;
-	font-size: 1.5rem;
-	font-weight: 500;
-	color: var(--cyan);
+.stats div:has(h3) {
+	background-color: #121f57;
+	border-radius: 18px;
+	padding: .2rem .5rem;
+}
+
+.stats h3{
+	font-size: clamp(2rem, 1rem + 3vw, 4.25rem);
+	background: var(--premium-gradient);
+	background-clip: text;
+	-webkit-background-clip: text;
+	color: transparent;
 }
 
 .stats div p{
+	align-self: center;
 	display: inline;
-	font-size: 1.25rem;
+	font-size: 1.5rem;
 	color: #d1f4ff;
 }
 
@@ -193,6 +213,14 @@ header h1::after {
     border: 1px solid rgba(34,197,94,.3);
 	width: fit-content;
     margin: 0 0 1rem auto;
+}
+
+.quote{
+	text-align: center;
+	padding: 2rem;
+	font-size: clamp(1.5rem,2vw,3rem);
+	font-weight: 300;
+	opacity: .85;
 }
 
 .complete{
@@ -233,10 +261,10 @@ footer{
 /* Observer classes */
 .features-card.hidden {
     opacity: 0;
-    transform: translate(-35px, 12px);
+    transform: translate(-500px, 5px);
 	transition:
         opacity .7s ease,
-        transform .7s ease;
+        transform .5s ease;
 }
 
 .features-card.show {
@@ -245,30 +273,18 @@ footer{
 }
 
 @media (hover: hover) {
-	.features-card:hover{
-		transform: translateY(-6px);
-		border-color: rgba(59,130,246,.5);
-		box-shadow: 0 10px 30px rgba(0,0,0,.35);
-	}
-
-	.features-card li:hover{
+	.features-row p:hover{
 		color: white;
 		transform: translateX(12px) scale(1.06);
 	}
 }
 
 @media (hover: none) {
-	.features-card li{
+	.features-row p{
 		color: white;
 	}
 
-	.features-card:active{
-		transform: translateY(-6px);
-		border-color: rgba(59,130,246,.5);
-		box-shadow: 0 10px 30px rgba(0,0,0,.35);
-	}
-
-	.features-card li:active{
+	.feature-row p:active{
 		transform: translateX(5px);
 	}
 }
