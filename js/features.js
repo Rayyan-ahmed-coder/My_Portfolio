@@ -79,12 +79,12 @@ class ContentLoader {
                     <div class="features-card">
 						<h2>${feature.heading}</h2>
 
-						${feature.lists.map(obj => 
-							`<div class="feature-row">
+						${feature.lists.map(list => `
+							<div class="feature-row">
 								<span>✓</span>
-								<p>${obj.lists}</p>
-							</div>`
-						).join(``) }
+								<p>${list}</p>
+							</div>
+						`).join("")}
 					</div>
                 `;
             });
@@ -113,5 +113,6 @@ document.addEventListener("DOMContentLoaded", () => {
     new AnimationObserver(animationObserver);
     new CustomCursor();
     new ProgressBar();
+	new ContentLoader();
 	new CurrentTime();
 });

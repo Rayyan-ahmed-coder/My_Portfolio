@@ -8,10 +8,30 @@
             "Responsive navigation layouts", 
             "Mobile menu support", 
             "Keyboard navigation support", 
-            "Accessible focus indicators", "Back-to-top button"
-        ]
+            "Accessible focus indicators", "Back-to-top button"]
     },
     {
-        "heading": ""
+        "heading": "Responsive Design Features",
+        "lists": [
+				"Clamp font sizing",
+				"Viewport unit sizing",
+				"Device-specific layouts",
+				"Mobile optimization",
+				"Tablet optimization",
+				"Large screen optimization",
+				"Landscape orientation support",
+				"Touch-friendly controls"]
+    },
+    {
+        "heading": "Animation Features</h2>",
+        "lists": [
+				"Scroll reveal animations",
+				"Fade-in effects",
+				"Slide-in transitions",
+				"Hover transformations",
+				"Custom cursor animations",
+				"Button interaction effects",
+				"Card hover effects",
+				"Smooth state transitions"]
     }
 ]
