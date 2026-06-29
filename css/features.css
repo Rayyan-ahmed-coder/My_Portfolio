@@ -93,15 +93,12 @@ header {
 	background-clip: text; 
 	-webkit-background-clip: text; 
 	color: transparent; 
-	font-family: 
-		'Gill Sans', 'Gill Sans MT', Calibri, 
-		'Trebuchet MS', sans-serif;
 	font-size: clamp(1.25rem + .25vw, 2.5rem + .8vw, 3rem + 1.6vw); 
-	font-weight: 400; 
+	font-weight: 500; 
 	width: fit-content; 
 	padding: 0 6px;
-	margin: 0 auto 13vh; 
-	letter-spacing: 4px; 
+	margin: 0 auto 11vw; 
+	letter-spacing: 2px; 
 	line-height: 1.55;
 } 
 
@@ -137,7 +134,8 @@ header {
 
 .features-card {
 	background: transparent;
-	border: 3px solid rgba(24, 16, 143, 0.733);
+	border: 3px solid rgba(23, 17, 105, 0.11);
+	border-radius: inherit;
     padding: 1.4rem;
 }
 
@@ -155,19 +153,19 @@ header {
 	display: flex;
 	align-items: center;
 	gap: 1rem;
-	padding: 1rem 0;
-	border-bottom: 1px solid rgba(18, 66, 168, 0.377);
+	padding: .3em 0;
+	border-bottom: 1px solid rgba(18, 66, 168, 0.445);
 }
 
 .feature-row span{
 	color: hsl(142, 100%, 64%);
 	font-weight: 900;
-	transform: scale(1.1);
+	transform: scale(1.2);
 }
 
 .feature-row p{
 	color: var(--text);
-	font-size: clamp(.75rem, 1rem + .6vw, 2.25rem);
+	font-size: clamp(.75rem, .85rem + .6vw, 2.25rem);
 }
 
 .stats {
@@ -190,11 +188,11 @@ header {
 .stats div:has(h3) {
 	background-color: #121f57;
 	border-radius: 18px;
-	padding: .2rem .5rem;
+	padding: .2em .75em;
 }
 
 .stats h3{
-	font-size: clamp(2rem, 1rem + 3vw, 4.25rem);
+	font-size: clamp(1.5rem, .75rem + 3vw, 4.25rem);
 	background: var(--premium-gradient);
 	background-clip: text;
 	-webkit-background-clip: text;
@@ -220,7 +218,7 @@ header {
 
 .quote{
 	text-align: center;
-	padding: 2rem;
+	padding: 2em;
 	font-size: clamp(1.5rem,2vw,3rem);
 	font-weight: 300;
 	opacity: .85;
@@ -235,6 +233,7 @@ footer{
 	text-align: center;
 	font-size: 2.4rem;
 	border-top: 1px solid hsla(189, 51%, 69%, 0.479);
+	background: rgba(5, 10, 70, 0.568);
 	padding: 2rem 0;
 }
 

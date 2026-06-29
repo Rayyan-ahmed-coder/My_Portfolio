@@ -23,7 +23,7 @@
 				"Touch-friendly controls"]
     },
     {
-        "heading": "Animation Features</h2>",
+        "heading": "Animation Features",
         "lists": [
 				"Scroll reveal animations",
 				"Fade-in effects",
@@ -33,5 +33,92 @@
 				"Button interaction effects",
 				"Card hover effects",
 				"Smooth state transitions"]
+    },
+    {
+        "heading": "Performance Features",
+        "lists": [
+				"Optimized image loading",
+				"Preloaded CSS files",
+                "Preload icons",
+                "Preload fonts",
+				"Deferred JavaScript loading",
+				"Efficient DOM updates",
+				"Minimal reflows and repaints",
+				"Reusable JavaScript classes",
+				"Lightweight animations",
+				"Performance monitoring"]
+    },
+    {
+        "heading": "User Experience Features",
+        "lists": [
+				"Reading progress bar",
+				"Interactive custom cursor",
+				"Visual feedback on interactions",
+				"Consistent spacing system",
+				"Modern UI design",
+				"Gradient accents",
+				"Accessible color contrast",
+				"Smooth scrolling experience"]
+    },
+    {
+        "heading": "Accessibility Features",
+        "lists": [
+				"Semantic HTML structure",
+				"ARIA attributes support",
+				"Keyboard accessibility",
+				"Screen reader friendly content",
+				"Focus management",
+				"Accessible form labels",
+				"Reduced motion compatibility",
+				"Proper text hierarchy"]
+    },
+    {
+        "heading": "JavaScript Features",
+        "lists": [
+				"Modular ES6 architecture",
+				"Reusable classes",
+				"Intersection Observer animations",
+				"Dynamic DOM manipulation",
+				"Event delegation",
+				"Custom utility functions",
+				"Object-oriented design",
+				"JSON-powered content loading"]
+    },
+    {
+        "heading": "Project Showcase Features",
+        "lists": [
+				"Project filtering system",
+				"Technology badges",
+				"Live demo links",
+				"GitHub repository links",
+				"Project descriptions",
+				"Project screenshots",
+				"Featured projects section",
+				"Project search functionality"]
+    },
+    {
+        "heading": "Contact Features",
+		"lists": [
+				"Interactive contact form",
+				"Form validation",
+				"Social media links",
+				"Email integration",
+				"Success / error feedback",
+				"Dialog-based contact window",
+                "Label input accessibilities",
+				"Accessible form controls",
+				"Spam prevention support"]
+    },
+    {
+        "heading": "Future Features",
+        "lists": [
+				"Dark / light mode toggle",
+				"Multi-language support",
+				"Theme customization",
+				"Blog and commenting system",
+				"Interactive statistics dashboard",
+				"Achievement system",
+				"Portfolio analytics",
+				"Progressive Web App support"]
     }
 ]

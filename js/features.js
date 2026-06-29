@@ -75,13 +75,16 @@ class ContentLoader {
             let html = "";
 
             features.forEach(feature => {
+				const Check = 
+					String(feature.heading) === "Future Features"? "-&gt;" : "✓";
+
                 html += `
                     <div class="features-card">
 						<h2>${feature.heading}</h2>
 
 						${feature.lists.map(list => `
 							<div class="feature-row">
-								<span class="complete">✓</span>
+								<span class="complete">${Check}</span>
 								<p>${list}</p>
 							</div>
 						`).join("")}
