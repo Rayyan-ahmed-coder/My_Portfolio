@@ -170,6 +170,7 @@ header {
 
 .stats {
     display: flex;
+	flex-direction: row;
     justify-content: flex-start;
 	align-items: center;
     gap: 1.5rem;
@@ -178,20 +179,27 @@ header {
     margin-bottom: 2vw;
 }
 
-.stats div {
-	display: flex;
-	align-items: flex-end;
-	flex-flow: row wrap;
-	gap: .25rem;
+.stats-wrapper{
+	width: 100%;
 }
 
-.stats div:has(h3) {
+.stats-wrapper {
+	display: flex;
+	align-items: flex-end;
+	flex-direction: row;
+	gap: 1.25rem;
+}
+
+.stats-wrapper div:has(h3) {
+	display: flex;
+	flex-flow: row wrap;
+	gap: .25rem;
 	background-color: #121f57;
 	border-radius: 18px;
 	padding: .2em .75em;
 }
 
-.stats h3{
+.stats-wrapper h3{
 	font-size: clamp(1.5rem, .75rem + 3vw, 4.25rem);
 	background: var(--premium-gradient);
 	background-clip: text;
@@ -199,14 +207,14 @@ header {
 	color: transparent;
 }
 
-.stats div p{
+.stats-wrapper div p{
 	align-self: center;
 	display: inline;
 	font-size: 1.5rem;
 	color: #d1f4ff;
 }
 
-.status-banner{
+.status-banner {
 	justify-self: flex-end;
     padding: 1rem;
     border-radius: 12px;
@@ -288,5 +296,16 @@ footer{
 
 	.feature-row p:active{
 		transform: translateX(5px);
+	}
+}
+
+/* Responsiveness */
+@media (max-width: 625px) {
+	.stats {
+		flex-direction: column;
+	}
+
+	.status-banner {
+		margin: 0 auto 1rem;
 	}
 }
