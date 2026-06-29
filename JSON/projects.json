@@ -24,7 +24,7 @@
         "title": "To do List Tracker",
         "description": "A task management app with add/delete features, <abbr title='JavaScript Object Notation'>JSON</abbr> storage, and modern design.",
         "tags": ["JavaScript", "JSON"],
-        "link": "https://rayyan-ahmed-coder.github.io/To-do_Tracker/",
+        "link": "html/To-do_Tracker.html",
         "target": "_blank"
     }
 ]
