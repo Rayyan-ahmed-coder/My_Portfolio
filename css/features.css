@@ -132,39 +132,42 @@ header {
 	flex-direction: column;
 	gap: 0;
 	background: hsl(251, 73%, 9%);
-	border-radius: 24px;
+	border-radius: 34px;
 }
 
 .features-card {
 	background: transparent;
 	border: 3px solid rgba(24, 16, 143, 0.733);
-	border-radius: inherit;
     padding: 1.4rem;
 }
 
 .features-card h2{
 	position: relative;
-	font-size: clamp(1rem + 0.6vw, 1.4rem + 1vw, 1.8rem + 1.3vw);
+	font-size: clamp(1rem + 0.6vw, 1.25rem + 2vw, 1.8rem + 1.3vw);
 	font-weight: 500;
-	color: hsl(195, 98%, 46%);
+	color: hsl(195, 83%, 55%);
 	width: fit-content;
 	margin-bottom: .5rem;
 	letter-spacing: .5px;
 }
 
-.features-card ol{
-    margin-top: .75rem;
-    display: flex;
-    flex-direction: column;
-    gap: .55rem;
-}
-
-.feature-row{
+.feature-row {
 	display: flex;
 	align-items: center;
 	gap: 1rem;
 	padding: 1rem 0;
-	border-bottom: 1px solid rgba(255,255,255,.06);
+	border-bottom: 1px solid rgba(18, 66, 168, 0.377);
+}
+
+.feature-row span{
+	color: hsl(142, 100%, 64%);
+	font-weight: 900;
+	transform: scale(1.1);
+}
+
+.feature-row p{
+	color: var(--text);
+	font-size: clamp(.75rem, 1rem + .6vw, 2.25rem);
 }
 
 .stats {
@@ -224,7 +227,7 @@ header {
 }
 
 .complete{
-	color: #22c55e;
+	color: #17ce5a;
 	font-weight: 700;
 }
 

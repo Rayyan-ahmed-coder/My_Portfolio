@@ -81,7 +81,7 @@ class ContentLoader {
 
 						${feature.lists.map(list => `
 							<div class="feature-row">
-								<span>✓</span>
+								<span class="complete">✓</span>
 								<p>${list}</p>
 							</div>
 						`).join("")}
