@@ -187,7 +187,7 @@ header {
 	display: flex;
 	align-items: flex-end;
 	flex-direction: row;
-	gap: 1.25rem;
+	gap: 2vw;
 }
 
 .stats-wrapper div:has(h3) {
