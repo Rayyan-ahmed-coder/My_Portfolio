@@ -533,7 +533,7 @@ nav #contact-button:hover {
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	padding: 0.8em;
+	padding: .8em;
 	border-radius: 42%;
 	background:
 		conic-gradient(from 0deg,
@@ -565,7 +565,7 @@ nav #contact-button:hover {
 	border: 3px solid rgba(37, 226, 226, 0.788);
 	border-radius: 50%;
 	background: #141b31;
-	padding: 0.2em 0.45em;
+	padding: .1em .55em;
 	font-size: clamp(calc(5rem + 2vw), calc(13rem + 1vw), 25vw);
 	font-weight: 600;
 	box-shadow: 

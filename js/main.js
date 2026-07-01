@@ -58,12 +58,10 @@ class NavigationModule {
 			});
 		});
 
-		// Update active link on scroll
 		window.addEventListener('scroll', () => {
 			window.requestAnimationFrame(() => this.updateActiveLink());
 		}, { passive: true });
 		
-		// Initial active link
 		this.updateActiveLink();
 	}
 
