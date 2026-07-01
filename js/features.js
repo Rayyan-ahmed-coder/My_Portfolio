@@ -81,7 +81,7 @@ class ContentLoader {
 						<h2>${feature.heading}</h2>
 						${feature.lists.map(list => `
 							<div class="feature-row">
-								<span class="complete">${String(feature.heading) === "Future Features"? "-&gt;" : "✓"}</span>
+								<div class="completion">${String(feature.heading) === "Future Features"? "<span>-&gt;</span>" : "✓"}</div>
 								<p>${list}</p>
 							</div>
 						`).join("")}

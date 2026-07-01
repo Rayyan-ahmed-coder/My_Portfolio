@@ -256,9 +256,14 @@ header {
 	opacity: .85;
 }
 
-.complete{
+.completion, .complete {
 	color: #17ce5a;
 	font-weight: 700;
+}
+
+.completion span {
+	color: #819092;
+	font-weight: 800;
 }
 
 footer{
@@ -271,8 +276,8 @@ footer{
 
 #progress-bar {
     position: fixed;
-    top:0;
-    left:0;
+    top: 0;
+    left: 0;
     width: 0%;
     height: 4px;
     background: linear-gradient(90deg,var(--cyan),var(--purple));
