@@ -560,6 +560,7 @@ nav #contact-button:hover {
 	justify-content: center;
 	align-items: center;
 	text-align: center;
+	max-height: 100vh;
 	height: 100%;
 	width: 100%;
 	border: 3px solid rgba(37, 226, 226, 0.788);
