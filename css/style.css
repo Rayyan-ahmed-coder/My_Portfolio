@@ -48,8 +48,6 @@ body {
 		'Helvetica Neue', sans-serif;
 	background: linear-gradient(135deg,#050816,#0f172a,#111827);
 	color: var(--white);
-	max-height: 100vh;
-	height: 100vh;
 	width: 100vw;
 	overflow-x: hidden !important;
 	overscroll-behavior: none !important;
