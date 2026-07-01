@@ -1,24 +1,27 @@
-// AOS-like Intersection Observer for animations
 class AnimationObserver {
 	constructor() {
-		this.observer = new IntersectionObserver((entries) => {
+		if ('IntersectionObserver' in window) {
+			this.observer = new IntersectionObserver((entries) => {
 				entries.forEach((entry) => {
 					if (entry.isIntersecting) {
 						entry.target.classList.add('show');
 						this.observer.unobserve(entry.target);
 					}
 				});
-			},
-			{ 
-				threshold: 0.16
-			}
-		);
+			}, { threshold: 0.16 });
+		} else {
+			this.observer = null;
+		}
 	}
 
 	observe(selector) {
 		document.querySelectorAll(selector).forEach((el) => {
 			el.classList.add('hidden');
-			this.observer.observe(el);
+			if (this.observer) {
+				this.observer.observe(el);
+			} else {
+				el.classList.add('show');
+			}
 		});
 	}
 }
@@ -56,7 +59,9 @@ class NavigationModule {
 		});
 
 		// Update active link on scroll
-		window.addEventListener('scroll', () => this.updateActiveLink(), { passive: true });
+		window.addEventListener('scroll', () => {
+			window.requestAnimationFrame(() => this.updateActiveLink());
+		}, { passive: true });
 		
 		// Initial active link
 		this.updateActiveLink();
@@ -103,18 +108,26 @@ class ContentLoader {
     }
 
     async init() {
-        await Promise.all([
-            this.loadProjects(),
-            this.loadSkills(),
-			this.loadLearnd()
-        ]);
+		const runContentLoad = () => {
+			Promise.all([
+				this.loadProjects(),
+				this.loadSkills(),
+				this.loadLearnd()
+			]).catch((error) => console.error('Portfolio content load failed:', error));
+		};
+
+		if ('requestIdleCallback' in window) {
+			window.requestIdleCallback(runContentLoad, { timeout: 1000 });
+		} else {
+			window.setTimeout(runContentLoad, 250);
+		}
     }
 
     async loadProjects() {
         if (!this.projectGrid) return;
 
         try {
-            const response = await fetch("JSON/projects.json");
+            const response = await fetch("JSON/projects.json", { cache: "force-cache" });
 
             if (!response.ok) {
                 throw new Error("Failed to fetch projects.");
@@ -173,7 +186,7 @@ class ContentLoader {
         if (!this.skillsGrid) return;
 
         try {
-            const response = await fetch("JSON/skills.json");
+            const response = await fetch("JSON/skills.json", { cache: "force-cache" });
             if (!response.ok) {
                 throw new Error("Failed to fetch skills.");
             }
@@ -221,7 +234,7 @@ class ContentLoader {
 		if (!this.learndCard) return;
 
         try {
-            const response = await fetch("JSON/learnd.json");
+            const response = await fetch("JSON/learnd.json", { cache: "force-cache" });
             if (!response.ok) {
                 throw new Error("Failed to fetch skills proficiency.");
             }
@@ -549,11 +562,16 @@ export class CustomCursor {
 	}
 
 	init() {
-		window.addEventListener('mousemove', (e) => {
-			this.cursor.style.display = `block`;
-			this.cursor.style.transform = 
-				`translate(${e.clientX - 6}px, ${e.clientY - 3}px)`;
-		});
+		let rafId = 0;
+		const onMouseMove = (e) => {
+			if (rafId) window.cancelAnimationFrame(rafId);
+			rafId = window.requestAnimationFrame(() => {
+				this.cursor.style.display = 'block';
+				this.cursor.style.transform = `translate(${e.clientX - 6}px, ${e.clientY - 3}px)`;
+			});
+		};
+
+		window.addEventListener('mousemove', onMouseMove, { passive: true });
 
 		// Add interactive states
 		document.querySelectorAll('a, button').forEach((el) => {
