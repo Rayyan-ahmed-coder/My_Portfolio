@@ -545,58 +545,80 @@ class SmoothScroll {
 		});
 	}
 }
-
-// Custom Cursor (Optional - desktop only)
 export class CustomCursor {
-	constructor() {
-		this.cursor = document.querySelector('.cursor');
-		
-		// Only enable on desktop
-		if (this.cursor && window.matchMedia('(pointer: fine)').matches) {
-			this.init();
-		} else if (this.cursor) {
-			this.cursor.style.display = 'none';
-		}
-	}
+  constructor() {
+    if (window.matchMedia('(pointer: fine)').matches) {
+      this.createCursorElement();
+      this.init();
+    }
+  }
 
-	init() {
-		let rafId = 0;
-		const onMouseMove = (e) => {
-			if (rafId) window.cancelAnimationFrame(rafId);
-			rafId = window.requestAnimationFrame(() => {
-				this.cursor.style.display = 'block';
-				this.cursor.style.transform = `translate(${e.clientX - 6}px, ${e.clientY - 3}px)`;
-			});
-		};
+  createCursorElement() {
+    this.cursor = document.createElement('div');
+    this.cursor.className = 'cursor';
+    
+    Object.assign(this.cursor.style, {
+      position: 'fixed',
+      top: '0',
+      left: '0',
+      pointerEvents: 'none',
+      display: 'none',
+      willChange: 'transform'
+    });
+    document.body.appendChild(this.cursor);
+  }
 
-		window.addEventListener('mousemove', onMouseMove, { passive: true });
+  init() {
+    let mouseX = 0;
+    let mouseY = 0;
+    let currentX = 0;
+    let currentY = 0;
+    let isMoving = false;
 
-		// Add interactive states
-		document.querySelectorAll('a, button').forEach((el) => {
-			el.addEventListener('mouseenter', () => this.cursor?.classList.add('active'));
-			el.addEventListener('mouseleave', () => this.cursor?.classList.remove('active'));
-		});
-	}
+    const onMouseMove = (e) => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+
+      if (!isMoving) {
+        isMoving = true;
+        this.cursor.style.display = 'block';
+        this.tick();
+      }
+    };
+
+    window.addEventListener('mousemove', onMouseMove, { passive: true })
+    this.tick = () => {
+      // Adjust the 0.15 multiplier to make the cursor follow tighter (e.g., 0.3) or looser (e.g., 0.08)
+      currentX += (mouseX - currentX) * 1.5;
+      currentY += (mouseY - currentY) * 1.5;
+      const offsetX = currentX - 6;
+      const offsetY = currentY - 3;
+      this.cursor.style.transform = `translate3d(${offsetX}px, ${offsetY}px, 0)`;
+      window.requestAnimationFrame(this.tick);
+    };
+
+    document.addEventListener('mouseover', (e) => {
+      if (e.target.closest('a, button, .interactive')) {
+        this.cursor.classList.add('active');
+      }
+    });
+
+    document.addEventListener('mouseout', (e) => {
+      if (e.target.closest('a, button, .interactive')) {
+        this.cursor.classList.remove('active');
+      }
+    });
+  }
 }
 
-// Button Navigation
 class ButtonNavigation {
 	constructor() {
 		const hireBtn = document.getElementById('hire-btn');
 		const projectsBtn = document.getElementById('projects-btn');
-
-		hireBtn?.addEventListener('click', () => {
-			document.getElementById('contact-button')?.click();
-		});
-
-		projectsBtn?.addEventListener('click', () => {
-			document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-		});
+		hireBtn?.addEventListener('click', () => {document.getElementById('contact-button')?.click();});
+		projectsBtn?.addEventListener('click', () => {document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth', block: 'start' });});
 	}
 }
-
-
-// Console Welcome Message
 class WelcomeMessage {
 	constructor() {
 		this.log();
@@ -616,8 +638,6 @@ class WelcomeMessage {
 	}
 }
 
-
-// Utility: Debounce
 function debounce(func, delay) {
 	let timeoutId;
 	return function (...args) {
@@ -626,13 +646,9 @@ function debounce(func, delay) {
 	};
 }
 
-// INITIALIZATION
-// INITIALIZATION
 document.addEventListener('DOMContentLoaded', () => {
-    // Initialize all modules
     const animationObserver = new AnimationObserver();
     animationObserver.observe('[data-aos]'); // Observes static HTML elements
-
     new NavigationModule();
     new ProgressBar();
     new ContactDialog();
