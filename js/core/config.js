@@ -1,0 +1,9 @@
+export const CONFIG = Object.freeze({
+    HEADER_HEIGHT: 76,
+    MOBILE_BREAKPOINT: 850,
+    OBSERVER_THRESHOLD: 0.15,
+    OBSERVER_ROOT_MARGIN: "0px 0px -80px",
+    STORAGE_THEME_KEY: "portfolio-theme",
+    SCROLL_TICK_RATE: 16,
+    ACTIVE_SECTION_OFFSET: 180
+});

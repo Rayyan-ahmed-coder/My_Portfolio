@@ -1,0 +1,18 @@
+[
+    {
+        "main": true,
+        "number": 1,
+        "preview": [
+            "CALCULATOR",
+            "01 + 01"
+        ],
+        "type": "WEB APPLICATION",
+        "content": {
+            "heading": "Calculator",
+            "description": 
+                "A responsive calculator built with vanilla HTML, CSS and JavaScript."
+        },
+        "tags": ["HTML", "CSS", "JavaScript"],
+        "link": "https://rayyan-ahmed-coder.github.io/Calculator/"
+    }
+]
