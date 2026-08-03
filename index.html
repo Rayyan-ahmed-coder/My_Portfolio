@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,15 +14,28 @@
     <meta property="og:description" content="Frontend developer building fast, modern and interactive web experiences.">
     <!-- <meta property="og:image" content="/assets/images/og-image.png"> -->
     <title>Rayyan Khan — Frontend Developer</title>
-    <link rel="icon" href="./assets/icons/favicon.jfif" type="image/jpeg" fetchpriority = "high">
-    <link rel="preload" href="./css/style.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <link rel="preload" href="./css/animations.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <link rel="preload" href="./css/responsive.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <link rel="stylesheet" href="./css/style.css" fetchpriority = "high">
-    <link rel="stylesheet" href="./css/animations.css" fetchpriority = "low">
-    <link rel="stylesheet" href="./css/responsive.css" fetchpriority = "high">
+    <script>
+        (function() {
+        // Must match your CONFIG.STORAGE_THEME_KEY name
+        const key = '__portfolio_theme__'; 
+        try {
+            const saved = localStorage.getItem(key);
+            const theme = (saved === 'dark' || saved === 'light') ? saved : 
+                        (window.matchMedia('(prefers-color-scheme: dark)').matches? 'dark' : 'light');
+            document.documentElement.dataset.theme = theme;
+            document.documentElement.style.colorScheme = theme;
+        } catch (e) {}
+        })();
+    </script>
+    <link rel="icon" href="./assets/icons/favicon.png" type="image/png" fetchpriority="high">
+    <link rel="stylesheet" href="./css/style.css" type="text/css" fetchpriority="high">
+    <link rel="preload" href="./css/animations.css" as="style" type="text/css" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="./css/responsive.css" as="style" type="text/css" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript>
+        <link rel="stylesheet" href="./css/animations.css" type="text/css">
+        <link rel="stylesheet" href="./css/responsive.css" type="text/css">
+    </noscript>
 </head>
-
 <body>
     <a class="skip-link" href="#main-content">Skip to content</a>
     <!-- HEADER -->
@@ -84,6 +96,15 @@
                     <span class="theme-icon" aria-hidden="true">
                         ◐
                     </span>
+                </button>
+
+                <button
+                    class="command-toggle"
+                    id="command-toggle"
+                    type="button"
+                    aria-label="Open command palette"
+                    aria-haspopup="dialog">
+                    <span class="command-icon" aria-hidden="true">⌘</span>
                 </button>
 
                 <button
@@ -574,11 +595,37 @@
             </div>
 
             <div class="footer-right">
-                <p>© <span id="current-year">2025</span>Rayyan Khan.</p>
+                <p>© <span id="current-year">2025 July 14th</span> | Rayyan Khan.</p>
                 <a href="#home">Back to top ↑</a>
             </div>
         </div>
     </footer>
+
+    <div class="command-panel" id="command-panel" aria-hidden="true" role="dialog" aria-label="Command center">
+        <div class="command-panel-shell">
+            <div class="command-panel-header">
+                <div>
+                    <h2>Command Center</h2>
+                    <p class="command-panel-subtitle">Instant access to pages, actions, filters, and system tools.</p>
+                </div>
+                <button class="command-close" id="command-close" type="button" aria-label="Close command center">×</button>
+            </div>
+            <div class="command-panel-search">
+                <label class="visually-hidden" for="command-input">Search commands</label>
+                <input id="command-input" type="search" placeholder="Type a command…" autocomplete="off" spellcheck="false" />
+            </div>
+            <div class="command-panel-meta" aria-hidden="true">
+                <span class="command-chip">Live system</span>
+                <span class="command-chip">Instant access</span>
+                <span class="command-chip">Ctrl + K</span>
+            </div>
+            <div class="command-panel-results-title">Commands</div>
+            <div class="command-panel-list" id="command-list" role="listbox" aria-label="Command results"></div>
+            <div class="command-panel-summary" id="command-summary" aria-label="Portfolio summary"></div>
+            <div class="command-panel-analytics" id="command-analytics" aria-label="Portfolio analytics"></div>
+            <p class="command-panel-footer">Shortcut: <kbd>Ctrl</kbd> + <kbd>K</kbd></p>
+        </div>
+    </div>
 
     <button
         class="scroll-top"
@@ -587,6 +634,6 @@
         aria-label="Scroll to top">
         ↑
     </button>
-    <script type="module" src="./js/app.js" defer></script>
+    <script type="module" src="./js/app.js"></script>
 </body>
 </html>

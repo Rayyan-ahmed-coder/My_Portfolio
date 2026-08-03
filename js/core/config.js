@@ -3,7 +3,7 @@ export const CONFIG = Object.freeze({
     MOBILE_BREAKPOINT: 850,
     OBSERVER_THRESHOLD: 0.15,
     OBSERVER_ROOT_MARGIN: "0px 0px -80px",
-    STORAGE_THEME_KEY: "portfolio-theme",
+    STORAGE_THEME_KEY: "__portfolio_theme__",
     SCROLL_TICK_RATE: 16,
     ACTIVE_SECTION_OFFSET: 180
 });

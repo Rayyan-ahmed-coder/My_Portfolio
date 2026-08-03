@@ -27,20 +27,25 @@ export default class CustomCursor {
         let currentX = 0;
         let currentY = 0;
         let isMoving = false;
+        let rafId = null;
+        let lastMoveTime = 0;
 
         const onMouseMove = (e) => {
             mouseX = e.clientX;
             mouseY = e.clientY;
+            lastMoveTime = performance.now(); // Track time without timers
 
             if (!isMoving) {
                 isMoving = true;
                 this.cursor.style.display = 'block';
-                this.tick();
+                if (!rafId) rafId = window.requestAnimationFrame(this.tick);
             }
         };
 
-        window.addEventListener('mousemove', onMouseMove, { passive: true })
-        this.tick = () => {
+        window.addEventListener('mousemove', onMouseMove, { passive: true });
+
+        this.tick = (timestamp) => {
+            // Smooth lerp math
             currentX += (mouseX - currentX) * 0.3;
             currentY += (mouseY - currentY) * 0.3;
 
@@ -49,19 +54,30 @@ export default class CustomCursor {
 
             this.cursor.style.transform = `translate3d(${offsetX}px, ${offsetY}px, 0)`;
 
-            window.requestAnimationFrame(this.tick);
+            // Check if 1200ms has elapsed since the last mouse movement
+            if (timestamp - lastMoveTime > 1200) {
+                this.cursor.style.display = 'none';
+                isMoving = false;
+                rafId = null; // Let the loop die naturally
+                return;
+            }
+
+            rafId = window.requestAnimationFrame(this.tick);
         };
 
+        // Efficient event delegation using bubbling targets
         document.addEventListener('mouseover', (e) => {
-        if (e.target.closest('a, button, .interactive')) {
-            this.cursor.classList.add('active');
-        }
+            const target = e.target;
+            if (target && (target.tagName === 'A' || target.tagName === 'BUTTON' || target.classList.contains('interactive') || target.closest('a, button, .interactive'))) {
+                this.cursor.classList.add('active');
+            }
         });
 
         document.addEventListener('mouseout', (e) => {
-        if (e.target.closest('a, button, .interactive')) {
-            this.cursor.classList.remove('active');
-        }
+            const target = e.target;
+            if (target && (target.tagName === 'A' || target.tagName === 'BUTTON' || target.classList.contains('interactive') || target.closest('a, button, .interactive'))) {
+                this.cursor.classList.remove('active');
+            }
         });
     }
 }

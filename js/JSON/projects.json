@@ -12,7 +12,26 @@
             "description": 
                 "A responsive calculator built with vanilla HTML, CSS and JavaScript."
         },
+        "category" : "web javascript",
         "tags": ["HTML", "CSS", "JavaScript"],
-        "link": "https://rayyan-ahmed-coder.github.io/Calculator/"
+        "link": "https://rayyan-ahmed-coder.github.io/Calculator/",
+        "target": "_blank"
+    },
+    {
+        "main": false,
+        "number": 2,
+        "preview": [
+            "AIR JUMPER",
+            "↑"
+        ],
+        "type": "CANVAS GAME",
+        "content": {
+            "heading": "Air Jumper",
+            "description": "A browser game featuring animation, collision detection, particles and dynamic environments."
+        },
+        "category": "game javascript",
+        "tags": ["html canvas", "JavaScript"],
+        "link": "https://rayyan-ahmed-coder.github.io/Air_juper.game/",
+        "target": "_blank"
     }
 ]
