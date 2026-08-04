@@ -16,7 +16,6 @@
     <title>Rayyan Khan — Frontend Developer</title>
     <script>
         (function() {
-        // Must match your CONFIG.STORAGE_THEME_KEY name
         const key = '__portfolio_theme__'; 
         try {
             const saved = localStorage.getItem(key);
@@ -29,16 +28,13 @@
     </script>
     <link rel="icon" href="./assets/icons/favicon.png" type="image/png" fetchpriority="high">
     <link rel="stylesheet" href="./css/style.css" type="text/css" fetchpriority="high">
-    <link rel="preload" href="./css/animations.css" as="style" type="text/css" onload="this.onload=null;this.rel='stylesheet'">
     <link rel="preload" href="./css/responsive.css" as="style" type="text/css" onload="this.onload=null;this.rel='stylesheet'">
     <noscript>
-        <link rel="stylesheet" href="./css/animations.css" type="text/css">
         <link rel="stylesheet" href="./css/responsive.css" type="text/css">
     </noscript>
 </head>
 <body>
     <a class="skip-link" href="#main-content">Skip to content</a>
-    <!-- HEADER -->
     <header class="site-header" id="site-header">
         <nav class="navbar container" aria-label="Primary navigation">
             <!-- LOGO -->
@@ -46,9 +42,6 @@
                 <span class="logo-mark" aria-hidden="true">R</span>
                 <span class="logo-text">Rayyan</span>
             </a>
-
-
-            <!-- DESKTOP NAVIGATION -->
             <div class="nav-wrapper" id="navigation-menu">
                 <ul class="nav-list">
                     <li>
@@ -84,8 +77,6 @@
                 </ul>
             </div>
 
-
-            <!-- NAV ACTIONS -->
             <div class="nav-actions">
                 <button
                     class="theme-toggle"
@@ -123,7 +114,6 @@
     </header>
 
     <main id="main-content">
-        <!-- HERO -->
         <section class="hero section" id="home" aria-labelledby="hero-title">
             <div class="hero-background" aria-hidden="true">
                 <div class="hero-grid"></div>
@@ -132,7 +122,6 @@
             </div>
 
             <div class="container hero-container">
-                <!-- HERO CONTENT -->
                 <div class="hero-content">
                     <p class="eyebrow" data-reveal>FRONTEND DEVELOPER</p>
                     <h1 class="hero-title" id="hero-title" data-reveal>
@@ -157,8 +146,6 @@
                         </a>
                     </div>
 
-
-                    <!-- QUICK STATS -->
                     <div class="hero-stats" data-reveal>
                         <div class="stat">
                             <strong>03+</strong>
@@ -175,8 +162,6 @@
                     </div>
                 </div>
 
-
-                <!-- HERO VISUAL -->
                 <div class="hero-visual" aria-hidden="true" data-reveal>
                     <div class="hero-card">
                         <div class="hero-card-top">
@@ -184,7 +169,6 @@
                             <span></span>
                             <span></span>
                         </div>
-
                         <div class="hero-letter">R</div>
                         <div class="hero-card-bottom">
                             <span>HTML</span>
@@ -195,7 +179,6 @@
                 </div>
             </div>
 
-            <!-- SCROLL INDICATOR -->
             <a class="scroll-indicator" href="#work" aria-label="Scroll to projects">
                 <span>Scroll</span>
                 <span class="scroll-line" aria-hidden="true"></span>
@@ -217,8 +200,6 @@
                     </p>
                 </div>
 
-
-                <!-- PROJECT FILTER -->
                 <div class="project-filters" role="group" aria-label="Filter projects">
                     <button class="filter-button active" type="button" data-filter="all">
                         All
@@ -234,126 +215,8 @@
                     </button>
                 </div>
 
-                <!-- PROJECT GRID -->
-                <div class="project-grid" id="projects-grid">
-                    <!-- PROJECT 01 -->
-                    <article class="project-card project-card-large" data-category="web javascript" data-reveal>
-                        <div class="project-preview">
-                            <div class="project-number">01</div>
-                            <div class="project-preview-content">
-                                <span>CALCULATOR</span>
-                                <strong>01 + 01</strong>
-                            </div>
-                        </div>
-
-                        <div class="project-content">
-                            <div>
-                                <p class="project-type">WEB APPLICATION</p>
-                                <h3>
-                                    Calculator
-                                </h3>
-                                <p>
-                                    A responsive calculator built
-                                    with vanilla HTML, CSS and
-                                    JavaScript.
-                                </p>
-                            </div>
-
-
-                            <div class="project-footer">
-                                <div class="project-tags">
-                                    <span>HTML</span>
-                                    <span>CSS</span>
-                                    <span>JavaScript</span>
-                                </div>
-                                <a class="project-link"href="#" aria-label="View Calculator project">
-                                    View
-                                    <span aria-hidden="true">↗</span>
-                                </a>
-
-                            </div>
-
-                        </div>
-                    </article>
-
-
-                    <!-- PROJECT 02 -->
-                    <article class="project-card" data-category="game javascript" data-reveal>
-                        <div class="project-preview">
-                            <div class="project-number">02</div>
-                            <div class="project-preview-content">
-                                <span>AIR JUMPER</span>
-                                <strong>↑</strong>
-                            </div>
-                        </div>
-
-
-                        <div class="project-content">
-                            <div>
-                                <p class="project-type">CANVAS GAME</p>
-                                <h3>
-                                    Air Jumper
-                                </h3>
-                                <p>
-                                    A browser game featuring
-                                    animation, collision detection,
-                                    particles and dynamic environments.
-                                </p>
-                            </div>
-
-                            <div class="project-footer">
-                                <div class="project-tags">
-                                    <span>Canvas</span>
-                                    <span>JavaScript</span>
-                                </div>
-                                <a class="project-link" href="#" aria-label="View Air Jumper project">
-                                    View
-                                    <span aria-hidden="true">↗</span>
-                                </a>
-                            </div>
-                        </div>
-                    </article>
-
-
-                    <!-- PROJECT 03 -->
-                    <article class="project-card" data-category="web javascript" data-reveal>
-                        <div class="project-preview">
-                            <div class="project-number">03</div>
-                            <div class="project-preview-content">
-                                <span>PORTFOLIO</span>
-                                <strong>R.</strong>
-                            </div>
-                        </div>
-
-
-                        <div class="project-content">
-                            <div>
-                                <p class="project-type">PERSONAL WEBSITE</p>
-                                <h3>Personal Portfolio</h3>
-                                <p>
-                                    A responsive portfolio focused
-                                    on clean design, performance
-                                    and interactive experiences.
-                                </p>
-                            </div>
-
-                            <div class="project-footer">
-                                <div class="project-tags">
-                                    <span>HTML</span>
-                                    <span>CSS</span>
-                                    <span>JavaScript</span>
-                                </div>
-                                <a class="project-link" href="#" aria-label="View portfolio project">
-                                    View
-                                    <span aria-hidden="true">↗</span>
-                                </a>
-                            </div>
-                        </div>
-                    </article>
-                </div>
-
-            </div>
-        </section>
+                <div class="project-grid" id="projects-grid"></div>
+            </section>
 
         <!-- Features Scetion -->
         <section class="features section" id="features" aria-labelledby="features-title">
@@ -501,16 +364,14 @@
                     </div>
                 </div>
 
-
                 <div class="skills-list">
-                    <div class="skill-row" data-reveal>
+                    <div class="skill-row" data-reveal="">
                         <span class="skill-index">01</span>
                         <h3>HTML</h3>
                         <span class="skill-description">
                             Semantic structure
                         </span>
                     </div>
-
 
                     <div class="skill-row" data-reveal>
                         <span class="skill-index">02</span>
@@ -520,7 +381,6 @@
                         </span>
                     </div>
 
-
                     <div class="skill-row" data-reveal>
                         <span class="skill-index">03</span>
                         <h3>JavaScript</h3>
@@ -529,9 +389,8 @@
                         </span>
                     </div>
 
-
                     <div class="skill-row" data-reveal>
-                        <span class="skill-index">04</span>
+                        <span class="skill-index">06</span>
                         <h3>GitHub</h3>
                         <span class="skill-description">
                             Version control

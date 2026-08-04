@@ -134,8 +134,8 @@ export default class loadcontent {
                     <a class="project-link" 
                        href="${safeLink}" 
                        title="Explore ${safeHeading}" 
-                       ${safeTarget === '_blank' ? 'target="_blank" rel="noopener noreferrer"' : `target="_self"`}
-                       ${safePrefetch === 'false' ? 'prefetch="false"' : ''}
+                       ${safeTarget === ('_blank' || 'blank_') ? 'target="_blank" rel="noopener noreferrer"' : safeTarget === ("_self" || "self_")? 'target="self_' : ''}
+                       ${safePrefetch === 'false'? 'prefetch="false"' : ''}
                        aria-describedby="project-title-${displayNum}">
                         View <span class="link-arrow" aria-hidden="true">↗</span>
                     </a>
