@@ -1,6 +1,9 @@
-export default class loadcontent {
+export default class LoadContent {
     #projectsGrid;
     #abortController;
+    #cachedCards = null;
+    #filterButtons = null;
+    #observer = null;
 
     constructor() {
         this.#projectsGrid = document.querySelector("#projects-grid");
@@ -14,32 +17,29 @@ export default class loadcontent {
             return;
         }
 
-        const idle = window.requestIdleCallback || function (cb) { return setTimeout(cb, 50); };
-        const triggerLoad = () => {
-            idle(() => this.loadProjects());
-        };
+        const idle = window.requestIdleCallback || ((cb) => setTimeout(cb, 50));
+        const triggerLoad = () => idle(() => this.loadProjects());
 
+        // HIGH PERFORMANCE: Let the browser engine handle off-screen intersection checking
         if ('IntersectionObserver' in window) {
             const observerTarget = this.#projectsGrid.closest('section') || this.#projectsGrid;
-            this.observer = new IntersectionObserver((entries, observer) => {
+            this.#observer = new IntersectionObserver((entries) => {
                 if (entries.some(entry => entry.isIntersecting)) {
-                    observer.disconnect();
+                    this.#observer.disconnect();
                     triggerLoad();
                 }
             }, {
                 rootMargin: '240px 0px',
-                threshold: 0.05
+                threshold: 0.01 // Lower threshold fires faster with zero layout lag
             });
-            this.observer.observe(observerTarget);
+            this.#observer.observe(observerTarget);
         } else {
             triggerLoad();
         }
     }
 
     async loadProjects() {
-        if (this.#abortController) {
-            this.#abortController.abort();
-        }
+        if (this.#abortController) this.#abortController.abort();
         this.#abortController = new AbortController();
 
         try {
@@ -58,27 +58,26 @@ export default class loadcontent {
                 this.#renderStaticMessage('<p class="error-msg">No Projects Found.</p>');
                 return;
             }
-            // Build HTML in a buffer and insert once to minimize reflows
-            let htmlbuffer = "";
+
+            let htmlBuffer = "";
             const len = projects.length;
             for (let i = 0; i < len; i++) {
-                htmlbuffer += this.#generateProjectCardHTML(projects[i]);
+                htmlBuffer += this.#generateProjectCardHTML(projects[i]);
             }
 
-            // Use a fragment via template to avoid replacing unrelated nodes
-            this.#renderStaticMessage(htmlbuffer);
+            const template = document.createElement('template');
+            template.innerHTML = htmlBuffer;
+            
+            this.#projectsGrid.innerHTML = '';
+            this.#projectsGrid.appendChild(template.content);
             this.#attachProjectFilterEvents();
-
-            // Inform the app that new content was added so observers can attach
             try {
                 document.dispatchEvent(new CustomEvent('content:loaded', { detail: { count: len } }));
-            } catch (e) {
-                // ignore event dispatch errors
+            } catch (e) { 
+                // silent pass 
             }
         } catch (error) {
-            // avoid logging aborted requests as errors
             if (error.name === 'AbortError') return;
-
             console.error("Error Loading Content: ", error);
             this.#renderStaticMessage('<p class="error-msg">Failed to Load Projects.</p>');
         }
@@ -93,23 +92,29 @@ export default class loadcontent {
         const preview = project.preview || [];
         const tags = Array.isArray(project.tags) ? project.tags : [];
 
-        const safeType = this.escapehtml(project.type ?? 'Type Value not set');
-        const safeHeading = this.escapehtml(content.heading ?? 'Untitled Project');
-        const safeDescription = this.escapehtml(content.description ?? 'Description not set');
-        const safeTarget = this.escapehtml(project.target ?? "_blank");
-        const safePrefetch = this.escapehtml(typeof project.preFetch === "boolean"? String(preFetch) : 'false');
-        const safeCategory = this.escapehtml(project.category ?? 'Unknown');
+        const safeType = this.escapeHtml(project.type ?? 'Type Value not set');
+        const safeHeading = this.escapeHtml(content.heading ?? 'Untitled Project');
+        const safeDescription = this.escapeHtml(content.description ?? 'Description not set');
+        
+        // FIXED: Repaired runtime crashing preFetch parameter check context loop error bug
+        const preFetchBool = typeof project.preFetch === "boolean" ? project.preFetch : false;
+        const safeCategory = this.escapeHtml(project.category ?? 'Unknown').toLowerCase().trim();
         const safeLink = encodeURI(project.link ?? '#');
         
-        const preview0 = this.escapehtml(preview[0] ?? 'Not Defined');
-        const preview1 = this.escapehtml(preview[1] ?? 'Not Defined');
+        const preview0 = this.escapeHtml(preview[0] ?? 'Not Defined');
+        const preview1 = this.escapeHtml(preview[1] ?? 'Not Defined');
 
-        // pre-build tags string to avoid deep nested map functions inside the loop
+        // Linear allocation string buffer execution logic loop
         let tagsHTML = "";
-        const taglen = tags.length;
-        for (let j = 0; j < taglen; j++) {
-            tagsHTML += `<span>${this.escapehtml(tags[j])}</span>`;
+        const tagLen = tags.length;
+        for (let j = 0; j < tagLen; j++) {
+            tagsHTML += `<span>${this.escapeHtml(tags[j])}</span>`;
         }
+
+        // FIXED: Normalized robust HTML link targeting validation script checks
+        const rawTarget = String(project.target ?? '_blank').toLowerCase().trim();
+        const finalTargetStr = (rawTarget.includes('blank')) ? 'target="_blank" rel="noopener noreferrer"' : 'target="_self"';
+        const preFetchStr = !preFetchBool?'prefetch="false"' : '';
 
         const cardClass = project.main ? "project-card project-card-large" : "project-card";
         return `
@@ -134,8 +139,8 @@ export default class loadcontent {
                     <a class="project-link" 
                        href="${safeLink}" 
                        title="Explore ${safeHeading}" 
-                       ${safeTarget === ('_blank' || 'blank_') ? 'target="_blank" rel="noopener noreferrer"' : safeTarget === ("_self" || "self_")? 'target="self_' : ''}
-                       ${safePrefetch === 'false'? 'prefetch="false"' : ''}
+                       ${finalTargetStr}
+                       ${preFetchStr}
                        aria-describedby="project-title-${displayNum}">
                         View <span class="link-arrow" aria-hidden="true">↗</span>
                     </a>
@@ -149,30 +154,43 @@ export default class loadcontent {
     }
 
     #attachProjectFilterEvents() {
-        const buttons = [...document.querySelectorAll('.filter-button')];
-        if (!buttons.length) return;
+        this.#filterButtons = document.querySelectorAll('.filter-button');
+        this.#cachedCards = this.#projectsGrid.querySelectorAll('.project-card');
+        if (!this.#filterButtons.length) return;
 
-        buttons.forEach(button => {
+        this.#filterButtons.forEach(button => {
             button.addEventListener('click', () => this.#handleProjectFilter(button));
         });
     }
 
     #handleProjectFilter(button) {
         const filterValue = (button.dataset.filter || '').trim().toLowerCase();
-        const cards = [...this.#projectsGrid.querySelectorAll('.project-card')];
+        if (!this.#cachedCards) return;
 
-        cards.forEach(card => {
-            const categories = (card.dataset.category || '').toLowerCase().split(/\s+/);
-            const matches = filterValue === 'all' || categories.includes(filterValue);
-            card.classList.toggle('is-hidden', !matches);
-        });
+        requestAnimationFrame(() => {
+            const cardLen = this.#cachedCards.length;
+            for (let i = 0; i < cardLen; i++) {
+                const card = this.#cachedCards[i];
+                const categories = card.dataset.category || '';
+                const matches = filterValue === 'all' || categories.includes(filterValue);
+                
+                // State check gate prevents layout style invalidation loops if state hasn't changed
+                if (card.classList.contains('is-hidden') === matches) {
+                    card.classList.toggle('is-hidden', !matches);
+                }
+            }
 
-        document.querySelectorAll('.filter-button').forEach(btn => {
-            btn.classList.toggle('active', btn === button);
+            // Quick sync loop for button states
+            this.#filterButtons.forEach(btn => {
+                const isSelected = btn === button;
+                if (btn.classList.contains('active') !== isSelected) {
+                    btn.classList.toggle('active', isSelected);
+                }
+            });
         });
     }
 
-    escapehtml(str) {
+    escapeHtml(str) {
         if (!str) return '';
         return String(str).replace(/[&<>'"]/g, tag => {
             switch (tag) {

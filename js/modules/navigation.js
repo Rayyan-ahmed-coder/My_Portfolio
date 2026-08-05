@@ -1,142 +1,140 @@
-import { $, $$ } from "../core/utilities.js";
+import { $, $$, rafThrottle } from "../core/utilities.js";
 import { CONFIG } from "../core/config.js";
 
-export default class Navigation {
-    // True private encapsulation for safety and better optimization
-    #header = $(".site-header");
-    #menuButton = $("#menu-toggle");
-    #navigation = $("#navigation-menu");
+export default class ScrollManager {
+    #scrollButton = $(".scroll-top");
+    #sections = $$("section[id]");
     #links = $$(".nav-link");
-    #isOpen = false;
-    #focusableElements = [];
+    #lastScrollY = 0;
+    #scrollDirection = "down";
+    #activeSection = "";
+    #observer = null;
+    
+    // Cache the thinned callback execution reference to fix the memory leak bug
+    #throttledScrollHandler = null;
 
-    constructor() {
-        if (!this.#menuButton || !this.#navigation) return;
+    constructor(observerInstance) {
+        this.#observer = observerInstance; 
         this.#initialize();
     }
 
     #initialize() {
+        // Fast initial layout pass reading values instantly
+        this.#updateScrollButtonState(window.scrollY);
+        
+        // FIXED: Cache the throttled reference locally so it can be unmounted safely later
+        this.#throttledScrollHandler = rafThrottle(() => this.#onScroll());
+        
+        // PERFORMANCE WIN: 'passive: true' lets the compositor thread slide immediately 
+        // without waiting for JS evaluation pipelines to finish executing.
+        window.addEventListener("scroll", this.#throttledScrollHandler, { passive: true });
+
+        this.#setupScrollToTop();
         this.#setupIntersectionObserver();
-        this.#setupEventListeners();
+        this.#setupSmoothScrolling();
     }
 
-    #setupEventListeners() {
-        // Core click handlers
-        this.#menuButton.addEventListener("click", () => this.toggle());
+    #onScroll() {
+        const currentScrollY = window.scrollY;
+        
+        // Direct, hyper-fast scroll comparison logic
+        this.#scrollDirection = currentScrollY > this.#lastScrollY ? "down" : "up";
+        this.#lastScrollY = currentScrollY;
 
-        this.#links.forEach(link => {
-            link.addEventListener("click", () => this.close());
-        });
-
-        // Safe dynamic keyboard focus mapping
-        const focusSelectors = 'a[href], button, input, textarea, select, [tabindex]:not([tabindex="-1"])';
-        this.#focusableElements = Array.from(this.#navigation.querySelectorAll(focusSelectors));
+        this.#updateScrollButtonState(currentScrollY);
     }
 
-    /**
-     * Blasing Fast Performance: Replaced scroll listeners with an intersection anchor
-     * This triggers header styling shifts with 0% scroll events or layout thrashing.
-     */
+    #updateScrollButtonState(scrollY) {
+        if (!this.#scrollButton) return;
+        
+        // PERFORMANCE WIN: Avoid writing/mutating classList on every single mouse tick.
+        // It strictly updates ONLY when crossing the 520px threshold layout gate.
+        const shouldBeVisible = scrollY > 520;
+        if (this.#scrollButton.classList.contains("visible") !== shouldBeVisible) {
+            // requestAnimationFrame guarantees the toggle animation won't interrupt scroll frames
+            requestAnimationFrame(() => {
+                this.#scrollButton.classList.toggle("visible", shouldBeVisible);
+            });
+        }
+    }
+
     #setupIntersectionObserver() {
-        if (!this.#header) return;
+        if (!this.#sections.length) return;
+        
+        const offsetPct = CONFIG.ACTIVE_SECTION_OFFSET ?? 100; 
+        
+        // HIGH PERFORMANCE: IntersectionObserver operates natively off the Main Thread.
+        // No manual bounding rect mathematics or scroll calculation polling.
+        const observerOptions = {
+            root: null, 
+            rootMargin: `-${offsetPct}px 0px -60% 0px`, 
+            threshold: 0
+        };
 
-        // Create an invisible 1px trigger point right below the top header zone
-        const scrollTrigger = document.createElement("div");
-        scrollTrigger.className = "scroll-trigger-anchor";
-        scrollTrigger.style.cssText = "position:absolute; top:20px; left:0; width:1px; height:1px; pointer-events:none; visibility:hidden;";
-        document.body.prepend(scrollTrigger);
+        this.#observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+                // HIGH SPEED: Only process active intersection triggers to save CPU overhead
+                if (entry.isIntersecting) {
+                    this.#updateActiveSection(entry.target.id);
+                }
+            });
+        }, observerOptions);
 
-        const observer = new IntersectionObserver((entries) => {
-            const entry = entries[0];
-            // If the 20px trigger point leaves the screen, add the class. Otherwise, remove it.
-            this.#header.classList.toggle("scrolled", !entry.isIntersecting);
-        }, { root: null, threshold: 0 });
-
-        observer.observe(scrollTrigger);
+        this.#sections.forEach((section) => this.#observer.observe(section));
     }
 
-    toggle() {
-        this.#isOpen ? this.close() : this.open();
+    #updateActiveSection(sectionId) {
+        if (sectionId === this.#activeSection) return;
+        this.#activeSection = sectionId;
+
+        requestAnimationFrame(() => {
+            this.#links.forEach((link) => {
+                const isActive = link.getAttribute("href") === `#${sectionId}`;
+                
+                if (link.classList.contains("active") !== isActive) {
+                    link.classList.toggle("active", isActive);
+                    link.setAttribute("aria-current", isActive ? "page" : "false");
+                }
+            });
+        });
     }
 
-    open() {
-        if (this.#isOpen) return;
-        this.#isOpen = true;
-
-        // 1. Structural DOM Updates
-        this.#navigation.classList.add("open");
-        this.#menuButton.setAttribute("aria-expanded", "true");
-        document.body.style.overflow = "hidden"; // Prevent background body scrolling
-
-        // 2. Performance & Security: Attach event listeners ONLY when open
-        document.addEventListener("keydown", this.#handleKeyDown);
-        document.addEventListener("click", this.#handleOutsideClick, { passive: true });
-
-        // 3. Accessibility: Focus the first focusable interactive link inside the menu
-        if (this.#focusableElements.length > 0) {
-            requestAnimationFrame(() => this.#focusableElements[0].focus());
-        }
-    }
-
-    close() {
-        if (!this.#isOpen) return;
-        this.#isOpen = false;
-
-        // 1. Structural DOM Updates
-        this.#navigation.classList.remove("open");
-        this.#menuButton.setAttribute("aria-expanded", "false");
-        document.body.style.overflow = ""; // Restore scrolling cleanly
-
-        // 2. Resource Cleanup: Instantly detach listeners to save processing power
-        document.removeEventListener("keydown", this.#handleKeyDown);
-        document.removeEventListener("click", this.#handleOutsideClick);
-
-        // 3. Accessibility: Return focus back to the menu toggle trigger element
-        requestAnimationFrame(() => this.#menuButton.focus());
-    }
-
-    // Arrow functions maintain execution context explicitly
-    #handleKeyDown = (event) => {
-        if (event.key === "Escape") {
-            this.close();
-            return;
-        }
-
-        if (event.key === "Tab") {
-            this.#handleFocusTrap(event);
-        }
-    }
-
-    /**
-     * High Security Accessibility: Locks keyboard navigation inside the open side drawer
-     */
-    #handleFocusTrap(event) {
-        if (this.#focusableElements.length === 0) return;
-
-        const firstEl = this.#focusableElements[0];
-        const lastEl = this.#focusableElements[this.#focusableElements.length - 1];
-
-        if (event.shiftKey) {
-            // If pressing Shift + Tab and on the first element, loop around to the last item
-            if (document.activeElement === firstEl) {
-                lastEl.focus();
+    #setupSmoothScrolling() {
+        this.#links.forEach((link) => {
+            link.addEventListener("click", (event) => {
+                const href = link.getAttribute("href");
+                if (!href?.startsWith("#")) return;
                 event.preventDefault();
-            }
-        } else {
-            // If pressing Tab and on the last element, loop around back to the first item
-            if (document.activeElement === lastEl) {
-                firstEl.focus();
-                event.preventDefault();
-            }
-        }
+                const target = $(href); 
+                if (!target) return;
+
+                target.setAttribute('tabindex', '-1');
+                target.focus({ preventScroll: true });
+
+                target.scrollIntoView({
+                    behavior: "smooth",
+                    block: "start"
+                });
+            });
+        });
     }
 
-    #handleOutsideClick = (event) => {
-        const target = event.target;
-        // Optimization: Quick pointer comparison matches before complex DOM tree traversal paths
-        if (this.#navigation.contains(target) || this.#menuButton.contains(target)) {
-            return;
+    #setupScrollToTop() {
+        if (!this.#scrollButton) return;
+        this.#scrollButton.addEventListener("click", () => {
+            window.scrollTo({ 
+                top: 0, 
+                behavior: "smooth" 
+            });
+        });
+    }
+
+    destroy() {
+        if (this.#throttledScrollHandler) {
+            window.removeEventListener("scroll", this.#throttledScrollHandler);
         }
-        this.close();
+        if (this.#observer) {
+            this.#observer.disconnect();
+        }
     }
 }

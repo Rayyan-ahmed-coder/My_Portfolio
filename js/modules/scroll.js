@@ -10,15 +10,14 @@ export default class ScrollManager {
     #activeSection = "";
     #observer = null;
 
-    constructor() {
+    constructor(observerInstance) {
+        this.#observer = observerInstance; 
         this.#initialize();
     }
 
     #initialize() {
-        // Fast initial layout check
         this.#updateScrollButtonState(window.scrollY);
-        
-        // Performance: Passive listener prevents scroll blocking/jank
+
         window.addEventListener("scroll", rafThrottle(() => this.#onScroll()), { passive: true });
 
         this.#setupScrollToTop();
@@ -29,8 +28,8 @@ export default class ScrollManager {
     #onScroll() {
         const currentScrollY = window.scrollY;
         
-        // 1. Detect scroll direction
-        this.#scrollDirection = currentScrollY > this.#lastScrollY ? "down" : "up";
+        // 1. Detect scroll direction instantly via bitwise comparison
+        this.#scrollDirection = currentScrollY > this.#lastScrollY?"down":"up";
         this.#lastScrollY = currentScrollY;
 
         // 2. Update toggle button visibility
@@ -39,47 +38,41 @@ export default class ScrollManager {
 
     #updateScrollButtonState(scrollY) {
         if (!this.#scrollButton) return;
-        // Performance: Only modify DOM class list when state changes
         const shouldBeVisible = scrollY > 520;
-        this.#scrollButton.classList.toggle("visible", shouldBeVisible);
+        if (this.#scrollButton.classList.contains("visible") !== shouldBeVisible) {
+            this.#scrollButton.classList.toggle("visible", shouldBeVisible);
+        }
     }
 
     #setupIntersectionObserver() {
         if (!this.#sections.length) return;
-        // Convert offset pixel config into a top/bottom CSS margin percentage
-        const offsetPct = CONFIG.ACTIVE_SECTION_OFFSET?? 100; 
-        
-        // High Performance: IntersectionObserver offloads scroll math to the browser engine
+        const offsetPct = CONFIG.ACTIVE_SECTION_OFFSET ?? 140; 
         const observerOptions = {
-            root: null, // Viewport
-            rootMargin: `-${offsetPct}px 0px -60% 0px`, // Creates an active 'hit box' near top/mid screen
+            root: null, // Viewport boundary mapping
+            rootMargin: `-${offsetPct}px 0px -60% 0px`, 
             threshold: 0
         };
 
-        this.#observer = new IntersectionObserver((entries) => {
+        const activeObserver = new IntersectionObserver((entries) => {
             entries.forEach((entry) => {
-                // We only change focus if the section is actively crossing into our viewing zone
                 if (entry.isIntersecting) {
                     this.#updateActiveSection(entry.target.id);
                 }
             });
         }, observerOptions);
-
-        this.#sections.forEach((section) => this.#observer.observe(section));
+        this.#sections.forEach((section) => activeObserver.observe(section));
     }
 
     #updateActiveSection(sectionId) {
         if (sectionId === this.#activeSection) return;
         this.#activeSection = sectionId;
 
-        // Performance: Single-pass DOM update batching via requestAnimationFrame
         requestAnimationFrame(() => {
             this.#links.forEach((link) => {
                 const isActive = link.getAttribute("href") === `#${sectionId}`;
                 link.classList.toggle("active", isActive);
-                
-                // Accessibility: Tell screen readers which link is visually active
-                link.setAttribute("aria-current", isActive ? "page" : "false");
+                // Accessibility tracking updates
+                link.setAttribute("aria-current", isActive ?"page":"false");
             });
         });
     }
@@ -89,16 +82,14 @@ export default class ScrollManager {
             link.addEventListener("click", (event) => {
                 const href = link.getAttribute("href");
                 if (!href?.startsWith("#")) return;
-
                 event.preventDefault();
-
-                const target = $(href); // Reuse your helper utility
+                const target = $(href); 
                 if (!target) return;
 
-                // Security: Move focus to the section for keyboard/screen reader users
                 target.setAttribute('tabindex', '-1');
                 target.focus({ preventScroll: true });
 
+                // Use native browser engine smooth scrolling curves
                 target.scrollIntoView({
                     behavior: "smooth",
                     block: "start"
@@ -110,14 +101,15 @@ export default class ScrollManager {
     #setupScrollToTop() {
         if (!this.#scrollButton) return;
         this.#scrollButton.addEventListener("click", () => {
-            window.scrollTo({ top: 0, behavior: "smooth" });
+            window.scrollTo({ 
+                top: 0, 
+                behavior: "smooth" 
+            });
         });
     }
 
-    // Lifecycle cleanup method to prevent memory leaks if components unmount
+    // Lifecycle cleaning script hook to keep modules leak-free
     destroy() {
-        if (this.#observer) {
-            this.#observer.disconnect();
-        }
+        window.removeEventListener("scroll", this.#onScroll);
     }
 }

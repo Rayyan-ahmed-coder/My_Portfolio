@@ -2,26 +2,28 @@ export const $ = (selector, parent = document) =>
     parent.querySelector(selector);
 
 export const $$ = (selector, parent = document) => 
-    [...parent.querySelectorAll(selector)];
+    parent.querySelectorAll(selector);
 
-export const clamp = (value, min, max) =>
-    Math.min(Math.max(value, min), max);
+export const clamp = (value, min, max) => 
+    value < min ? min : (value > max ? max : value); // Math.min/max logic inline avoids engine overhead
 
-export const isMobile = () => window.innerWidth <= 850;
+// Performance: Cache the matchMedia references so the browser doesn't re-parse media strings on every call
+const mobileQuery = window.matchMedia("(max-width: 850px)");
+export const isMobile = () => mobileQuery.matches;
 
-export const prefersReducedMotion = () =>
-    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+export const prefersReducedMotion = () => motionQuery.matches;
 
 export const nextFrame = () => 
-    new Promise(requestAnimationFrame);
+    new Promise((resolve) => requestAnimationFrame(resolve));
 
-export const rafThrottle = callback => {
+export const rafThrottle = (callback) => {
     let ticking = false;
-    return () => {
+    return function (...args) {
         if (ticking) return;
         ticking = true;
         requestAnimationFrame(() => {
-            callback(); 
+            callback.apply(this, args); // FIXED: Preserves execution 'this' context and passes arguments safely
             ticking = false;
         });
     };
@@ -29,10 +31,10 @@ export const rafThrottle = callback => {
 
 export const debounce = (callback, delay = 150) => {
     let timeout;
-    return (...args) => {
+    return function (...args) {
         clearTimeout(timeout);
         timeout = setTimeout(() => {
-            callback(...args);
+            callback.apply(this, args); // FIXED: Preserves context variables across asynchronous timeouts
         }, delay);
     };
 };
