@@ -1,0 +1,9 @@
+Chef Developer: Rayyan Ahmed
+Site: https://github.io
+From: Earth
+
+Tools Used: Visual Studio Code, Git, GitHub Pages
+
+Standards: HTML5, CSS3, JavaScript
+Components: Open Graph Meta, Schema JSON-LD
+Software Lifecycle: Optimized Build

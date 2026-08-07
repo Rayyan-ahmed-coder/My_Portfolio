@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",                          /* Compiles to modern, highly optimized JS */
+    "module": "NodeNext",                        /* Enables fast module loading */
+    "moduleResolution": "NodeNext",
+    "lib": ["DOM", "DOM.Iterable", "ES2022"],   /* Reduces bundled code size */
+    "allowJs": true,                             /* Allows normal JS files */
+    "skipLibCheck": true,                        /* Speeds up your project build time */
+    "strict": true,                              /* Prevents memory leaks and heavy runtime bugs */
+    "noEmit": false,
+    "removeComments": true,                      /* Strips code comments to save file size */
+    "sourceMap": false                           /* Disables bulky source maps in production */
+  }
+}
