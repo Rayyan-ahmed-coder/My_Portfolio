@@ -47,7 +47,7 @@ export default class CommandPalette {
 
             // Developer-friendly / misc
             { title: 'Print page', subtitle: 'Open browser print dialog', action: () => window.print(), category: 'Tools', shortcut: 'p' },
-            { title: 'Open devtools (hint)', subtitle: 'Suggestion: use browser devtools', action: () => this.openLink('about:blank'), category: 'Tools', shortcut: 'd' },
+            { title: 'Open devtools (hint)', subtitle: 'Suggestion: use browser devtools', action: () => console.info('Open devtools with F12 or Ctrl+Shift+I'), category: 'Tools', shortcut: 'd' },
             { title: 'View source (GitHub)', subtitle: 'Open repository source', action: () => this.openLink('https://github.com/'), category: 'Tools', shortcut: 'v' },
 
             // Extras: quick navigation & controls
@@ -193,8 +193,21 @@ export default class CommandPalette {
                 if (globalIndex === this.selectedIndex) {
                     item.classList.add('selected');
                 }
-                const shortcutMarkup = command.shortcut ? `<kbd class="cmd-shortcut">${command.shortcut}</kbd>` : '';
-                item.innerHTML = `<div class="command-item-main"><strong>${command.title}</strong><span>${command.subtitle || 'Press Enter to execute'}</span></div>${shortcutMarkup}`;
+                const main = document.createElement('div');
+                main.className = 'command-item-main';
+                const title = document.createElement('strong');
+                title.textContent = command.title;
+                const subtitle = document.createElement('span');
+                subtitle.textContent = command.subtitle || 'Press Enter to execute';
+                main.append(title, subtitle);
+                item.appendChild(main);
+
+                if (command.shortcut) {
+                    const shortcut = document.createElement('kbd');
+                    shortcut.className = 'cmd-shortcut';
+                    shortcut.textContent = command.shortcut;
+                    item.appendChild(shortcut);
+                }
                 item.addEventListener('click', (e) => {
                     const idx = Number(e.currentTarget.dataset.index);
                     this.executeCommand(idx);
@@ -223,7 +236,11 @@ export default class CommandPalette {
             }
             const card = document.createElement('div');
             card.className = 'command-stat';
-            card.innerHTML = `<strong>${stat.value}</strong><span>${stat.label}</span>`;
+            const value = document.createElement('strong');
+            value.textContent = String(stat.value);
+            const label = document.createElement('span');
+            label.textContent = stat.label;
+            card.append(value, label);
             this.analyticsContainer.appendChild(card);
         });
     }
@@ -249,10 +266,12 @@ export default class CommandPalette {
 
     renderSummary() {
         const summary = this.getSummaryData();
-        this.summaryContainer.innerHTML = `
-            <strong>${summary.title}</strong>
-            <span>${summary.description}</span>
-        `;
+        this.summaryContainer.textContent = '';
+        const title = document.createElement('strong');
+        title.textContent = summary.title;
+        const description = document.createElement('span');
+        description.textContent = summary.description;
+        this.summaryContainer.append(title, description);
     }
 
     handleGlobalShortcut(event) {
@@ -321,6 +340,7 @@ export default class CommandPalette {
         const topTechTag = Object.entries(topTag).sort((a, b) => b[1] - a[1])[0]?.[0] || 'None';
 
         return {
+            commands: { value: this.commands.length, label: 'Commands available' },
             projects: { value: projectCount, label: 'Projects featured' },
             categories: { value: projectCategories.size, label: 'Project categories' },
             techTags: { value: techTags.size, label: 'Technology tags' },
@@ -445,6 +465,12 @@ export default class CommandPalette {
     }
 
     openLink(url) {
-        window.open(url, '_blank');
+        const target = String(url ?? '').trim();
+        const scheme = /^([a-z][a-z0-9+.-]*):/i.exec(target)?.[1].toLowerCase();
+        if (scheme && !['http', 'https', 'mailto'].includes(scheme)) {
+            console.warn(`Blocked navigation to unsupported URL scheme: ${target}`);
+            return null;
+        }
+        return window.open(target, '_blank', 'noopener,noreferrer');
     }
 }

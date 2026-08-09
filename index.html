@@ -8,16 +8,23 @@
     <meta http-equiv="Content-Security-Policy" content="
         default-src 'self'; 
         script-src 'self' 'unsafe-inline'; 
-        style-src 'self' 'unsafe-inline' https://googleapis.com; 
-        font-src 'self' https://gstatic.com; 
-        img-src 'self' data: https://unsplash.com https://github.io;
+        style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; 
+        font-src 'self' https://fonts.gstatic.com; 
+        img-src 'self' data: https://images.unsplash.com;
         connect-src 'self';
+        manifest-src 'self';
+        worker-src 'self';
+        object-src 'none';
+        base-uri 'self';
+        form-action 'self';
+        upgrade-insecure-requests;
     ">
     <title>Rayyan Khan — Senior Frontend Developer | Interactive Web Experiences</title>
     <meta name="description" content="Rayyan Khan is a Senior Frontend Developer specializing in building blazing-fast, modern, scalable, and highly interactive web experiences using cutting-edge technologies.">
     <meta name="keywords" content="Rayyan Khan, Frontend Developer, Senior Web Developer, Software Engineer, Portfolio, React, TypeScript, JavaScript, Next.js, HTML5, CSS3, Responsive Design, UI/UX, Web Performance">
     <meta name="author" content="Rayyan Khan">
     <meta name="robots" content="index, follow">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
     <link rel="canonical" href="https://github.io">
     <!-- THEME & BROWSER INTEGRATION -->
     <meta name="theme-color" content="#e63946" media="(prefers-color-scheme: light)">

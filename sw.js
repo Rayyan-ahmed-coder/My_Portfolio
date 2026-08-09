@@ -44,7 +44,8 @@ self.addEventListener('activate', (event) => {
 
 // 3. Fetch Event: Advanced Hybrid Caching Engine
 self.addEventListener('fetch', (event) => {
-    // Restrict interception to safe, local HTTP/HTTPS requests
+    // Restrict interception to safe, local HTTP/HTTPS GET requests
+    if (event.request.method !== 'GET') return;
     if (!event.request.url.startsWith(self.location.origin)) return;
 
     // STRATEGY A: Webpage/HTML navigation requests

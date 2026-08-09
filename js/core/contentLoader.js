@@ -99,7 +99,7 @@ export default class LoadContent {
         // FIXED: Repaired runtime crashing preFetch parameter check context loop error bug
         const preFetchBool = typeof project.preFetch === "boolean" ? project.preFetch : false;
         const safeCategory = this.escapeHtml(project.category ?? 'Unknown').toLowerCase().trim();
-        const safeLink = encodeURI(project.link ?? '#');
+        const safeLink = this.escapeHtml(this.sanitizeUrl(project.link));
         
         const preview0 = this.escapeHtml(preview[0] ?? 'Not Defined');
         const preview1 = this.escapeHtml(preview[1] ?? 'Not Defined');
@@ -188,6 +188,22 @@ export default class LoadContent {
                 }
             });
         });
+    }
+
+    // Only same-document, relative and http(s)/mailto URLs are allowed as link targets,
+    // so scriptable schemes such as javascript: or data: can never reach an href.
+    sanitizeUrl(rawUrl) {
+        const url = String(rawUrl ?? '#').trim();
+        if (!url || url === '#') return '#';
+
+        const scheme = /^([a-z][a-z0-9+.-]*):/i.exec(url)?.[1].toLowerCase();
+        if (scheme && !['http', 'https', 'mailto'].includes(scheme)) return '#';
+
+        try {
+            return encodeURI(url);
+        } catch {
+            return '#';
+        }
     }
 
     escapeHtml(str) {
