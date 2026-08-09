@@ -1,0 +1,17 @@
+{
+  "name": "my_portfolio",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Rayyan Ahmed Khan's portfolio site",
+  "license": "MIT",
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "coverage": "vitest run --coverage"
+  },
+  "devDependencies": {
+    "@vitest/coverage-v8": "4.1.10",
+    "jsdom": "26.1.0",
+    "vitest": "4.1.10"
+  }
+}

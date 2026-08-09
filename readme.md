@@ -10,3 +10,14 @@ Optimizations:
 </ul>
 <br>
 <p>Made in 2025 July 14th</p>
+
+## Tests
+
+Unit tests run on Vitest with a jsdom environment.
+
+```bash
+npm install
+npm test         # run the suite once
+npm run test:watch
+npm run coverage # text + lcov coverage report
+```

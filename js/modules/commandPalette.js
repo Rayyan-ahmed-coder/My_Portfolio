@@ -321,6 +321,7 @@ export default class CommandPalette {
         const topTechTag = Object.entries(topTag).sort((a, b) => b[1] - a[1])[0]?.[0] || 'None';
 
         return {
+            commands: { value: this.commands.length, label: 'Commands available' },
             projects: { value: projectCount, label: 'Projects featured' },
             categories: { value: projectCategories.size, label: 'Project categories' },
             techTags: { value: techTags.size, label: 'Technology tags' },
