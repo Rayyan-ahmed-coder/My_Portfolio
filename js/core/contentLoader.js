@@ -1,3 +1,5 @@
+import { $, $$, escapeHtml, onIdle, toggleClass } from "./utilities.js";
+
 export default class LoadContent {
     #projectsGrid;
     #abortController;
@@ -6,7 +8,7 @@ export default class LoadContent {
     #observer = null;
 
     constructor() {
-        this.#projectsGrid = document.querySelector("#projects-grid");
+        this.#projectsGrid = $("#projects-grid");
         this.#abortController = null;
         this.init();
     }
@@ -17,8 +19,7 @@ export default class LoadContent {
             return;
         }
 
-        const idle = window.requestIdleCallback || ((cb) => setTimeout(cb, 50));
-        const triggerLoad = () => idle(() => this.loadProjects());
+        const triggerLoad = () => onIdle(() => this.loadProjects(), 50);
 
         // HIGH PERFORMANCE: Let the browser engine handle off-screen intersection checking
         if ('IntersectionObserver' in window) {
@@ -92,23 +93,23 @@ export default class LoadContent {
         const preview = project.preview || [];
         const tags = Array.isArray(project.tags) ? project.tags : [];
 
-        const safeType = this.escapeHtml(project.type ?? 'Type Value not set');
-        const safeHeading = this.escapeHtml(content.heading ?? 'Untitled Project');
-        const safeDescription = this.escapeHtml(content.description ?? 'Description not set');
+        const safeType = escapeHtml(project.type ?? 'Type Value not set');
+        const safeHeading = escapeHtml(content.heading ?? 'Untitled Project');
+        const safeDescription = escapeHtml(content.description ?? 'Description not set');
         
         // FIXED: Repaired runtime crashing preFetch parameter check context loop error bug
         const preFetchBool = typeof project.preFetch === "boolean" ? project.preFetch : false;
-        const safeCategory = this.escapeHtml(project.category ?? 'Unknown').toLowerCase().trim();
+        const safeCategory = escapeHtml(project.category ?? 'Unknown').toLowerCase().trim();
         const safeLink = encodeURI(project.link ?? '#');
         
-        const preview0 = this.escapeHtml(preview[0] ?? 'Not Defined');
-        const preview1 = this.escapeHtml(preview[1] ?? 'Not Defined');
+        const preview0 = escapeHtml(preview[0] ?? 'Not Defined');
+        const preview1 = escapeHtml(preview[1] ?? 'Not Defined');
 
         // Linear allocation string buffer execution logic loop
         let tagsHTML = "";
         const tagLen = tags.length;
         for (let j = 0; j < tagLen; j++) {
-            tagsHTML += `<span>${this.escapeHtml(tags[j])}</span>`;
+            tagsHTML += `<span>${escapeHtml(tags[j])}</span>`;
         }
 
         // FIXED: Normalized robust HTML link targeting validation script checks
@@ -154,8 +155,8 @@ export default class LoadContent {
     }
 
     #attachProjectFilterEvents() {
-        this.#filterButtons = document.querySelectorAll('.filter-button');
-        this.#cachedCards = this.#projectsGrid.querySelectorAll('.project-card');
+        this.#filterButtons = $$('.filter-button');
+        this.#cachedCards = $$('.project-card', this.#projectsGrid);
         if (!this.#filterButtons.length) return;
 
         this.#filterButtons.forEach(button => {
@@ -173,34 +174,13 @@ export default class LoadContent {
                 const card = this.#cachedCards[i];
                 const categories = card.dataset.category || '';
                 const matches = filterValue === 'all' || categories.includes(filterValue);
-                
+
                 // State check gate prevents layout style invalidation loops if state hasn't changed
-                if (card.classList.contains('is-hidden') === matches) {
-                    card.classList.toggle('is-hidden', !matches);
-                }
+                toggleClass(card, 'is-hidden', !matches);
             }
 
             // Quick sync loop for button states
-            this.#filterButtons.forEach(btn => {
-                const isSelected = btn === button;
-                if (btn.classList.contains('active') !== isSelected) {
-                    btn.classList.toggle('active', isSelected);
-                }
-            });
-        });
-    }
-
-    escapeHtml(str) {
-        if (!str) return '';
-        return String(str).replace(/[&<>'"]/g, tag => {
-            switch (tag) {
-                case '&': return '&amp;';
-                case '<': return '&lt;';
-                case '>': return '&gt;';
-                case "'": return '&#39;';
-                case '"': return '&quot;';
-                default: return tag;
-            }
+            this.#filterButtons.forEach(btn => toggleClass(btn, 'active', btn === button));
         });
     }
 }

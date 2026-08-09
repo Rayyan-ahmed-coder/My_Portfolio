@@ -1,15 +1,27 @@
+import {
+    $,
+    $$,
+    createEl,
+    debounce,
+    escapeHtml,
+    prefersDarkScheme,
+    scrollToTarget,
+    scrollToTop,
+    toggleClass
+} from "../core/utilities.js";
+
 export default class CommandPalette {
     constructor() {
-        this.body = document.querySelector(`body`);
-        this.panel = document.getElementById('command-panel');
-        this.toggle = document.getElementById('command-toggle');
-        this.closeButton = document.getElementById('command-close');
-        this.input = document.getElementById('command-input');
-        this.list = document.getElementById('command-list');
-        this.resultsTitle = document.querySelector('.command-panel-results-title');
-        this.analyticsContainer = document.getElementById('command-analytics');
-        this.summaryContainer = document.getElementById('command-summary');
-        this.metaContainer = document.querySelector('.command-panel-meta');
+        this.body = document.body;
+        this.panel = $('#command-panel');
+        this.toggle = $('#command-toggle');
+        this.closeButton = $('#command-close');
+        this.input = $('#command-input');
+        this.list = $('#command-list');
+        this.resultsTitle = $('.command-panel-results-title');
+        this.analyticsContainer = $('#command-analytics');
+        this.summaryContainer = $('#command-summary');
+        this.metaContainer = $('.command-panel-meta');
         this.commands = [
             // Numeric quick navigation
             { title: 'Go to Home', subtitle: 'Jump to the hero section', action: () => this.navigateTo('#home'), category: 'Navigation', shortcut: '1' },
@@ -51,7 +63,7 @@ export default class CommandPalette {
             { title: 'View source (GitHub)', subtitle: 'Open repository source', action: () => this.openLink('https://github.com/'), category: 'Tools', shortcut: 'v' },
 
             // Extras: quick navigation & controls
-            { title: 'Scroll to top', subtitle: 'Return to the top of the page', action: () => window.scrollTo({ top: 0, behavior: 'smooth' }), category: 'Navigation', shortcut: 'Home' },
+            { title: 'Scroll to top', subtitle: 'Return to the top of the page', action: () => scrollToTop(), category: 'Navigation', shortcut: 'Home' },
             { title: 'Scroll to bottom', subtitle: 'Jump to bottom of page', action: () => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }), category: 'Navigation', shortcut: 'End' },
             { title: 'Open contact links', subtitle: 'Open contact links area', action: () => this.navigateTo('#contact'), category: 'Navigation', shortcut: 'k' },
             { title: 'Open projects grid', subtitle: 'Focus the projects area', action: () => this.dispatchSelector('#projects-grid'), category: 'Navigation', shortcut: 'x' }
@@ -72,18 +84,9 @@ export default class CommandPalette {
         this.init();
     }
 
-    debounce(fn, delay = 120) {
-        let timer;
-        return (...args) => {
-            clearTimeout(timer);
-            timer = setTimeout(() => fn.apply(this, args), delay);
-        };
-    }
-
     init() {
-        this.toggle.addEventListener('click', () => this.open());
         this.closeButton.addEventListener('click', () => this.close());
-        this.debouncedFilter = this.debounce(() => this.filterCommands(), 120);
+        this.debouncedFilter = debounce(() => this.filterCommands(), 120);
         this.input.addEventListener('input', this.debouncedFilter);
         this.input.addEventListener('keydown', event => this.handleKeyDown(event));
         this.panel.addEventListener('click', event => {
@@ -91,14 +94,8 @@ export default class CommandPalette {
                 this.close();
             }
         });
+        // The Ctrl/Cmd+K binding and the toggle button live in app.js, which lazy loads this module
         document.addEventListener('keydown', event => {
-            // quick toggle
-            if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
-                event.preventDefault();
-                this.togglePanel();
-                return;
-            }
-
             // global shortcut commands
             if (this.handleGlobalShortcut(event)) {
                 return;
@@ -111,10 +108,16 @@ export default class CommandPalette {
             }
         });
 
-        this.renderMeta();
-        this.renderAnalytics();
-        this.renderSummary();
+        this.renderPanelStats();
         this.renderCommands();
+    }
+
+    // Single analytics pass shared by every stats region of the panel
+    renderPanelStats() {
+        const data = this.getAnalyticsData();
+        this.renderMeta(data);
+        this.renderAnalytics(data);
+        this.renderSummary(data);
     }
 
     open() {
@@ -123,9 +126,7 @@ export default class CommandPalette {
         this.panel.setAttribute('aria-hidden', 'false');
         this.input.value = '';
         this.filterCommands();
-        this.renderMeta();
-        this.renderAnalytics();
-        this.renderSummary();
+        this.renderPanelStats();
         this.input.focus();
     }
 
@@ -164,8 +165,7 @@ export default class CommandPalette {
         const fragment = document.createDocumentFragment();
 
         if (this.filteredCommands.length === 0) {
-            const emptyState = document.createElement('div');
-            emptyState.className = 'command-item empty';
+            const emptyState = createEl('div', 'command-item empty');
             emptyState.textContent = 'No matching commands';
             fragment.appendChild(emptyState);
             this.list.appendChild(fragment);
@@ -177,24 +177,25 @@ export default class CommandPalette {
 
         categories.forEach(category => {
             const categoryCommands = this.filteredCommands.filter(cmd => (cmd.category || 'Other') === category);
-            const categoryLabel = document.createElement('div');
-            categoryLabel.className = 'command-category';
+            const categoryLabel = createEl('div', 'command-category');
             categoryLabel.textContent = category;
             fragment.appendChild(categoryLabel);
 
             categoryCommands.forEach(command => {
                 const globalIndex = this.filteredCommands.indexOf(command);
-                const item = document.createElement('button');
+                const shortcutMarkup = command.shortcut ? `<kbd class="cmd-shortcut">${escapeHtml(command.shortcut)}</kbd>` : '';
+                const item = createEl(
+                    'button',
+                    'command-item',
+                    `<div class="command-item-main"><strong>${escapeHtml(command.title)}</strong><span>${escapeHtml(command.subtitle) || 'Press Enter to execute'}</span></div>${shortcutMarkup}`
+                );
                 item.type = 'button';
-                item.className = 'command-item';
                 item.dataset.index = String(globalIndex);
                 item.setAttribute('role', 'option');
                 item.setAttribute('aria-selected', globalIndex === this.selectedIndex ? 'true' : 'false');
                 if (globalIndex === this.selectedIndex) {
                     item.classList.add('selected');
                 }
-                const shortcutMarkup = command.shortcut ? `<kbd class="cmd-shortcut">${command.shortcut}</kbd>` : '';
-                item.innerHTML = `<div class="command-item-main"><strong>${command.title}</strong><span>${command.subtitle || 'Press Enter to execute'}</span></div>${shortcutMarkup}`;
                 item.addEventListener('click', (e) => {
                     const idx = Number(e.currentTarget.dataset.index);
                     this.executeCommand(idx);
@@ -208,8 +209,7 @@ export default class CommandPalette {
         this.resultsTitle.textContent = `Commands · ${this.filteredCommands.length} result${this.filteredCommands.length !== 1 ? 's' : ''}`;
     }
 
-    renderAnalytics() {
-        const data = this.getAnalyticsData();
+    renderAnalytics(data = this.getAnalyticsData()) {
         this.analyticsContainer.innerHTML = '';
         const order = ['projects', 'categories', 'techTags', 'sections', 'skills', 'filters', 'features', 'commandGroups', 'actions', 'topTag', 'theme'];
 
@@ -221,15 +221,13 @@ export default class CommandPalette {
             if (stat.value === 0 || stat.value === 'None') {
                 return;
             }
-            const card = document.createElement('div');
-            card.className = 'command-stat';
-            card.innerHTML = `<strong>${stat.value}</strong><span>${stat.label}</span>`;
-            this.analyticsContainer.appendChild(card);
+            this.analyticsContainer.appendChild(
+                createEl('div', 'command-stat', `<strong>${escapeHtml(stat.value)}</strong><span>${escapeHtml(stat.label)}</span>`)
+            );
         });
     }
 
-    renderMeta() {
-        const data = this.getAnalyticsData();
+    renderMeta(data = this.getAnalyticsData()) {
         this.metaContainer.innerHTML = '';
         const chips = [
             { label: 'Open palette', value: 'Ctrl + K' },
@@ -240,15 +238,14 @@ export default class CommandPalette {
         ];
 
         chips.forEach(chip => {
-            const element = document.createElement('span');
-            element.className = 'command-chip';
+            const element = createEl('span', 'command-chip');
             element.textContent = `${chip.value} · ${chip.label}`;
             this.metaContainer.appendChild(element);
         });
     }
 
-    renderSummary() {
-        const summary = this.getSummaryData();
+    renderSummary(data = this.getAnalyticsData()) {
+        const summary = this.getSummaryData(data);
         this.summaryContainer.innerHTML = `
             <strong>${summary.title}</strong>
             <span>${summary.description}</span>
@@ -290,9 +287,7 @@ export default class CommandPalette {
         return false;
     }
 
-    getSummaryData() {
-        const data = this.getAnalyticsData();
-
+    getSummaryData(data = this.getAnalyticsData()) {
         return {
             title: `Live portfolio snapshot • ${data.commands.value} commands ready`,
             description: `${data.projects.value} projects · ${data.categories.value} categories · ${data.techTags.value} tech tags · ${data.sections.value} section anchors · ${data.skills.value} skill groups · ${data.theme.value} mode`
@@ -300,17 +295,16 @@ export default class CommandPalette {
     }
 
     getAnalyticsData() {
-        const projects = Array.from(document.querySelectorAll('.project-card'));
+        const projects = Array.from($$('.project-card'));
         const projectCount = projects.length;
-        const projectTags = Array.from(document.querySelectorAll('.project-tags span')).map(tag => tag.textContent.trim()).filter(Boolean);
+        const projectTags = Array.from($$('.project-tags span')).map(tag => tag.textContent.trim()).filter(Boolean);
         const projectCategories = new Set(projects.flatMap(project => (project.dataset.category || '').split(' ').map(tag => tag.trim()).filter(Boolean)));
         const techTags = new Set(projectTags);
-        const featureCount = document.querySelectorAll('.feature-card').length;
-        const skillRows = document.querySelectorAll('.skill-row').length;
-        const filters = document.querySelectorAll('.filter-button').length;
-        const navLinks = document.querySelectorAll('.nav-link').length;
-        const sectionAnchors = document.querySelectorAll('section[id]').length || navLinks;
-        const activeTheme = document.documentElement.dataset.theme || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        const featureCount = $$('.feature-card').length;
+        const skillRows = $$('.skill-row').length;
+        const navLinks = $$('.nav-link').length;
+        const sectionAnchors = $$('section[id]').length || navLinks;
+        const activeTheme = document.documentElement.dataset.theme || (prefersDarkScheme() ? 'dark' : 'light');
         const commandGroups = new Set(this.commands.map(cmd => cmd.category || 'Other')).size;
         const actionCount = this.commands.filter(cmd => cmd.category === 'Actions').length;
         const filterCommands = this.commands.filter(cmd => cmd.category === 'Filters').length;
@@ -336,7 +330,7 @@ export default class CommandPalette {
     }
 
     copyEmail() {
-        const emailLink = document.querySelector('.contact-email');
+        const emailLink = $('.contact-email');
         const emailAddress = emailLink?.getAttribute('href')?.replace('mailto:', '') || 'your-email@example.com';
         return this.copyText(emailAddress);
     }
@@ -385,14 +379,13 @@ export default class CommandPalette {
 
     setSelectedIndex(index) {
         this.selectedIndex = index;
-        Array.from(this.list.querySelectorAll('.command-item')).forEach(item => {
-            const itemIndex = Number(item.dataset.index);
-            const selected = itemIndex === index;
+        $$('.command-item', this.list).forEach(item => {
+            const selected = Number(item.dataset.index) === index;
             item.setAttribute('aria-selected', selected ? 'true' : 'false');
-            item.classList.toggle('selected', selected);
+            toggleClass(item, 'selected', selected);
         });
 
-        const selectedItem = this.list.querySelector(`.command-item[data-index="${index}"]`);
+        const selectedItem = $(`.command-item[data-index="${index}"]`, this.list);
         if (selectedItem) {
             selectedItem.scrollIntoView({ block: 'nearest', inline: 'nearest' });
         }
@@ -409,14 +402,11 @@ export default class CommandPalette {
     }
 
     navigateTo(hash) {
-        const target = document.querySelector(hash);
-        if (target) {
-            target.scrollIntoView({ behavior: 'smooth' });
-        }
+        scrollToTarget(hash);
     }
 
     dispatchCommand(elementId) {
-        const element = document.getElementById(elementId);
+        const element = $(`#${elementId}`);
         if (element) {
             element.click();
             return true;
@@ -426,14 +416,14 @@ export default class CommandPalette {
     }
 
     dispatchSelector(selector) {
-        let element = document.querySelector(selector);
+        let element = $(selector);
         if (element) {
             element.click();
             return true;
         }
 
         if (selector.startsWith('.')) {
-            element = document.querySelector(`a[href*="${selector.slice(1)}"]`);
+            element = $(`a[href*="${selector.slice(1)}"]`);
             if (element) {
                 element.click();
                 return true;

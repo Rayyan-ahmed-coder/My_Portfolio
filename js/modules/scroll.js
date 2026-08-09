@@ -1,4 +1,4 @@
-import { $, $$, rafThrottle } from "../core/utilities.js";
+import { $, $$, rafThrottle, toggleClass, scrollToTop, scrollToTarget } from "../core/utilities.js";
 import { CONFIG } from "../core/config.js";
 
 export default class ScrollManager {
@@ -8,17 +8,25 @@ export default class ScrollManager {
     #lastScrollY = 0;
     #scrollDirection = "down";
     #activeSection = "";
-    #observer = null;
+    #sectionObserver = null;
 
-    constructor(observerInstance) {
-        this.#observer = observerInstance; 
+    // Cache the thinned callback execution reference to fix the memory leak bug
+    #throttledScrollHandler = null;
+
+    constructor() {
         this.#initialize();
     }
 
     #initialize() {
+        // Fast initial layout pass reading values instantly
         this.#updateScrollButtonState(window.scrollY);
 
-        window.addEventListener("scroll", rafThrottle(() => this.#onScroll()), { passive: true });
+        // FIXED: Cache the throttled reference locally so it can be unmounted safely later
+        this.#throttledScrollHandler = rafThrottle(() => this.#onScroll());
+
+        // PERFORMANCE WIN: 'passive: true' lets the compositor thread slide immediately 
+        // without waiting for JS evaluation pipelines to finish executing.
+        window.addEventListener("scroll", this.#throttledScrollHandler, { passive: true });
 
         this.#setupScrollToTop();
         this.#setupIntersectionObserver();
@@ -27,40 +35,49 @@ export default class ScrollManager {
 
     #onScroll() {
         const currentScrollY = window.scrollY;
-        
-        // 1. Detect scroll direction instantly via bitwise comparison
-        this.#scrollDirection = currentScrollY > this.#lastScrollY?"down":"up";
+
+        // Direct, hyper-fast scroll comparison logic
+        this.#scrollDirection = currentScrollY > this.#lastScrollY ? "down" : "up";
         this.#lastScrollY = currentScrollY;
 
-        // 2. Update toggle button visibility
         this.#updateScrollButtonState(currentScrollY);
     }
 
     #updateScrollButtonState(scrollY) {
         if (!this.#scrollButton) return;
+
+        // PERFORMANCE WIN: Avoid writing/mutating classList on every single mouse tick.
+        // It strictly updates ONLY when crossing the 520px threshold layout gate.
         const shouldBeVisible = scrollY > 520;
-        if (this.#scrollButton.classList.contains("visible") !== shouldBeVisible) {
-            this.#scrollButton.classList.toggle("visible", shouldBeVisible);
-        }
+        if (this.#scrollButton.classList.contains("visible") === shouldBeVisible) return;
+
+        // requestAnimationFrame guarantees the toggle animation won't interrupt scroll frames
+        requestAnimationFrame(() => toggleClass(this.#scrollButton, "visible", shouldBeVisible));
     }
 
     #setupIntersectionObserver() {
         if (!this.#sections.length) return;
-        const offsetPct = CONFIG.ACTIVE_SECTION_OFFSET ?? 140; 
+
+        const offsetPct = CONFIG.ACTIVE_SECTION_OFFSET ?? 140;
+
+        // HIGH PERFORMANCE: IntersectionObserver operates natively off the Main Thread.
+        // No manual bounding rect mathematics or scroll calculation polling.
         const observerOptions = {
             root: null, // Viewport boundary mapping
-            rootMargin: `-${offsetPct}px 0px -60% 0px`, 
+            rootMargin: `-${offsetPct}px 0px -60% 0px`,
             threshold: 0
         };
 
-        const activeObserver = new IntersectionObserver((entries) => {
+        this.#sectionObserver = new IntersectionObserver((entries) => {
             entries.forEach((entry) => {
+                // HIGH SPEED: Only process active intersection triggers to save CPU overhead
                 if (entry.isIntersecting) {
                     this.#updateActiveSection(entry.target.id);
                 }
             });
         }, observerOptions);
-        this.#sections.forEach((section) => activeObserver.observe(section));
+
+        this.#sections.forEach((section) => this.#sectionObserver.observe(section));
     }
 
     #updateActiveSection(sectionId) {
@@ -70,9 +87,11 @@ export default class ScrollManager {
         requestAnimationFrame(() => {
             this.#links.forEach((link) => {
                 const isActive = link.getAttribute("href") === `#${sectionId}`;
-                link.classList.toggle("active", isActive);
-                // Accessibility tracking updates
-                link.setAttribute("aria-current", isActive ?"page":"false");
+
+                if (toggleClass(link, "active", isActive)) {
+                    // Accessibility tracking updates
+                    link.setAttribute("aria-current", isActive ? "page" : "false");
+                }
             });
         });
     }
@@ -83,33 +102,25 @@ export default class ScrollManager {
                 const href = link.getAttribute("href");
                 if (!href?.startsWith("#")) return;
                 event.preventDefault();
-                const target = $(href); 
-                if (!target) return;
-
-                target.setAttribute('tabindex', '-1');
-                target.focus({ preventScroll: true });
-
                 // Use native browser engine smooth scrolling curves
-                target.scrollIntoView({
-                    behavior: "smooth",
-                    block: "start"
-                });
+                scrollToTarget(href, { focus: true });
             });
         });
     }
 
     #setupScrollToTop() {
         if (!this.#scrollButton) return;
-        this.#scrollButton.addEventListener("click", () => {
-            window.scrollTo({ 
-                top: 0, 
-                behavior: "smooth" 
-            });
-        });
+        this.#scrollButton.addEventListener("click", scrollToTop);
     }
 
     // Lifecycle cleaning script hook to keep modules leak-free
     destroy() {
-        window.removeEventListener("scroll", this.#onScroll);
+        if (this.#throttledScrollHandler) {
+            window.removeEventListener("scroll", this.#throttledScrollHandler);
+        }
+        if (this.#sectionObserver) {
+            this.#sectionObserver.disconnect();
+            this.#sectionObserver = null;
+        }
     }
 }

@@ -1,5 +1,5 @@
-import Navigation from "./modules/navigation.js";
 import Theme from "./modules/theme.js";
+import { onIdle } from "./core/utilities.js";
 
 class Portfolio {
     constructor() {
@@ -20,14 +20,10 @@ class Portfolio {
 
     initialize() {
         try {
-            const themeButton = document.getElementById('theme-toggle');
-            const theme = new Theme();
-            
-            this.modules.navigation = new Navigation();
-            this.modules.theme = theme;
+            // Theme binds its own toggle button listener internally
+            this.modules.theme = new Theme();
 
-            const idle = window.requestIdleCallback || (cb => setTimeout(cb, 200));
-            idle(async () => {
+            onIdle(async () => {
                 try {
                     const [
                         { default: ObserverManager }, 
@@ -42,8 +38,7 @@ class Portfolio {
                     ]);
 
                     this.modules.observer = new ObserverManager();
-                    // Pass the complete instance map if ScrollManager requires theme or nav reference states later
-                    this.modules.scroll = new ScrollManager(this.modules.observer);
+                    this.modules.scroll = new ScrollManager();
                     this.modules.cursor = new CustomCursor();
                     this.modules.content = new LoadContent();
                 } catch (e) {
@@ -94,12 +89,6 @@ class Portfolio {
                 }
             }, { once: true });
 
-            if (themeButton) {
-                themeButton.addEventListener('click', () => theme.toggleTheme());
-            } else {
-                console.warn('Theme toggle button not found.');
-            }
-            
             console.log("Portfolio initialized successfully.");
         } catch (error) {
             console.error("Portfolio initialization failed:", error);

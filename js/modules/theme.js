@@ -1,9 +1,10 @@
 import { CONFIG } from "../core/config.js";
+import { $, darkSchemeQuery, prefersDarkScheme } from "../core/utilities.js";
 
 export default class Theme {
     // Private fields for encapsulation and minor bundle optimization
     #root = document.documentElement;
-    #toggleButton = document.getElementById('theme-toggle');
+    #toggleButton = $('#theme-toggle');
     #iconEl = this.#toggleButton?.querySelector('.theme-icon');
     // Cryptographic hash or structured prefix to make the storage key tamper-resistant
     #storageKey = CONFIG.STORAGE_THEME_KEY || '__portfolio_theme__';
@@ -21,8 +22,7 @@ export default class Theme {
             return;
         }
 
-        const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-        this.#setTheme(prefersDark ? "dark" : "light", true);
+        this.#setTheme(prefersDarkScheme() ? "dark" : "light", true);
     }
 
     #setupEventListeners() {
@@ -31,12 +31,11 @@ export default class Theme {
         this.#toggleButton.addEventListener('click', () => this.toggleTheme());
 
         // Performance: Sync theme instantly if user changes OS preferences while on the site
-        window.matchMedia("(prefers-color-scheme: dark)")
-            .addEventListener('change', (e) => {
-                if (!localStorage.getItem(this.#storageKey)) {
-                    this.#setTheme(e.matches ? "dark" : "light", false);
-                }
-            });
+        darkSchemeQuery.addEventListener('change', (e) => {
+            if (!this.#getValidatedStorage()) {
+                this.#setTheme(e.matches ? "dark" : "light", false);
+            }
+        });
     }
 
     #getValidatedStorage() {
@@ -75,7 +74,7 @@ export default class Theme {
             }
 
             // 4. Update Theme Color Meta Tag (Optimized CSS variable read)
-            const metaThemeColor = document.querySelector('meta[name="theme-color"]');
+            const metaThemeColor = $('meta[name="theme-color"]');
             if (metaThemeColor) {
                 // Security fallback values if CSS variables are altered/missing
                 const targetVariable = theme === 'dark' ? '--color-black' : '--color-primary';
@@ -88,7 +87,7 @@ export default class Theme {
     }
 
     toggleTheme() {
-        const current = this.#root.dataset.theme || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+        const current = this.#root.dataset.theme || (prefersDarkScheme() ? "dark" : "light");
         this.#setTheme(current === "dark" ? "light" : "dark", true);
     }
 }

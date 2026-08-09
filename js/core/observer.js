@@ -1,4 +1,4 @@
-import { $$ } from "./utilities.js";
+import { resolveElements } from "./utilities.js";
 
 export default class ObserverManager {
     // Encapsulate structural state cleanly away from global scope access
@@ -31,14 +31,7 @@ export default class ObserverManager {
     }
 
     #initialize() {
-        const staticElements = $$("[data-reveal]");
-        if (!staticElements.length) return;
-
-        // Efficiently batch track items using a native Set structure
-        staticElements.forEach((el) => {
-            this.#elements.add(el);
-            this.#observer.observe(el);
-        });
+        this.observe("[data-reveal]");
     }
 
     /**
@@ -73,16 +66,7 @@ export default class ObserverManager {
             return;
         }
 
-        let targetsToObserve = [];
-
-        if (typeof target === 'string') {
-            targetsToObserve = $$(target);
-        } else if (target instanceof Element) {
-            targetsToObserve = [target];
-        } else if (target instanceof NodeList || Array.isArray(target)) {
-            targetsToObserve = Array.from(target);
-        }
-
+        const targetsToObserve = resolveElements(target);
         const len = targetsToObserve.length;
         if (len === 0) return;
 
@@ -99,16 +83,8 @@ export default class ObserverManager {
     /**
      * Fallback for legacy environments or failed states
      */
-    #revealFallback(target = null) {
-        if (!target) {
-            $$("[data-reveal]").forEach((el) => el.classList.add("revealed"));
-            return;
-        }
-
-        const elements = typeof target === 'string' ? $$(target) : [target].flat();
-        elements.forEach((el) => {
-            if (el instanceof Element) el.classList.add("revealed");
-        });
+    #revealFallback(target = "[data-reveal]") {
+        resolveElements(target).forEach((el) => el.classList.add("revealed"));
     }
 
     /**

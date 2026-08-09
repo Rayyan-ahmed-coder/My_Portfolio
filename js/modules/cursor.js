@@ -1,3 +1,5 @@
+import { createEl, toggleClass } from "../core/utilities.js";
+
 export default class CustomCursor {
     // Private properties for fast engine execution
     #cursor = null;
@@ -8,7 +10,6 @@ export default class CustomCursor {
     #isMoving = false;
     #rafId = null;
     #lastMoveTime = 0;
-    #isActiveState = false;
     #closeness = 0.55;
 
     #boundMouseMove = null;
@@ -22,8 +23,7 @@ export default class CustomCursor {
     }
 
     #createCursorElement() {
-        this.#cursor = document.createElement('div');
-        this.#cursor.className = 'cursor';
+        this.#cursor = createEl('div', 'cursor');
         
         Object.assign(this.#cursor.style, {
             position: 'fixed',
@@ -52,9 +52,7 @@ export default class CustomCursor {
 
         if (this.#closeness >= 1) {
             this.#cursor.style.display = 'block';
-            const offsetX = Math.round(this.#mouseX - 10);
-            const offsetY = Math.round(this.#mouseY - 10);
-            this.#cursor.style.transform = `translate3d(${offsetX}px, ${offsetY}px, 0)`;
+            this.#applyPosition(this.#mouseX, this.#mouseY);
             return;
         }
 
@@ -74,10 +72,7 @@ export default class CustomCursor {
         this.#currentX += (this.#mouseX - this.#currentX) * this.#closeness;
         this.#currentY += (this.#mouseY - this.#currentY) * this.#closeness;
 
-        const offsetX = Math.round(this.#currentX - 10); 
-        const offsetY = Math.round(this.#currentY - 10); 
-
-        this.#cursor.style.transform = `translate3d(${offsetX}px, ${offsetY}px, 0)`;
+        this.#applyPosition(this.#currentX, this.#currentY);
 
         const deltaX = this.#mouseX - this.#currentX;
         const deltaY = this.#mouseY - this.#currentY;
@@ -93,6 +88,10 @@ export default class CustomCursor {
         this.#rafId = requestAnimationFrame((t) => this.#tick(t));
     }
 
+    #applyPosition(x, y) {
+        this.#cursor.style.transform = `translate3d(${Math.round(x - 10)}px, ${Math.round(y - 10)}px, 0)`;
+    }
+
     #handleInteractivity(e) {
         const target = e.target;
         if (!target) return;
@@ -103,13 +102,7 @@ export default class CustomCursor {
             target.classList.contains('interactive') || 
             target.closest('a, button, .interactive');
 
-        if (isInteractive && !this.#isActiveState) {
-            this.#isActiveState = true;
-            this.#cursor.classList.add('active');
-        } else if (!isInteractive && this.#isActiveState) {
-            this.#isActiveState = false;
-            this.#cursor.classList.remove('active');
-        }
+        toggleClass(this.#cursor, 'active', Boolean(isInteractive));
     }
 
     destroy() {
