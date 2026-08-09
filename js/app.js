@@ -1,14 +1,23 @@
 import Navigation from "./modules/navigation.js";
 import Theme from "./modules/theme.js";
+import { reportError, runSafely } from "./core/errors.js";
 
 class Portfolio {
     constructor() {
         this.modules = {};
-        
-        // FIXED: Global error handlers must be bound immediately in constructor, 
-        // not nested inside catch blocks where they will never trigger out-of-box loops.
+
+        // Global handlers must be bound immediately so failures raised before
+        // (or outside of) initialize() are still reported.
         window.addEventListener('unhandledrejection', event => {
-            console.warn(`Unhandled promise rejection: ${event.reason}`);
+            reportError('window.unhandledrejection', event.reason);
+        });
+
+        window.addEventListener('error', event => {
+            reportError('window.error', event.error ?? event.message, {
+                source: event.filename,
+                line: event.lineno,
+                column: event.colno
+            });
         });
 
         if (document.readyState === 'loading') {
@@ -22,33 +31,13 @@ class Portfolio {
         try {
             const themeButton = document.getElementById('theme-toggle');
             const theme = new Theme();
-            
+
             this.modules.navigation = new Navigation();
             this.modules.theme = theme;
 
             const idle = window.requestIdleCallback || (cb => setTimeout(cb, 200));
-            idle(async () => {
-                try {
-                    const [
-                        { default: ObserverManager }, 
-                        { default: ScrollManager }, 
-                        { default: CustomCursor }, 
-                        { default: LoadContent }
-                    ] = await Promise.all([
-                        import('./core/observer.js'),
-                        import('./modules/scroll.js'),
-                        import('./modules/cursor.js'),
-                        import('./core/contentLoader.js')
-                    ]);
-
-                    this.modules.observer = new ObserverManager();
-                    // Pass the complete instance map if ScrollManager requires theme or nav reference states later
-                    this.modules.scroll = new ScrollManager(this.modules.observer);
-                    this.modules.cursor = new CustomCursor();
-                    this.modules.content = new LoadContent();
-                } catch (e) {
-                    console.warn('Deferred module init failed', e);
-                }
+            idle(() => {
+                runSafely('app.loadDeferredModules', () => this.#loadDeferredModules());
             });
 
             this.modules.command = null;
@@ -62,7 +51,7 @@ class Portfolio {
                     this.modules.command = new mod.default();
                     return this.modules.command;
                 } catch (err) {
-                    console.warn('Command palette failed to load', err);
+                    reportError('app.loadCommandPalette', err);
                     return null;
                 } finally {
                     this._commandLoaderInProgress = false;
@@ -71,45 +60,88 @@ class Portfolio {
 
             const cmdToggleEl = document.getElementById('command-toggle');
             if (cmdToggleEl) {
-                cmdToggleEl.addEventListener('click', async (e) => {
+                cmdToggleEl.addEventListener('click', (e) => {
                     e.preventDefault();
-                    const cp = await loadCommandPalette();
-                    if (cp) cp.open();
+                    runSafely('app.commandToggleClick', async () => {
+                        const cp = await loadCommandPalette();
+                        if (cp) cp.open();
+                    });
                 });
             }
 
-            document.addEventListener('keydown', async (ev) => {
+            document.addEventListener('keydown', (ev) => {
                 if ((ev.ctrlKey || ev.metaKey) && ev.key.toLowerCase() === 'k') {
                     ev.preventDefault();
-                    const cp = await loadCommandPalette();
-                    if (cp) cp.togglePanel();
+                    runSafely('app.commandToggleShortcut', async () => {
+                        const cp = await loadCommandPalette();
+                        if (cp) cp.togglePanel();
+                    });
                 }
             });
 
             document.addEventListener('content:loaded', () => {
-                try {
+                runSafely('app.observeRevealedContent', () => {
                     this.modules.observer?.observe('[data-reveal]');
-                } catch (e) {
-                    // silent catch
-                }
+                });
             }, { once: true });
 
             if (themeButton) {
-                themeButton.addEventListener('click', () => theme.toggleTheme());
+                themeButton.addEventListener('click', () => {
+                    runSafely('app.themeToggleClick', () => theme.toggleTheme());
+                });
             } else {
                 console.warn('Theme toggle button not found.');
             }
-            
+
             console.log("Portfolio initialized successfully.");
         } catch (error) {
-            console.error("Portfolio initialization failed:", error);
+            // Core bootstrap failed: report it and let it reach window.onerror
+            // instead of leaving the page in a half-initialized silent state.
+            throw reportError('app.initialize', error);
+        }
+    }
+
+    /**
+     * Loads the deferred modules independently so that one failing import or
+     * constructor does not take the remaining modules down with it.
+     */
+    async #loadDeferredModules() {
+        const deferred = [
+            ['observer', async () => {
+                const { default: ObserverManager } = await import('./core/observer.js');
+                this.modules.observer = new ObserverManager();
+            }],
+            ['cursor', async () => {
+                const { default: CustomCursor } = await import('./modules/cursor.js');
+                this.modules.cursor = new CustomCursor();
+            }],
+            ['content', async () => {
+                const { default: LoadContent } = await import('./core/contentLoader.js');
+                this.modules.content = new LoadContent();
+            }]
+        ];
+
+        const results = await Promise.allSettled(deferred.map(([, load]) => load()));
+
+        results.forEach((result, index) => {
+            if (result.status === 'rejected') {
+                reportError('app.loadDeferredModules', result.reason, { module: deferred[index][0] });
+            }
+        });
+
+        // ScrollManager is loaded last because it consumes the observer instance.
+        try {
+            const { default: ScrollManager } = await import('./modules/scroll.js');
+            this.modules.scroll = new ScrollManager(this.modules.observer);
+        } catch (error) {
+            reportError('app.loadDeferredModules', error, { module: 'scroll' });
         }
     }
 
     destroy() {
         Object.values(this.modules).forEach(module => {
             if (module && typeof module.destroy === 'function') {
-                module.destroy();
+                runSafely('app.destroy', () => module.destroy());
             }
         });
     }

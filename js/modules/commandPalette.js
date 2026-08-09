@@ -1,3 +1,5 @@
+import { reportError, runSafely } from "../core/errors.js";
+
 export default class CommandPalette {
     constructor() {
         this.body = document.querySelector(`body`);
@@ -65,8 +67,20 @@ export default class CommandPalette {
         });
         this.selectedIndex = 0;
 
-        if (!this.panel || !this.toggle || !this.closeButton || !this.input || !this.list || !this.resultsTitle || !this.analyticsContainer || !this.summaryContainer || !this.metaContainer) {
-            throw new Error('Command palette elements are missing');
+        const missing = Object.entries({
+            '#command-panel': this.panel,
+            '#command-toggle': this.toggle,
+            '#command-close': this.closeButton,
+            '#command-input': this.input,
+            '#command-list': this.list,
+            '.command-panel-results-title': this.resultsTitle,
+            '#command-analytics': this.analyticsContainer,
+            '#command-summary': this.summaryContainer,
+            '.command-panel-meta': this.metaContainer
+        }).filter(([, element]) => !element).map(([selector]) => selector);
+
+        if (missing.length) {
+            throw new Error(`Command palette elements are missing: ${missing.join(', ')}`);
         }
 
         this.init();
@@ -100,7 +114,7 @@ export default class CommandPalette {
             }
 
             // global shortcut commands
-            if (this.handleGlobalShortcut(event)) {
+            if (runSafely('commandPalette.handleGlobalShortcut', () => this.handleGlobalShortcut(event))) {
                 return;
             }
 
@@ -264,7 +278,7 @@ export default class CommandPalette {
 
             if (command) {
                 event.preventDefault();
-                command.action();
+                this.#runAction(command);
                 return true;
             }
             return false;
@@ -281,7 +295,7 @@ export default class CommandPalette {
                 const command = this.shortcutMap.get(key);
                 if (command) {
                     event.preventDefault();
-                    command.action();
+                    this.#runAction(command);
                     return true;
                 }
             }
@@ -341,8 +355,22 @@ export default class CommandPalette {
         return this.copyText(emailAddress);
     }
 
-    copyText(value) {
-        return navigator.clipboard?.writeText(value).catch(() => null);
+    /**
+     * @returns {Promise<boolean>} Whether the value reached the clipboard.
+     */
+    async copyText(value) {
+        if (!navigator.clipboard) {
+            reportError('commandPalette.copyText', new Error('Clipboard API unavailable in this context'));
+            return false;
+        }
+
+        try {
+            await navigator.clipboard.writeText(value);
+            return true;
+        } catch (error) {
+            reportError('commandPalette.copyText', error);
+            return false;
+        }
     }
 
     focusSearch() {
@@ -404,15 +432,26 @@ export default class CommandPalette {
             return;
         }
 
-        command.action();
+        this.#runAction(command);
         this.close();
+    }
+
+    /**
+     * Executes a command action, reporting synchronous throws and rejected
+     * promises instead of letting them escape as unhandled failures.
+     */
+    #runAction(command) {
+        return runSafely(`commandPalette.action:${command.title}`, () => command.action());
     }
 
     navigateTo(hash) {
         const target = document.querySelector(hash);
-        if (target) {
-            target.scrollIntoView({ behavior: 'smooth' });
+        if (!target) {
+            reportError('commandPalette.navigateTo', new Error(`Navigation target not found: ${hash}`));
+            return false;
         }
+        target.scrollIntoView({ behavior: 'smooth' });
+        return true;
     }
 
     dispatchCommand(elementId) {
@@ -421,7 +460,7 @@ export default class CommandPalette {
             element.click();
             return true;
         }
-        console.warn(`Command target not found: ${elementId}`);
+        reportError('commandPalette.dispatchCommand', new Error(`Command target not found: ${elementId}`));
         return false;
     }
 
@@ -440,11 +479,16 @@ export default class CommandPalette {
             }
         }
 
-        console.warn(`Selector command target not found: ${selector}`);
+        reportError('commandPalette.dispatchSelector', new Error(`Selector command target not found: ${selector}`));
         return false;
     }
 
     openLink(url) {
-        window.open(url, '_blank');
+        const opened = window.open(url, '_blank', 'noopener');
+        if (!opened) {
+            reportError('commandPalette.openLink', new Error('Popup blocked; falling back to same-tab navigation'), { url });
+            window.location.assign(url);
+        }
+        return Boolean(opened);
     }
 }

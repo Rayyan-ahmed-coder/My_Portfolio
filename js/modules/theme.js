@@ -1,4 +1,5 @@
 import { CONFIG } from "../core/config.js";
+import { reportError } from "../core/errors.js";
 
 export default class Theme {
     // Private fields for encapsulation and minor bundle optimization
@@ -33,7 +34,7 @@ export default class Theme {
         // Performance: Sync theme instantly if user changes OS preferences while on the site
         window.matchMedia("(prefers-color-scheme: dark)")
             .addEventListener('change', (e) => {
-                if (!localStorage.getItem(this.#storageKey)) {
+                if (!this.#getValidatedStorage()) {
                     this.#setTheme(e.matches ? "dark" : "light", false);
                 }
             });
@@ -44,9 +45,9 @@ export default class Theme {
             const val = localStorage.getItem(this.#storageKey);
             // Security: Strictly whitelist accepted values to prevent XSS injection via localStorage
             return (val === 'dark' || val === 'light') ? val : null;
-        } catch (e) {
-            // Security/Robustness: Handle environments where localStorage is disabled (e.g., private browsing)
-            console.warn("Storage access denied. Falling back to system defaults.");
+        } catch (error) {
+            // Robustness: environments where localStorage is disabled (e.g., private browsing)
+            reportError('theme.readStorage', error, { key: this.#storageKey });
             return null;
         }
     }
@@ -62,7 +63,10 @@ export default class Theme {
             if (shouldSave) {
                 try {
                     localStorage.setItem(this.#storageKey, theme);
-                } catch (e) { /* Fail silently if quota exceeded or blocked */ }
+                } catch (error) {
+                    // Non-fatal: the theme still applies, it just will not persist.
+                    reportError('theme.persist', error, { key: this.#storageKey, theme });
+                }
             }
 
             // 3. Accessibility & UI Updates

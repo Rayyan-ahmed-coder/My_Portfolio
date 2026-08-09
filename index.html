@@ -32,6 +32,7 @@
                 document.documentElement.setAttribute('data-theme', theme);
                 document.documentElement.style.colorScheme = theme;
             } catch (e) {
+                console.warn('Theme preload failed, defaulting to light theme:', e);
                 document.documentElement.setAttribute('data-theme', 'light');
             }
         })();

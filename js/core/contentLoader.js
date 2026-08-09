@@ -1,3 +1,5 @@
+import { reportError, runSafely } from "./errors.js";
+
 export default class LoadContent {
     #projectsGrid;
     #abortController;
@@ -11,14 +13,23 @@ export default class LoadContent {
         this.init();
     }
 
-    async init() {
+    /**
+     * Cancels any in-flight request and releases the intersection observer.
+     */
+    destroy() {
+        this.#abortController?.abort();
+        this.#observer?.disconnect();
+    }
+
+    init() {
         if (!this.#projectsGrid) {
-            console.error("Target #projects-grid element not Found in DOM.");
-            return;
+            throw new Error("Target #projects-grid element not found in DOM.");
         }
 
         const idle = window.requestIdleCallback || ((cb) => setTimeout(cb, 50));
-        const triggerLoad = () => idle(() => this.loadProjects());
+        // loadProjects() runs detached from any caller, so its rejection has to
+        // be reported here or it would surface as an unhandled rejection.
+        const triggerLoad = () => idle(() => runSafely('contentLoader.loadProjects', () => this.loadProjects()));
 
         // HIGH PERFORMANCE: Let the browser engine handle off-screen intersection checking
         if ('IntersectionObserver' in window) {
@@ -71,15 +82,13 @@ export default class LoadContent {
             this.#projectsGrid.innerHTML = '';
             this.#projectsGrid.appendChild(template.content);
             this.#attachProjectFilterEvents();
-            try {
+            runSafely('contentLoader.dispatchContentLoaded', () => {
                 document.dispatchEvent(new CustomEvent('content:loaded', { detail: { count: len } }));
-            } catch (e) { 
-                // silent pass 
-            }
+            });
         } catch (error) {
             if (error.name === 'AbortError') return;
-            console.error("Error Loading Content: ", error);
             this.#renderStaticMessage('<p class="error-msg">Failed to Load Projects.</p>');
+            throw reportError('contentLoader.loadProjects', error);
         }
     }
 
