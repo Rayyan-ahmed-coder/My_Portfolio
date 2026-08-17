@@ -5,8 +5,5 @@ export const CONFIG = Object.freeze({
     OBSERVER_ROOT_MARGIN: "0px 0px -80px",
     STORAGE_THEME_KEY: "__portfolio_theme__",
     SCROLL_TICK_RATE: 16,
-    ACTIVE_SECTION_OFFSET: 140,
-    SCROLL_TOP_THRESHOLD: 520,
+    ACTIVE_SECTION_OFFSET: 140
 });
-
-export type Config = typeof CONFIG;

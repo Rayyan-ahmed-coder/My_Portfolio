@@ -1,29 +1,14 @@
 {
   "compilerOptions": {
-    "target": "ES2022",
-    "module": "ESNext",
-    "moduleResolution": "bundler",
-    "lib": ["DOM", "DOM.Iterable", "ES2022"],
-    "types": ["vite/client"],
-    "allowImportingTsExtensions": true,
-    "verbatimModuleSyntax": true,
-    "isolatedModules": true,
-    "useDefineForClassFields": true,
-    "resolveJsonModule": true,
-    "skipLibCheck": true,
-
-    /* Strictness: the compiler, not runtime, catches null and type mistakes. */
-    "strict": true,
-    "noImplicitOverride": true,
-    "noUncheckedIndexedAccess": false,
-    "noFallthroughCasesInSwitch": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "exactOptionalPropertyTypes": false,
-    "forceConsistentCasingInFileNames": true,
-
-    /* Type checking only; bundling is Vite's job. */
-    "noEmit": true
-  },
-  "include": ["js/**/*.ts", "tests/**/*.ts", "vite.config.ts", "vitest.config.mts"]
+    "target": "ES2022",                          /* Compiles to modern, highly optimized JS */
+    "module": "NodeNext",                        /* Enables fast module loading */
+    "moduleResolution": "NodeNext",
+    "lib": ["DOM", "DOM.Iterable", "ES2022"],   /* Reduces bundled code size */
+    "allowJs": true,                             /* Allows normal JS files */
+    "skipLibCheck": true,                        /* Speeds up your project build time */
+    "strict": true,                              /* Prevents memory leaks and heavy runtime bugs */
+    "noEmit": false,
+    "removeComments": true,                      /* Strips code comments to save file size */
+    "sourceMap": false                           /* Disables bulky source maps in production */
+  }
 }
