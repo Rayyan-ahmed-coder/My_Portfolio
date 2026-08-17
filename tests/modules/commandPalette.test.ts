@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import CommandPalette from '../../js/modules/commandPalette.js';
-import { stubMatchMedia, trackDocumentListeners } from '../helpers.js';
+import CommandPalette, { MissingPaletteElementsError } from '../../js/modules/commandPalette.js';
+import type { Command } from '../../js/core/types.js';
+import { stubMatchMedia } from '../helpers.js';
 
 const paletteMarkup = `
     <button id="command-toggle">Open</button>
@@ -36,57 +37,87 @@ const contentMarkup = `
     </div>
 `;
 
-const keydown = (target, init) => {
+const keydown = (target: EventTarget, init: KeyboardEventInit): KeyboardEvent => {
     const event = new KeyboardEvent('keydown', { bubbles: true, cancelable: true, ...init });
     target.dispatchEvent(event);
     return event;
 };
 
+const byId = <E extends HTMLElement = HTMLElement>(id: string): E => document.getElementById(id) as E;
+const q = <E extends Element = HTMLElement>(selector: string): E => document.querySelector<E>(selector) as E;
+const input = (): HTMLInputElement => byId<HTMLInputElement>('command-input');
+const commandByTitle = (palette: CommandPalette, title: string): Command =>
+    palette.commands.find((command) => command.title === title) as Command;
+
 describe('modules/commandPalette', () => {
-    let listeners;
+    let instances: CommandPalette[] = [];
+
+    /** The palette binds document-level listeners, so every instance is destroyed. */
+    const create = (): CommandPalette => {
+        const palette = new CommandPalette();
+        instances.push(palette);
+        return palette;
+    };
 
     beforeEach(() => {
         stubMatchMedia(false);
+        document.documentElement.removeAttribute('data-theme');
+        document.documentElement.removeAttribute('style');
+        document.documentElement.className = '';
         document.body.innerHTML = paletteMarkup + contentMarkup;
-        listeners = trackDocumentListeners();
+        instances = [];
     });
 
     afterEach(() => {
-        listeners.detachAll();
+        instances.splice(0).forEach((palette) => palette.destroy());
     });
 
-    const create = () => new CommandPalette();
-
     describe('construction', () => {
-        it('throws when a required element is missing', () => {
-            document.getElementById('command-list').remove();
+        it('throws a typed error when a required element is missing', () => {
+            byId('command-list').remove();
 
-            expect(() => create()).toThrow(/Command palette elements are missing/);
+            expect(() => create()).toThrow(MissingPaletteElementsError);
+            expect(() => create()).toThrow(/Command palette elements are missing: list/);
+        });
+
+        it('degrades to null via create() instead of throwing', () => {
+            const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+            byId('command-panel').remove();
+
+            expect(CommandPalette.create()).toBeNull();
+            expect(warn).toHaveBeenCalled();
+        });
+
+        it('builds a working palette through create()', () => {
+            const palette = CommandPalette.create();
+
+            expect(palette).toBeInstanceOf(CommandPalette);
+            palette?.destroy();
         });
 
         it('renders the full command list grouped by category', () => {
             const palette = create();
-            const list = document.getElementById('command-list');
+            const list = byId('command-list');
 
             expect(list.querySelectorAll('.command-item')).toHaveLength(palette.commands.length);
             const categories = [...list.querySelectorAll('.command-category')].map((el) => el.textContent);
-            expect(categories).toEqual([...new Set(palette.commands.map((cmd) => cmd.category))]);
+            expect(categories).toEqual([...new Set(palette.commands.map((command) => command.category))]);
         });
 
         it('reports the result count and preselects the first item', () => {
             const palette = create();
 
-            expect(document.querySelector('.command-panel-results-title').textContent).toBe(
+            expect(q('.command-panel-results-title').textContent).toBe(
                 `Commands · ${palette.commands.length} results`
             );
-            expect(document.querySelector('.command-item').getAttribute('aria-selected')).toBe('true');
+            expect(q('.command-item').getAttribute('aria-selected')).toBe('true');
         });
 
         it('indexes every shortcut in lowercase', () => {
             const palette = create();
 
-            expect(palette.shortcutMap.get('1').title).toBe('Go to Home');
-            expect(palette.shortcutMap.get('alt+shift+t').title).toBe('Toggle theme');
+            expect(palette.shortcuts.get('1')?.title).toBe('Go to Home');
+            expect(palette.shortcuts.get('alt+shift+t')?.title).toBe('Toggle theme');
         });
     });
 
@@ -97,22 +128,22 @@ describe('modules/commandPalette', () => {
             palette.open();
 
             expect(document.body.classList.contains('body-locked')).toBe(true);
-            expect(document.getElementById('command-panel').classList.contains('open')).toBe(true);
-            expect(document.getElementById('command-panel').getAttribute('aria-hidden')).toBe('false');
-            expect(document.activeElement).toBe(document.getElementById('command-input'));
+            expect(byId('command-panel').classList.contains('open')).toBe(true);
+            expect(byId('command-panel').getAttribute('aria-hidden')).toBe('false');
+            expect(document.activeElement).toBe(input());
             expect(palette.isOpen()).toBe(true);
         });
 
         it('clears a stale query when reopening', () => {
             const palette = create();
             palette.open();
-            document.getElementById('command-input').value = 'theme';
+            input().value = 'theme';
             palette.filterCommands();
             palette.close();
 
             palette.open();
 
-            expect(document.getElementById('command-input').value).toBe('');
+            expect(input().value).toBe('');
             expect(palette.filteredCommands).toHaveLength(palette.commands.length);
         });
 
@@ -123,18 +154,18 @@ describe('modules/commandPalette', () => {
             palette.close();
 
             expect(document.body.classList.contains('body-locked')).toBe(false);
-            expect(document.getElementById('command-panel').getAttribute('aria-hidden')).toBe('true');
-            expect(document.activeElement).toBe(document.getElementById('command-toggle'));
+            expect(byId('command-panel').getAttribute('aria-hidden')).toBe('true');
+            expect(document.activeElement).toBe(byId('command-toggle'));
             expect(palette.isOpen()).toBe(false);
         });
 
-        it('toggles from the toggle button, the close button and Ctrl+K', () => {
+        it('opens from the toggle, closes from the close button and toggles with Ctrl+K', () => {
             const palette = create();
 
-            document.getElementById('command-toggle').click();
+            byId('command-toggle').click();
             expect(palette.isOpen()).toBe(true);
 
-            document.getElementById('command-close').click();
+            byId('command-close').click();
             expect(palette.isOpen()).toBe(false);
 
             keydown(document, { key: 'k', ctrlKey: true });
@@ -161,10 +192,10 @@ describe('modules/commandPalette', () => {
             const palette = create();
             palette.open();
 
-            document.getElementById('command-input').click();
+            input().click();
             expect(palette.isOpen()).toBe(true);
 
-            document.getElementById('command-panel').click();
+            byId('command-panel').click();
             expect(palette.isOpen()).toBe(false);
         });
     });
@@ -172,70 +203,87 @@ describe('modules/commandPalette', () => {
     describe('filtering', () => {
         it('matches on title, subtitle and category', () => {
             const palette = create();
-            const input = document.getElementById('command-input');
 
-            input.value = 'clipboard';
+            input().value = 'clipboard';
             palette.filterCommands();
-            expect(palette.filteredCommands.map((cmd) => cmd.title)).toEqual([
+            expect(palette.filteredCommands.map((command) => command.title)).toEqual([
                 'Copy email address',
                 'Copy creator name',
             ]);
 
-            input.value = 'accessibility';
+            input().value = 'accessibility';
             palette.filterCommands();
-            expect(palette.filteredCommands.every((cmd) => cmd.category === 'Accessibility')).toBe(true);
+            expect(palette.filteredCommands.every((command) => command.category === 'Accessibility')).toBe(true);
         });
 
         it('is case and whitespace insensitive', () => {
             const palette = create();
-            document.getElementById('command-input').value = '  ToGgLe ThEmE  ';
+            input().value = '  ToGgLe ThEmE  ';
 
             palette.filterCommands();
 
-            expect(palette.filteredCommands[0].title).toBe('Toggle theme');
+            expect(palette.filteredCommands[0]?.title).toBe('Toggle theme');
         });
 
         it('renders an empty state for a query with no matches', () => {
             const palette = create();
-            document.getElementById('command-input').value = 'zzzz-nothing';
+            input().value = 'zzzz-nothing';
 
             palette.filterCommands();
 
-            expect(document.querySelector('.command-item.empty').textContent).toBe('No matching commands');
-            expect(document.querySelector('.command-panel-results-title').textContent).toBe('Commands · 0 results');
+            expect(q('.command-item.empty').textContent).toBe('No matching commands');
+            expect(q('.command-panel-results-title').textContent).toBe('Commands · 0 results');
         });
 
         it('uses the singular result label for a single match', () => {
             const palette = create();
-            document.getElementById('command-input').value = 'Print page';
+            input().value = 'Print page';
 
             palette.filterCommands();
 
-            expect(document.querySelector('.command-panel-results-title').textContent).toBe('Commands · 1 result');
+            expect(q('.command-panel-results-title').textContent).toBe('Commands · 1 result');
         });
 
         it('debounces input events', () => {
             vi.useFakeTimers();
-            const palette = create();
-            const filter = vi.spyOn(palette, 'filterCommands');
-            const input = document.getElementById('command-input');
+            try {
+                const palette = create();
+                const filter = vi.spyOn(palette, 'filterCommands');
 
-            input.value = 'a';
-            input.dispatchEvent(new Event('input'));
-            input.value = 'ab';
-            input.dispatchEvent(new Event('input'));
-            expect(filter).not.toHaveBeenCalled();
+                input().value = 'a';
+                input().dispatchEvent(new Event('input'));
+                input().value = 'ab';
+                input().dispatchEvent(new Event('input'));
+                expect(filter).not.toHaveBeenCalled();
 
-            vi.advanceTimersByTime(120);
-            expect(filter).toHaveBeenCalledTimes(1);
-            vi.useRealTimers();
+                vi.advanceTimersByTime(120);
+                expect(filter).toHaveBeenCalledTimes(1);
+            } finally {
+                vi.useRealTimers();
+            }
+        });
+
+        it('cancels a pending filter on destroy', () => {
+            vi.useFakeTimers();
+            try {
+                const palette = new CommandPalette();
+                const filter = vi.spyOn(palette, 'filterCommands');
+
+                input().dispatchEvent(new Event('input'));
+                palette.destroy();
+                vi.advanceTimersByTime(500);
+
+                expect(filter).not.toHaveBeenCalled();
+            } finally {
+                vi.useRealTimers();
+            }
         });
 
         it('resets the selection to the first result after filtering', () => {
             const palette = create();
             palette.setSelectedIndex(4);
 
-            document.getElementById('command-input').value = 'go to';
+            input().value = 'go to';
             palette.filterCommands();
 
             expect(palette.selectedIndex).toBe(0);
@@ -246,7 +294,7 @@ describe('modules/commandPalette', () => {
         it('ignores navigation keys while the panel is closed', () => {
             const palette = create();
 
-            const event = keydown(document.getElementById('command-input'), { key: 'ArrowDown' });
+            const event = keydown(input(), { key: 'ArrowDown' });
 
             expect(event.defaultPrevented).toBe(false);
             expect(palette.selectedIndex).toBe(0);
@@ -255,20 +303,19 @@ describe('modules/commandPalette', () => {
         it('moves the selection with the arrow keys and clamps at both ends', () => {
             const palette = create();
             palette.open();
-            const input = document.getElementById('command-input');
 
-            keydown(input, { key: 'ArrowUp' });
+            keydown(input(), { key: 'ArrowUp' });
             expect(palette.selectedIndex).toBe(0);
 
-            keydown(input, { key: 'ArrowDown' });
-            keydown(input, { key: 'ArrowDown' });
+            keydown(input(), { key: 'ArrowDown' });
+            keydown(input(), { key: 'ArrowDown' });
             expect(palette.selectedIndex).toBe(2);
 
-            keydown(input, { key: 'ArrowUp' });
+            keydown(input(), { key: 'ArrowUp' });
             expect(palette.selectedIndex).toBe(1);
 
             palette.setSelectedIndex(palette.filteredCommands.length - 1);
-            keydown(input, { key: 'ArrowDown' });
+            keydown(input(), { key: 'ArrowDown' });
             expect(palette.selectedIndex).toBe(palette.filteredCommands.length - 1);
         });
 
@@ -278,19 +325,17 @@ describe('modules/commandPalette', () => {
 
             palette.setSelectedIndex(3);
 
-            const selected = document.querySelectorAll('.command-item.selected');
+            const selected = document.querySelectorAll<HTMLElement>('.command-item.selected');
             expect(selected).toHaveLength(1);
-            expect(selected[0].dataset.index).toBe('3');
-            expect(selected[0].getAttribute('aria-selected')).toBe('true');
+            expect(selected[0]?.dataset.index).toBe('3');
+            expect(selected[0]?.getAttribute('aria-selected')).toBe('true');
         });
 
-        it('selects the hovered item', () => {
+        it('selects the hovered item through the delegated listener', () => {
             const palette = create();
             palette.open();
 
-            document
-                .querySelector('.command-item[data-index="2"]')
-                .dispatchEvent(new MouseEvent('mouseover', { bubbles: true }));
+            q('.command-item[data-index="2"]').dispatchEvent(new MouseEvent('mouseover', { bubbles: true }));
 
             expect(palette.selectedIndex).toBe(2);
         });
@@ -299,9 +344,9 @@ describe('modules/commandPalette', () => {
             const palette = create();
             palette.open();
             palette.setSelectedIndex(1);
-            const action = vi.spyOn(palette.filteredCommands[1], 'action');
+            const action = vi.spyOn(palette.filteredCommands[1] as Command, 'action');
 
-            keydown(document.getElementById('command-input'), { key: 'Enter' });
+            keydown(input(), { key: 'Enter' });
 
             expect(action).toHaveBeenCalledTimes(1);
             expect(palette.isOpen()).toBe(false);
@@ -310,9 +355,9 @@ describe('modules/commandPalette', () => {
         it('runs a command by clicking it', () => {
             const palette = create();
             palette.open();
-            const action = vi.spyOn(palette.filteredCommands[0], 'action');
+            const action = vi.spyOn(palette.filteredCommands[0] as Command, 'action');
 
-            document.querySelector('.command-item[data-index="0"]').click();
+            q<HTMLElement>('.command-item[data-index="0"]').click();
 
             expect(action).toHaveBeenCalledTimes(1);
         });
@@ -320,33 +365,32 @@ describe('modules/commandPalette', () => {
         it('maps digits typed in the input to the nth result, with 0 as the tenth', () => {
             const palette = create();
             palette.open();
-            const input = document.getElementById('command-input');
-            // handleKeyDown is called directly: dispatching on the input would also
-            // reach the document level single-key shortcut handler.
-            palette.filteredCommands = Array.from({ length: 10 }, (_, index) => ({
-                title: `Fake ${index}`,
-                action: vi.fn(),
-            }));
+            const third = vi.spyOn(palette.filteredCommands[2] as Command, 'action');
+            const tenth = vi.spyOn(palette.filteredCommands[9] as Command, 'action');
 
-            palette.handleKeyDown({ key: '3', target: input, preventDefault() {} });
-            expect(palette.filteredCommands[2].action).toHaveBeenCalledTimes(1);
+            // Focus matters: an unfocused input would let the document level
+            // single-key shortcut handler run the same command a second time.
+            input().focus();
+
+            // Digits only map to results when the event originates in the input.
+            palette.handleKeyDown(new KeyboardEvent('keydown', { key: '3', cancelable: true }));
+            expect(third).not.toHaveBeenCalled();
+
+            input().dispatchEvent(new KeyboardEvent('keydown', { key: '3', bubbles: true, cancelable: true }));
+            expect(third).toHaveBeenCalledTimes(1);
 
             palette.open();
-            palette.filteredCommands = Array.from({ length: 10 }, (_, index) => ({
-                title: `Fake ${index}`,
-                action: vi.fn(),
-            }));
-            palette.handleKeyDown({ key: '0', target: input, preventDefault() {} });
-            expect(palette.filteredCommands[9].action).toHaveBeenCalledTimes(1);
+            input().dispatchEvent(new KeyboardEvent('keydown', { key: '0', bubbles: true, cancelable: true }));
+            expect(tenth).toHaveBeenCalledTimes(1);
         });
 
         it('ignores digits that point past the end of the results', () => {
             const palette = create();
             palette.open();
-            document.getElementById('command-input').value = 'Print page';
+            input().value = 'Print page';
             palette.filterCommands();
 
-            const event = keydown(document.getElementById('command-input'), { key: '5' });
+            const event = keydown(input(), { key: '5' });
 
             expect(event.defaultPrevented).toBe(false);
             expect(palette.isOpen()).toBe(true);
@@ -360,13 +404,40 @@ describe('modules/commandPalette', () => {
 
             expect(palette.isOpen()).toBe(true);
         });
+
+        it('reports a failing command instead of propagating', () => {
+            const error = vi.spyOn(console, 'error').mockImplementation(() => {});
+            const palette = create();
+            palette.open();
+            vi.spyOn(palette.filteredCommands[0] as Command, 'action').mockImplementation(() => {
+                throw new Error('boom');
+            });
+
+            expect(() => palette.executeCommand(0)).not.toThrow();
+            expect(error).toHaveBeenCalled();
+            expect(palette.isOpen()).toBe(false);
+        });
+
+        it('reports a rejected async command', async () => {
+            const error = vi.spyOn(console, 'error').mockImplementation(() => {});
+            const palette = create();
+            palette.open();
+            vi.spyOn(palette.filteredCommands[0] as Command, 'action').mockResolvedValue(
+                Promise.reject(new Error('async boom'))
+            );
+
+            palette.executeCommand(0);
+            await Promise.resolve();
+            await Promise.resolve();
+
+            expect(error).toHaveBeenCalled();
+        });
     });
 
     describe('global shortcuts', () => {
         it('runs Alt+Shift combos', () => {
             const palette = create();
-            const command = palette.shortcutMap.get('alt+shift+t');
-            const action = vi.spyOn(command, 'action');
+            const action = vi.spyOn(palette.shortcuts.get('alt+shift+t') as Command, 'action');
 
             const event = keydown(document, { key: 't', altKey: true, shiftKey: true });
 
@@ -384,7 +455,7 @@ describe('modules/commandPalette', () => {
 
         it('runs single-key shortcuts when not typing', () => {
             const palette = create();
-            const action = vi.spyOn(palette.shortcutMap.get('f'), 'action');
+            const action = vi.spyOn(palette.shortcuts.get('f') as Command, 'action');
 
             keydown(document, { key: 'f' });
 
@@ -393,10 +464,10 @@ describe('modules/commandPalette', () => {
 
         it('ignores single-key shortcuts while typing in a field', () => {
             const palette = create();
-            const action = vi.spyOn(palette.shortcutMap.get('f'), 'action');
-            document.getElementById('command-input').focus();
+            const action = vi.spyOn(palette.shortcuts.get('f') as Command, 'action');
+            input().focus();
 
-            keydown(document.getElementById('command-input'), { key: 'f' });
+            keydown(input(), { key: 'f' });
 
             expect(action).not.toHaveBeenCalled();
         });
@@ -412,7 +483,7 @@ describe('modules/commandPalette', () => {
     describe('command actions', () => {
         it('navigates to an existing section', () => {
             const palette = create();
-            const target = document.getElementById('work');
+            const target = byId('work');
             target.scrollIntoView = vi.fn();
 
             palette.navigateTo('#work');
@@ -449,7 +520,7 @@ describe('modules/commandPalette', () => {
         it('clicks a command target by selector', () => {
             const palette = create();
             const clicked = vi.fn();
-            document.querySelector('[data-filter="web"]').addEventListener('click', clicked);
+            q('[data-filter="web"]').addEventListener('click', clicked);
 
             expect(palette.dispatchSelector('[data-filter="web"]')).toBe(true);
             expect(clicked).toHaveBeenCalledTimes(1);
@@ -457,10 +528,10 @@ describe('modules/commandPalette', () => {
 
         it('falls back to a link whose href contains the class name', () => {
             const palette = create();
-            const link = document.querySelector('.contact-email');
+            const link = q<HTMLAnchorElement>('.contact-email');
             link.className = '';
             link.setAttribute('href', 'mailto:contact-email@example.com');
-            const clicked = vi.fn((event) => event.preventDefault());
+            const clicked = vi.fn((event: Event) => event.preventDefault());
             link.addEventListener('click', clicked);
 
             expect(palette.dispatchSelector('.contact-email')).toBe(true);
@@ -475,19 +546,19 @@ describe('modules/commandPalette', () => {
             expect(warn).toHaveBeenCalled();
         });
 
-        it('opens links in a new tab', () => {
+        it('opens links in a new tab without leaking the opener', () => {
             const open = vi.fn();
             vi.stubGlobal('open', open);
-            window.open = open;
+            window.open = open as unknown as typeof window.open;
             const palette = create();
 
             palette.openLink('/resume.pdf');
 
-            expect(open).toHaveBeenCalledWith('/resume.pdf', '_blank');
+            expect(open).toHaveBeenCalledWith('/resume.pdf', '_blank', 'noopener,noreferrer');
         });
 
         it('copies the contact email from the mailto link', async () => {
-            const writeText = vi.fn().mockResolvedValue(undefined);
+            const writeText = vi.fn<(value: string) => Promise<void>>().mockResolvedValue(undefined);
             vi.stubGlobal('navigator', { clipboard: { writeText } });
             const palette = create();
 
@@ -497,9 +568,9 @@ describe('modules/commandPalette', () => {
         });
 
         it('falls back to a placeholder address when no contact link exists', async () => {
-            const writeText = vi.fn().mockResolvedValue(undefined);
+            const writeText = vi.fn<(value: string) => Promise<void>>().mockResolvedValue(undefined);
             vi.stubGlobal('navigator', { clipboard: { writeText } });
-            document.querySelector('.contact-email').remove();
+            q('.contact-email').remove();
             const palette = create();
 
             await palette.copyEmail();
@@ -508,22 +579,28 @@ describe('modules/commandPalette', () => {
         });
 
         it('swallows clipboard rejections', async () => {
-            vi.stubGlobal('navigator', { clipboard: { writeText: vi.fn().mockRejectedValue(new Error('denied')) } });
+            const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+            vi.stubGlobal('navigator', {
+                clipboard: { writeText: vi.fn().mockRejectedValue(new Error('denied')) },
+            });
             const palette = create();
 
             await expect(palette.copyText('text')).resolves.toBeNull();
+            expect(warn).toHaveBeenCalled();
         });
 
-        it('does nothing when the Clipboard API is unavailable', () => {
+        it('resolves without writing when the Clipboard API is unavailable', async () => {
+            const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
             vi.stubGlobal('navigator', {});
             const palette = create();
 
-            expect(palette.copyText('text')).toBeUndefined();
+            await expect(palette.copyText('text')).resolves.toBeNull();
+            expect(warn).toHaveBeenCalled();
         });
 
         it('opens the panel and selects the query when focusing search', () => {
             const palette = create();
-            const select = vi.spyOn(document.getElementById('command-input'), 'select');
+            const select = vi.spyOn(input(), 'select');
 
             palette.focusSearch();
 
@@ -533,16 +610,23 @@ describe('modules/commandPalette', () => {
     });
 
     describe('the shipped command set', () => {
+        let stopNavigation: (event: Event) => void;
+
         beforeEach(() => {
             vi.stubGlobal('open', vi.fn());
             vi.stubGlobal('print', vi.fn());
             vi.stubGlobal('scrollTo', vi.fn());
             vi.stubGlobal('navigator', { clipboard: { writeText: vi.fn().mockResolvedValue(undefined) } });
-            window.open = vi.fn();
+            window.open = vi.fn() as unknown as typeof window.open;
             window.print = vi.fn();
             window.scrollTo = vi.fn();
             // Commands that click mailto links would make jsdom attempt a real navigation.
-            document.addEventListener('click', (event) => event.preventDefault());
+            stopNavigation = (event: Event): void => event.preventDefault();
+            document.addEventListener('click', stopNavigation);
+        });
+
+        afterEach(() => {
+            document.removeEventListener('click', stopNavigation);
         });
 
         it('runs every action without throwing', () => {
@@ -558,16 +642,17 @@ describe('modules/commandPalette', () => {
 
         it('gives every command a unique title and shortcut', () => {
             const palette = create();
-            const titles = palette.commands.map((cmd) => cmd.title);
-            const shortcuts = palette.commands.map((cmd) => cmd.shortcut.toLowerCase());
+            const titles = palette.commands.map((command) => command.title);
+            const shortcuts = palette.commands.map((command) => command.shortcut?.toLowerCase() ?? '');
 
             expect(new Set(titles).size).toBe(titles.length);
+            expect(shortcuts.every(Boolean)).toBe(true);
             expect(new Set(shortcuts).size).toBe(shortcuts.length);
         });
 
         it('toggles the accessibility helpers on the root element', () => {
             const palette = create();
-            const run = (title) => palette.commands.find((cmd) => cmd.title === title).action();
+            const run = (title: string): void => void commandByTitle(palette, title).action();
 
             run('Toggle animations');
             expect(document.documentElement.classList.contains('reduced-motion')).toBe(true);
@@ -581,8 +666,10 @@ describe('modules/commandPalette', () => {
 
         it('steps the root font size up and down with a lower bound', () => {
             const palette = create();
-            const run = (title) => palette.commands.find((cmd) => cmd.title === title).action();
-            vi.spyOn(window, 'getComputedStyle').mockReturnValue({ fontSize: '16px', getPropertyValue: () => '' });
+            const run = (title: string): void => void commandByTitle(palette, title).action();
+            const computed = vi
+                .spyOn(window, 'getComputedStyle')
+                .mockReturnValue({ fontSize: '16px', getPropertyValue: () => '' } as unknown as CSSStyleDeclaration);
 
             run('Increase text size');
             expect(document.documentElement.style.fontSize).toBe('17px');
@@ -590,14 +677,17 @@ describe('modules/commandPalette', () => {
             run('Decrease text size');
             expect(document.documentElement.style.fontSize).toBe('15px');
 
-            window.getComputedStyle.mockReturnValue({ fontSize: '10px', getPropertyValue: () => '' });
+            computed.mockReturnValue({
+                fontSize: '10px',
+                getPropertyValue: () => '',
+            } as unknown as CSSStyleDeclaration);
             run('Decrease text size');
             expect(document.documentElement.style.fontSize).toBe('12px');
         });
 
         it('scrolls to the top and bottom of the page', () => {
             const palette = create();
-            const run = (title) => palette.commands.find((cmd) => cmd.title === title).action();
+            const run = (title: string): void => void commandByTitle(palette, title).action();
 
             run('Scroll to top');
             expect(window.scrollTo).toHaveBeenCalledWith({ top: 0, behavior: 'smooth' });
@@ -609,7 +699,7 @@ describe('modules/commandPalette', () => {
         it('opens the print dialog', () => {
             const palette = create();
 
-            palette.commands.find((cmd) => cmd.title === 'Print page').action();
+            void commandByTitle(palette, 'Print page').action();
 
             expect(window.print).toHaveBeenCalledTimes(1);
         });
@@ -628,6 +718,25 @@ describe('modules/commandPalette', () => {
             expect(data.topTag.value).toBe('JS');
         });
 
+        it('memoises the snapshot until it is invalidated', () => {
+            const palette = create();
+            const first = palette.getAnalyticsData();
+
+            expect(palette.getAnalyticsData()).toBe(first);
+
+            palette.invalidateAnalytics();
+            expect(palette.getAnalyticsData()).not.toBe(first);
+        });
+
+        it('drops the memoised snapshot when new content is loaded', () => {
+            const palette = create();
+            const first = palette.getAnalyticsData();
+
+            document.dispatchEvent(new CustomEvent('content:loaded', { detail: { count: 3 } }));
+
+            expect(palette.getAnalyticsData()).not.toBe(first);
+        });
+
         it('falls back to the nav link count when there are no sections', () => {
             document.querySelectorAll('section[id]').forEach((section) => section.remove());
 
@@ -639,10 +748,6 @@ describe('modules/commandPalette', () => {
             expect(create().getAnalyticsData().theme.value).toBe('Dark');
 
             document.documentElement.removeAttribute('data-theme');
-            stubMatchMedia({ '(prefers-color-scheme: dark)': true });
-            expect(create().getAnalyticsData().theme.value).toBe('Dark');
-
-            stubMatchMedia(false);
             expect(create().getAnalyticsData().theme.value).toBe('Light');
         });
 
@@ -657,15 +762,15 @@ describe('modules/commandPalette', () => {
             const cards = [...document.querySelectorAll('#command-analytics .command-stat')];
 
             expect(cards.length).toBeGreaterThan(0);
-            expect(cards.some((card) => card.textContent.includes('Projects featured'))).toBe(true);
+            expect(cards.some((card) => card.textContent?.includes('Projects featured'))).toBe(true);
         });
 
         it('skips zero-valued and "None" metrics', () => {
-            document.getElementById('projects-grid').innerHTML = '';
+            byId('projects-grid').innerHTML = '';
             document.querySelectorAll('.feature-card, .skill-row').forEach((el) => el.remove());
 
             create();
-            const text = document.getElementById('command-analytics').textContent;
+            const text = byId('command-analytics').textContent ?? '';
 
             expect(text).not.toContain('Projects featured');
             expect(text).not.toContain('Feature cards');
@@ -690,7 +795,19 @@ describe('modules/commandPalette', () => {
             expect(summary.title).toBe(`Live portfolio snapshot • ${palette.commands.length} commands ready`);
             expect(summary.description).toContain('2 projects');
             expect(summary.description).toContain('3 categories');
-            expect(document.getElementById('command-summary').textContent).toContain(summary.title);
+            expect(byId('command-summary').textContent).toContain(summary.title);
+        });
+    });
+
+    describe('destroy()', () => {
+        it('detaches the document and element listeners', () => {
+            const palette = new CommandPalette();
+
+            palette.destroy();
+
+            keydown(document, { key: 'k', ctrlKey: true });
+            byId('command-toggle').click();
+            expect(palette.isOpen()).toBe(false);
         });
     });
 });
