@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import ObserverManager, { type ObserveTarget } from '../../js/core/observer.js';
-import { stubIntersectionObserver, type IntersectionObserverStub } from '../helpers.js';
+import ObserverManager from '../../js/core/observer.js';
+import { stubIntersectionObserver } from '../helpers.js';
 
 const revealMarkup = `
     <div data-reveal id="a"></div>
@@ -8,10 +8,8 @@ const revealMarkup = `
     <div id="plain"></div>
 `;
 
-const byId = (id: string): HTMLElement => document.getElementById(id) as HTMLElement;
-
 describe('core/observer', () => {
-    let observers: IntersectionObserverStub;
+    let observers;
 
     beforeEach(() => {
         observers = stubIntersectionObserver();
@@ -54,8 +52,7 @@ describe('core/observer', () => {
     it('reveals intersecting elements once and stops tracking them', () => {
         document.body.innerHTML = revealMarkup;
         new ObserverManager();
-        const a = byId('a');
-        const b = byId('b');
+        const [a, b] = [document.getElementById('a'), document.getElementById('b')];
 
         observers.last.trigger([
             { target: a, isIntersecting: true },
@@ -82,7 +79,7 @@ describe('core/observer', () => {
             document.body.innerHTML = '<div id="single"></div>';
             const manager = new ObserverManager();
 
-            manager.observe(byId('single'));
+            manager.observe(document.getElementById('single'));
 
             expect(observers.last.observed.map((el) => el.id)).toEqual(['single']);
         });
@@ -92,7 +89,7 @@ describe('core/observer', () => {
             const manager = new ObserverManager();
 
             manager.observe(document.querySelectorAll('.n'));
-            manager.observe([byId('n3')]);
+            manager.observe([document.getElementById('n3')]);
 
             expect(observers.last.observed.map((el) => el.id)).toEqual(['n1', 'n2', 'n3']);
         });
@@ -109,7 +106,7 @@ describe('core/observer', () => {
         it('re-observes an element after it was revealed', () => {
             document.body.innerHTML = revealMarkup;
             const manager = new ObserverManager();
-            const a = byId('a');
+            const a = document.getElementById('a');
             observers.last.trigger([{ target: a }]);
 
             manager.observe(a);
@@ -123,7 +120,7 @@ describe('core/observer', () => {
             const initial = observers.last.observed.length;
 
             manager.observe('.does-not-exist');
-            manager.observe(42 as unknown as ObserveTarget);
+            manager.observe(42);
 
             expect(observers.last.observed).toHaveLength(initial);
         });
@@ -131,17 +128,17 @@ describe('core/observer', () => {
 
     describe('without IntersectionObserver support', () => {
         beforeEach(() => {
-            delete (window as { IntersectionObserver?: unknown }).IntersectionObserver;
-            delete (globalThis as { IntersectionObserver?: unknown }).IntersectionObserver;
+            delete window.IntersectionObserver;
+            delete globalThis.IntersectionObserver;
         });
 
         it('reveals all static elements immediately', () => {
             document.body.innerHTML = revealMarkup;
             new ObserverManager();
 
-            expect(byId('a').classList.contains('revealed')).toBe(true);
-            expect(byId('b').classList.contains('revealed')).toBe(true);
-            expect(byId('plain').classList.contains('revealed')).toBe(false);
+            expect(document.getElementById('a').classList.contains('revealed')).toBe(true);
+            expect(document.getElementById('b').classList.contains('revealed')).toBe(true);
+            expect(document.getElementById('plain').classList.contains('revealed')).toBe(false);
         });
 
         it('reveals dynamically observed selectors and elements immediately', () => {
@@ -149,15 +146,15 @@ describe('core/observer', () => {
             const manager = new ObserverManager();
 
             manager.observe('.late');
-            manager.observe(byId('single'));
+            manager.observe(document.getElementById('single'));
 
-            expect(byId('x').classList.contains('revealed')).toBe(true);
-            expect(byId('single').classList.contains('revealed')).toBe(true);
+            expect(document.getElementById('x').classList.contains('revealed')).toBe(true);
+            expect(document.getElementById('single').classList.contains('revealed')).toBe(true);
         });
 
         it('skips non-element targets in the fallback path', () => {
             const manager = new ObserverManager();
-            expect(() => manager.observe(['not-an-element'] as unknown as ObserveTarget)).not.toThrow();
+            expect(() => manager.observe(['not-an-element'])).not.toThrow();
         });
     });
 
@@ -173,7 +170,7 @@ describe('core/observer', () => {
 
             // A destroyed manager falls back to revealing directly instead of throwing.
             manager.observe('[data-reveal]');
-            expect(byId('a').classList.contains('revealed')).toBe(true);
+            expect(document.getElementById('a').classList.contains('revealed')).toBe(true);
         });
 
         it('is safe to call twice', () => {

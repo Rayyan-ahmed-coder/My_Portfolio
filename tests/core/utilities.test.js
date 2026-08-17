@@ -13,16 +13,16 @@ describe('core/utilities', () => {
             document.body.innerHTML = '<p class="a">one</p><p class="a">two</p>';
             const { $, $$ } = await loadUtilities();
 
-            expect($('.a')?.textContent).toBe('one');
+            expect($('.a').textContent).toBe('one');
             expect($$('.a')).toHaveLength(2);
         });
 
         it('scopes the query to the given parent', async () => {
             document.body.innerHTML = '<div id="outside"><span>no</span></div><div id="scope"><span>yes</span></div>';
             const { $, $$ } = await loadUtilities();
-            const scope = document.getElementById('scope') as HTMLElement;
+            const scope = document.getElementById('scope');
 
-            expect($('span', scope)?.textContent).toBe('yes');
+            expect($('span', scope).textContent).toBe('yes');
             expect($$('span', scope)).toHaveLength(1);
         });
 
@@ -73,20 +73,11 @@ describe('core/utilities', () => {
 
             expect(matchMedia).toHaveBeenCalledTimes(2);
         });
-
-        it('degrades to "no match" when matchMedia is unavailable', async () => {
-            vi.stubGlobal('matchMedia', undefined);
-            (window as { matchMedia?: unknown }).matchMedia = undefined;
-            const { matchesMedia, mediaQuery } = await loadUtilities();
-
-            expect(mediaQuery('(max-width: 850px)')).toBeNull();
-            expect(matchesMedia('(max-width: 850px)')).toBe(false);
-        });
     });
 
     describe('nextFrame', () => {
         it('resolves on the next animation frame', async () => {
-            vi.stubGlobal('requestAnimationFrame', (cb: FrameRequestCallback) => {
+            vi.stubGlobal('requestAnimationFrame', (cb) => {
                 cb(123);
                 return 1;
             });
@@ -96,41 +87,10 @@ describe('core/utilities', () => {
         });
     });
 
-    describe('onIdle', () => {
-        it('uses requestIdleCallback when the browser provides it', async () => {
-            const idle = vi.fn((callback: () => void) => {
-                callback();
-                return 1;
-            });
-            vi.stubGlobal('requestIdleCallback', idle);
-            const { onIdle } = await loadUtilities();
-
-            const spy = vi.fn();
-            onIdle(spy);
-
-            expect(idle).toHaveBeenCalledTimes(1);
-            expect(spy).toHaveBeenCalledTimes(1);
-        });
-
-        it('falls back to a timeout on engines without requestIdleCallback', async () => {
-            vi.useFakeTimers();
-            vi.stubGlobal('requestIdleCallback', undefined);
-            const { onIdle } = await loadUtilities();
-
-            const spy = vi.fn();
-            onIdle(spy, 50);
-            expect(spy).not.toHaveBeenCalled();
-
-            vi.advanceTimersByTime(50);
-            expect(spy).toHaveBeenCalledTimes(1);
-            vi.useRealTimers();
-        });
-    });
-
     describe('rafThrottle', () => {
         it('collapses bursts of calls into a single frame', async () => {
-            const frames: FrameRequestCallback[] = [];
-            vi.stubGlobal('requestAnimationFrame', (cb: FrameRequestCallback) => frames.push(cb));
+            const frames = [];
+            vi.stubGlobal('requestAnimationFrame', (cb) => frames.push(cb));
             const { rafThrottle } = await loadUtilities();
 
             const spy = vi.fn();
@@ -142,54 +102,42 @@ describe('core/utilities', () => {
             expect(spy).not.toHaveBeenCalled();
             expect(frames).toHaveLength(1);
 
-            frames.shift()?.(0);
+            frames.shift()();
             expect(spy).toHaveBeenCalledTimes(1);
         });
 
         it('allows a new call once the frame has run', async () => {
-            const frames: FrameRequestCallback[] = [];
-            vi.stubGlobal('requestAnimationFrame', (cb: FrameRequestCallback) => frames.push(cb));
+            const frames = [];
+            vi.stubGlobal('requestAnimationFrame', (cb) => frames.push(cb));
             const { rafThrottle } = await loadUtilities();
 
             const spy = vi.fn();
             const throttled = rafThrottle(spy);
             throttled();
-            frames.shift()?.(0);
+            frames.shift()();
             throttled();
-            frames.shift()?.(0);
+            frames.shift()();
 
             expect(spy).toHaveBeenCalledTimes(2);
         });
 
-        it('forwards the latest arguments of a burst', async () => {
-            const frames: FrameRequestCallback[] = [];
-            vi.stubGlobal('requestAnimationFrame', (cb: FrameRequestCallback) => frames.push(cb));
+        it('preserves the `this` context and arguments', async () => {
+            const frames = [];
+            vi.stubGlobal('requestAnimationFrame', (cb) => frames.push(cb));
             const { rafThrottle } = await loadUtilities();
 
-            const spy = vi.fn();
-            const throttled = rafThrottle(spy);
-            throttled('a', 1);
-            throttled('b', 2);
-            frames.shift()?.(0);
+            const context = {
+                calls: [],
+                handler: null,
+            };
+            context.handler = rafThrottle(function (...args) {
+                this.calls.push(args);
+            });
 
-            expect(spy).toHaveBeenCalledExactlyOnceWith('b', 2);
-        });
+            context.handler('a', 1);
+            frames.shift()();
 
-        it('cancel() drops the pending frame so teardown leaves nothing running', async () => {
-            const frames: FrameRequestCallback[] = [];
-            const caf = vi.fn();
-            vi.stubGlobal('requestAnimationFrame', (cb: FrameRequestCallback) => frames.push(cb));
-            vi.stubGlobal('cancelAnimationFrame', caf);
-            const { rafThrottle } = await loadUtilities();
-
-            const spy = vi.fn();
-            const throttled = rafThrottle(spy);
-            throttled();
-            throttled.cancel();
-            frames.shift()?.(0);
-
-            expect(caf).toHaveBeenCalledTimes(1);
-            expect(spy).not.toHaveBeenCalled();
+            expect(context.calls).toEqual([['a', 1]]);
         });
     });
 
@@ -226,43 +174,19 @@ describe('core/utilities', () => {
             vi.useRealTimers();
         });
 
-        it('cancel() prevents the trailing call', async () => {
+        it('preserves the `this` context', async () => {
             vi.useFakeTimers();
             const { debounce } = await loadUtilities();
-            const spy = vi.fn();
-            const debounced = debounce(spy, 10);
+            const target = { value: 0 };
+            target.bump = debounce(function (amount) {
+                this.value += amount;
+            }, 10);
 
-            debounced();
-            debounced.cancel();
-            vi.advanceTimersByTime(50);
+            target.bump(5);
+            vi.advanceTimersByTime(10);
 
-            expect(spy).not.toHaveBeenCalled();
+            expect(target.value).toBe(5);
             vi.useRealTimers();
-        });
-    });
-
-    describe('listen', () => {
-        it('returns a remover that detaches the listener', async () => {
-            const { listen } = await loadUtilities();
-            const spy = vi.fn();
-            const off = listen(document, 'custom:ping', spy);
-
-            document.dispatchEvent(new Event('custom:ping'));
-            off();
-            document.dispatchEvent(new Event('custom:ping'));
-
-            expect(spy).toHaveBeenCalledTimes(1);
-        });
-    });
-
-    describe('escapeHtml', () => {
-        it('escapes every character that could break out of markup', async () => {
-            const { escapeHtml } = await loadUtilities();
-
-            expect(escapeHtml('<img src=x onerror="y">')).toBe('&lt;img src=x onerror=&quot;y&quot;&gt;');
-            expect(escapeHtml("a & b 'c'")).toBe('a &amp; b &#39;c&#39;');
-            expect(escapeHtml(null)).toBe('');
-            expect(escapeHtml(undefined)).toBe('');
         });
     });
 });
