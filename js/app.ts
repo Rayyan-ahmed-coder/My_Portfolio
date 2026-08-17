@@ -67,7 +67,7 @@ export class Portfolio implements Disposable {
             this.#importModule("observer", () => import("./core/observer.js")),
             this.#importModule("scroll", () => import("./modules/scroll.js")),
             this.#importModule("cursor", () => import("./modules/cursor.js")),
-            this.#importModule("content", () => import("./core/contentLoader.js")),
+            this.#importModule("content", () => import("./features/projects/island.tsx")),
         ]);
 
         if (observer) this.#start("observer", () => new observer());

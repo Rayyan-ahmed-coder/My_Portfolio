@@ -6,6 +6,8 @@
     "lib": ["DOM", "DOM.Iterable", "ES2022"],
     "types": ["vite/client"],
     "allowImportingTsExtensions": true,
+    "jsx": "react-jsx",
+    "jsxImportSource": "preact",
     "verbatimModuleSyntax": true,
     "isolatedModules": true,
     "useDefineForClassFields": true,
@@ -25,5 +27,12 @@
     /* Type checking only; bundling is Vite's job. */
     "noEmit": true
   },
-  "include": ["js/**/*.ts", "tests/**/*.ts", "vite.config.ts", "vitest.config.mts"]
+  "include": [
+    "js/**/*.ts",
+    "js/**/*.tsx",
+    "tests/**/*.ts",
+    "tests/**/*.tsx",
+    "vite.config.ts",
+    "vitest.config.mts"
+  ]
 }

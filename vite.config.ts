@@ -4,6 +4,11 @@ import { ViteMinifyPlugin } from "vite-plugin-minify";
 export default defineConfig({
     // Ensures assets load correctly under the GitHub Pages sub-folder path.
     base: "/My_Portfolio/",
+    // esbuild handles JSX, so Preact components cost no extra build tooling.
+    esbuild: {
+        jsx: "automatic",
+        jsxImportSource: "preact",
+    },
     build: {
         target: "es2022",
         minify: "terser",

@@ -24,5 +24,8 @@
     "vite": "^6.4.3",
     "vite-plugin-minify": "^2.1.0",
     "vitest": "4.1.10"
+  },
+  "dependencies": {
+    "preact": "^10.29.8"
   }
 }
