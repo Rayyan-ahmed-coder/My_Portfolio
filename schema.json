@@ -1,0 +1,18 @@
+{
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "name": "Rayyan Ahmed",
+  "jobTitle": "Software Engineer",
+  "url": "https://github.io",
+  "sameAs": [
+    "https://github.com",
+    "https://linkedin.com"
+  ],
+  "knowsAbout": [
+    "Software Development",
+    "Web Development",
+    "JavaScript",
+    "Frontend Engineering"
+  ],
+  "description": "Professional developer portfolio showcasing engineering projects, technical skills, and software solutions."
+}

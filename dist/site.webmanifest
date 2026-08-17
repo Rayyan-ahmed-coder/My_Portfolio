@@ -1,0 +1,45 @@
+{
+    "name": "Rayyan Khan | Frontend Architecture Portfolio",
+    "short_name": "Rayyan Khan",
+    "description": "Professional engineering portfolio showcasing hyper-optimized, high-performance, and responsive web experiences built by Rayyan Khan.",
+    "start_url": "/My_Portfolio/",
+    "id": "/My_Portfolio/",
+    
+    "scope": "/My_Portfolio/",
+    "display": "standalone",
+    "orientation": "portrait-primary",
+    "background_color": "#1d3557",
+    "theme_color": "#e63946",
+    "prefer_related_applications": false,
+    "categories": [
+        "development",
+        "productivity",
+        "utilities"
+    ],
+    "icons": [
+        {
+            "src": "assets/icons/icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "assets/icons/icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "maskable"
+        },
+        {
+            "src": "assets/icons/icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "assets/icons/maskable-icon-512x512.svg",
+            "sizes": "512x512",
+            "type": "image/svg+xml",
+            "purpose": "maskable"
+        }
+    ]
+}

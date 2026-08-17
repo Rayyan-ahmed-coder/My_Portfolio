@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://sitemaps.org" xmlns:image="http://google.com">
+    
+    <!-- Main Portfolio Homepage -->
+    <url>
+        <loc>https://github.io</loc>
+        <lastmod>2026-08-07</lastmod>
+        <changefreq>daily</changefreq>
+        <priority>1.0</priority>
+        <!-- Image Sitemap Extension to boost Google Image Search SEO -->
+        <image:image>
+        <image:loc>https://github.iofavicon.png</image:loc>
+        <image:title>Rayyan Ahmed Portfolio icon</image:title>
+        <image:caption>Official logo and avatar for Rayyan Ahmed's developer portfolio.</image:caption>
+        </image:image>
+    </url>
+
+</urlset>

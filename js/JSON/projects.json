@@ -1,0 +1,54 @@
+[
+    {
+        "main": true,
+        "number": 1,
+        "preview": [
+            "CALCULATOR",
+            "01 + 01"
+        ],
+        "type": "WEB APPLICATION",
+        "content": {
+            "heading": "Calculator",
+            "description": 
+                "A responsive calculator built with vanilla HTML, CSS and JavaScript."
+        },
+        "category" : "web javascript",
+        "tags": ["HTML", "CSS", "JavaScript"],
+        "link": "https://rayyan-ahmed-coder.github.io/Calculator/",
+        "target": "_blank"
+    },
+    {
+        "main": false,
+        "number": 2,
+        "preview": [
+            "AIR JUMPER",
+            "↑"
+        ],
+        "type": "CANVAS GAME",
+        "content": {
+            "heading": "Air Jumper",
+            "description": "A browser game featuring animation, collision detection, particles and dynamic environments."
+        },
+        "category": "game javascript",
+        "tags": ["HTML canvas", "JavaScript"],
+        "link": "https://rayyan-ahmed-coder.github.io/Air_juper.game/",
+        "target": "_blank"
+    },
+    {
+        "main": false,
+        "number": 3,
+        "preview": [
+            "PORTFOLIO",
+            "R."
+        ],
+        "type": "PERSONAL WEBSITE",
+        "content": {
+            "heading": "Personal Portfolio",
+            "description": "A responsive portfolio focused on clean design, performance and interactive experiences."
+        },
+        "category": "web javascript",
+        "tags": ["HTML", "CSS", "JavaScript"],
+        "link": "#",
+        "target": "empty"
+    }
+]

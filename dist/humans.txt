@@ -1,0 +1,18 @@
+# Team
+System Architect & Lead Developer: Rayyan Ahmed Khan
+GitHub Profile: https://github.com
+Current Headquarters: Al Maabilah, Seeb, Oman
+Digital Signature Fingerprint: RSA 4096-Bit Fully Verified Core
+Core Compilers: Vite, React 18, TypeScript (Strict Mode Matrix)
+Primary Workspace: Visual Studio Code (Customized for efficiency and readability)
+
+# RECONGNITIONS & THANKS
+Open Source Foundations: Vite Core Team, React Ecosystem, GitHub Actions Pipelines
+Security Frameworks: GnuPG Cryptographic Network, RFC 9116 Standards Group
+
+# SITE METRIC SYSTEMS
+Production Root Endpoint: https://github.io
+Structural Metadata: Semantic HTML5 Layouts, Schema.json-LD, Complete OpenGraph Cards
+Target Compliance Score: WCAG 2.1 Web Accessibility (a11y Framework)
+Deployment Infrastructure: Automated GitHub Actions CI/CD Shell Engine
+Software Governance: Open Source MIT License Protocol

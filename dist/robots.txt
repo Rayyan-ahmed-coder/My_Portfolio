@@ -1,0 +1,26 @@
+# 🌐 GLOBAL SEARCH ENGINE CRAWLER RULES (GOOGLE, BING, YANDEX)
+
+User-agent: *
+Allow: /
+
+# Prevent indexing of build systems and dependency trees
+Disallow: /admin/
+Disallow: /node_modules/
+Disallow: /.git/
+Disallow: /dist/
+Disallow: /coverage/
+
+# 🤖 AI COMPASSIONATE SCRAPER DIRECTIONS (OPTIONAL SECURITY)
+
+# Allows AI models to scan your portfolio code for talent indexing,
+# but stops aggressive, resource-heavy scrapers from hitting build files.
+User-agent: GPTBot
+Allow: /
+Disallow: /admin/
+
+User-agent: ClaudeBot
+Allow: /
+Disallow: /admin/
+
+# 🗺️ PRODUCTION INDEXING MAP ENTRIES
+Sitemap: https://github.io

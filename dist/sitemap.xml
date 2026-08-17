@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://sitemaps.org" xmlns:image="http://google.com">
+    <!-- 🌐 Main Portfolio Architecture Root Node -->
+    <url>
+        <loc>https://github.io</loc>
+        <lastmod>2026-08-16</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>1.0</priority>
+        
+        <!-- 🖼️ Structural Media Assets Node -->
+        <image:image>
+            <image:loc>https://github.iofavicon.png</image:loc>
+            <image:title>Rayyan Ahmed Khan - Engineering Identity Asset</image:title>
+            <image:caption>Official system layout icon for Rayyan Ahmed Khan's web architecture portfolio hub.</image:caption>
+        </image:image>
+    </url>
+</urlset>
