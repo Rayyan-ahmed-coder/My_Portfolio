@@ -2,7 +2,7 @@
 # Enforces RFC 9116 security standards across all structural endpoints.
 
 # 📥 Primary Vulnerability Ingestion Endpoints
-Contact: mailto:example@example.com
+Contact: mailto:rayyan.workhost@gmail.com
 Contact: https://github.com
 
 # 🔐 Cryptographic Encryption Keys (Bypasses Cleartext Interceptions)

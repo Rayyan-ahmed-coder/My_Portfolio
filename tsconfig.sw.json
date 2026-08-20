@@ -1,8 +1,10 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "lib": ["ESNext", "WebWorker"],
-    "types": []
+    // Overrides the base DOM settings to isolate the service worker global scope
+    "lib": ["ES2022", "WebWorker"], 
+    "types": [],
+    "noEmit": true
   },
   "include": ["sw.ts"]
 }
