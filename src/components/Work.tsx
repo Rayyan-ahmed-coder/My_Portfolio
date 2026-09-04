@@ -1,5 +1,3 @@
-import React from "react";
-
 export default function WorkSection() {
     return (
         <section className="work section" id="work" aria-labelledby="work-title">

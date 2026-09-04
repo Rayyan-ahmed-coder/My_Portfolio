@@ -1,6 +1,7 @@
 import React from "react";
 import MainNavbar from './components/MainNavbar'
 import HeroSection from './components/Hero'
+import WorkSection from './components/Work'
 
 export default function App(): React.JSX.Element {
     return (
@@ -11,6 +12,7 @@ export default function App(): React.JSX.Element {
             <a className="skip-link" href="#main-content">Skip to content</a>
             <main id="main-content">
                 <HeroSection />
+                <WorkSection />
 
                 <section className="features section" id="features" aria-labelledby="features-title">
                     <div className="container">
@@ -192,14 +194,12 @@ export default function App(): React.JSX.Element {
 
                         <div className="contact-heading">
                             <p className="eyebrow">CONTACT</p>
-
                             <h2 id="contact-title">
                                 Have an idea?
                                 <br />
                                 Let's build it.
                             </h2>
                         </div>
-
 
                         <div className="contact-content">
                             <p>
@@ -256,7 +256,7 @@ export default function App(): React.JSX.Element {
                     </div>
                     <div className="command-panel-search">
                         <label className="visually-hidden" htmlFor="command-input">Search commands</label>
-                        <input id="command-input" type="search" placeholder="Type a command…" autocomplete="off" spellcheck="false" />
+                        <input id="command-input" type="search" placeholder="Type a command…" autoComplete="off" spellCheck="false" />
                     </div>
                     <div className="command-panel-meta" aria-hidden="true">
                         <span className="command-chip">Live system</span>

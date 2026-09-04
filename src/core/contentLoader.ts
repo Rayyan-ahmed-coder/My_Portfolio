@@ -5,8 +5,12 @@ import type { ContentLoadedDetail, Disposable, Project } from "./types.js";
 const SCOPE = "contentLoader";
 const MAX_ATTEMPTS = 2;
 
-/** Served from public/, so the path stays stable and same-origin under the CSP. */
-export const PROJECTS_URL = `${import.meta.env.BASE_URL}data/projects.json`;
+/** Resolve the project manifest against the active app base so it works in local dev and deployed subpaths. */
+export const PROJECTS_URL = (() => {
+    const base = typeof import.meta.env.BASE_URL === "string" && import.meta.env.BASE_URL ? import.meta.env.BASE_URL : "/";
+    const absoluteBase = new URL(base, window.location.href).toString();
+    return new URL("data/projects.json", absoluteBase).toString();
+})();
 
 const asString = (value: unknown, fallback: string): string =>
     typeof value === "string" && value.trim() !== "" ? value : fallback;

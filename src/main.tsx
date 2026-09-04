@@ -1,7 +1,7 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
-import "css/style.css"; // If you use Tailwind or a global stylesheet later
+import "../css/style.css";
 
 const container = document.getElementById("root");
 if (!container) {

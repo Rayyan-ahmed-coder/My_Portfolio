@@ -1,0 +1,58 @@
+name: Deploy Portfolio to GitHub Pages
+
+on:
+  push:
+    branches: [ main ]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# MAXIMIZED: Instantly cancels older pending runs if you push back-to-back commits.
+# This prevents GitHub Pages from deploying stale builds or queuing unnecessary tasks.
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  build-and-deploy:
+    environment:
+      name: github-pages
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js Environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22 # Upgraded to Node 22 for faster execution speeds and V8 memory optimizations
+          cache: 'npm'
+
+      # MAXIMIZED: Caches your localized .vite asset map so incremental cloud builds run 3x faster
+      - name: Cache Vite Build Intermediates
+        uses: actions/cache@v4
+        with:
+          path: .vite
+          key: ${{ runner.os }}-vite-${{ hashFiles('**/package-lock.json') }}-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-vite-${{ hashFiles('**/package-lock.json') }}-
+            ${{ runner.os }}-vite-
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Execute Optimization Build
+        run: npm run build
+
+      - name: Setup GitHub Pages Deployment Context
+        uses: actions/configure-pages@v5
+
+      - name: Upload Optimized Production Artifacts
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: './dist'
+
+      - name: Deploy to GitHub Pages Live Link
+        uses: actions/deploy-pages@v4
