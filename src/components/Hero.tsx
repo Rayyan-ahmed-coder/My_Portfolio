@@ -13,9 +13,7 @@ export default function HeroSection(): React.JSX.Element {
                 <div className="hero-content">
                     <p className="eyebrow" data-reveal>FRONTEND DEVELOPER</p>
                     <h1 className="hero-title" id="hero-title" data-reveal>
-                        Building
-                        <span className="accent-text">digital experiences</span>
-                        that matter.
+                        Building <span className="accent-text">digital experiences</span> that matter.
                     </h1>
 
                     <p className="hero-description" data-reveal>
@@ -26,8 +24,7 @@ export default function HeroSection(): React.JSX.Element {
 
                     <div className="hero-actions" data-reveal>
                         <a className="button button-primary" href="#work">
-                            View my work
-                            <span aria-hidden="true">→</span>
+                            View my work <span aria-hidden="true">→</span>
                         </a>
                         <a className="button button-secondary" href="#contact">
                             Let's talk

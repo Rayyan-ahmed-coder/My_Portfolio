@@ -51,7 +51,7 @@ export default defineConfig(({ command }) => {
             VitePWA({
                 strategies: "injectManifest",
                 srcDir: ".", 
-                filename: "sw.ts",
+                filename: "sw.mts",
                 registerType: "autoUpdate",
                 injectRegister: "inline", 
                 devOptions: {
@@ -143,7 +143,15 @@ export default defineConfig(({ command }) => {
         server: {
             port: 5173,
             strictPort: true,
-            open: true 
+            open: true,
+            hmr: {
+                host: "localhost",
+                port: 5173,
+                protocol: "ws"
+            },
+            warmup: {
+                clientFiles: ["./index.html", "./src/main.tsx"]
+            }
         }
     };
 });

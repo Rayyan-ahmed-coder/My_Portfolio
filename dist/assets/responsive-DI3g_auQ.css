@@ -1,4 +1,4 @@
-﻿/* LARGE LAPTOPS */
+/* LARGE LAPTOPS */
 @media (max-width: 1140px) {
     :root {
         --container-padding: clamp(1rem, 3vw, 2rem);
@@ -54,25 +54,23 @@
         padding: 0 1rem;
         justify-content: flex-start;
         border-radius: var(--radius-md);
-    }
+        &:hover, &.active {
+            background: var(--color-primary-soft);
+        }
 
-    .nav-link:hover,
-    .nav-link.active {
-        background: var(--color-primary-soft);
-    }
-
-    .nav-link::after {
-        left: auto;
-        right: 1rem;
-        bottom: 50%;
-        width: 4px;
-        height: 0;
-        transform: translateY(50%);
-    }
-
-    .nav-link.active::after {
-        width: 4px;
-        height: 20px;
+        &::after {
+            width: 4px;
+            height: 20px;
+        }
+        
+        &::after {
+            left: auto;
+            right: 1rem;
+            bottom: 50%;
+            width: 4px;
+            height: 0;
+            transform: translateY(50%);
+        }
     }
 
     .menu-toggle {
@@ -173,10 +171,9 @@
     .section-heading {
         grid-template-columns: 1fr;
         gap: 1.5rem;
-    }
-
-    .section-heading h2 {
-        font-size: clamp(2.4rem, 13vw, 3.6rem);
+        & h2 {
+            font-size: clamp(2.4rem, 13vw, 3.6rem);
+        }
     }
 
     .project-filters {

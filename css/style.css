@@ -1,6 +1,5 @@
 ﻿:root {
     color-scheme: light;
-
     /* Neutral surfaces */
     --color-background: #f6f8fb;
     --color-surface: #ffffff;
@@ -9,11 +8,9 @@
     --color-text: #0b1220;
     --color-text-secondary: #475569;
     --color-text-muted: #6b7a88;
-
     /* Borders / strokes */
     --color-border: rgba(15, 23, 42, 0.11);
     --color-border-strong: rgba(15, 23, 42, 0.171);
-
     /* Primary brand colors (reddish professional) */
     --color-primary: #ef476f;
     --color-primary-dark: #d92e5d;
