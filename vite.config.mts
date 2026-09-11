@@ -147,6 +147,7 @@ export default defineConfig(({ command }) => {
             hmr: {
                 host: "localhost",
                 port: 5173,
+                clientPort: 5173,
                 protocol: "ws"
             },
             warmup: {

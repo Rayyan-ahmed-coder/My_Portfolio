@@ -2,18 +2,19 @@ import React from "react";
 import MainNavbar from './components/MainNavbar'
 import HeroSection from './components/Hero'
 import WorkSection from './components/Work'
+import AboutSection from "./components/About";
+import TechnologiesSection from "./components/Technologies";
 
 export default function App(): React.JSX.Element {
     return (
         <>
             <header className="site-header" id="site-header">
-                <MainNavbar />
+                <MainNavbar/>
             </header>
             <a className="skip-link" href="#main-content">Skip to content</a>
             <main id="main-content">
-                <HeroSection />
-                <WorkSection />
-
+                <HeroSection/>
+                <WorkSection/>
                 <section className="features section" id="features" aria-labelledby="features-title">
                     <div className="container">
                         <div className="section-heading">
@@ -98,106 +99,15 @@ export default function App(): React.JSX.Element {
 
                     </div>
                 </section>
-
-                <section className="about section" id="about" aria-labelledby="about-title">
-                    <div className="container about-container">
-                        <div className="about-heading">
-                            <p className="eyebrow">ABOUT ME</p>
-                            <h2 id="about-title">
-                                I enjoy turning
-                                <span className="accent-text">ideas</span>
-                                into reality.
-                            </h2>
-                        </div>
-
-
-                        <div className="about-content">
-                            <p className="about-lead">
-                                I'm a frontend developer who enjoys
-                                understanding how things work and then
-                                building them from the ground up.
-                            </p>
-
-
-                            <p>
-                                My current focus is frontend development,
-                                where I'm learning how to combine clean
-                                interfaces with efficient JavaScript and
-                                thoughtful user experiences.
-                            </p>
-
-                            <p>
-                                I don't just want to make websites that
-                                look good. I want to understand the
-                                engineering and thoughts behind them.
-                            </p>
-
-                            <a className="text-link" href="#contact" >
-                                Get in touch
-                                <span aria-hidden="true">→</span>
-                            </a>
-                        </div>
-
-                    </div>
-                </section>
-
-                <section className="skills section" id="skills" aria-labelledby="skills-title">
-                    <div className="container">
-                        <div className="section-heading">
-                            <div>
-                                <p className="eyebrow">TOOLKIT</p>
-                                <h2 id="skills-title">
-                                    Technologies I use.
-                                </h2>
-                            </div>
-                        </div>
-
-                        <div className="skills-list">
-                            <div className="skill-row" data-reveal="">
-                                <span className="skill-index">01</span>
-                                <h3>HTML</h3>
-                                <span className="skill-description">
-                                    Semantic structure
-                                </span>
-                            </div>
-
-                            <div className="skill-row" data-reveal>
-                                <span className="skill-index">02</span>
-                                <h3>CSS</h3>
-                                <span className="skill-description">
-                                    Responsive interfaces
-                                </span>
-                            </div>
-
-                            <div className="skill-row" data-reveal>
-                                <span className="skill-index">03</span>
-                                <h3>JavaScript</h3>
-                                <span className="skill-description">
-                                    Interactive experiences
-                                </span>
-                            </div>
-
-                            <div className="skill-row" data-reveal>
-                                <span className="skill-index">06</span>
-                                <h3>GitHub</h3>
-                                <span className="skill-description">
-                                    Version control
-                                </span>
-                            </div>
-                        </div>
-
-                    </div>
-                </section>
-
+                <AboutSection/>
+                <TechnologiesSection/>
                 <section className="contact section" id="contact" aria-labelledby="contact-title">
                     <div className="container contact-container">
 
                         <div className="contact-heading">
                             <p className="eyebrow">CONTACT</p>
                             <h2 id="contact-title">
-                                Have an idea?
-                                <br />
-                                Let's build it.
+                                Have an idea? <br/> Let's build it.
                             </h2>
                         </div>
 

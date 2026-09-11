@@ -214,12 +214,30 @@
         gap: 2.5rem;
     }
 
-    .skill-row {
-        grid-template-columns: 1fr;
-        padding: 1.25rem;
+    .skills-list {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: .75rem;
+    }
+
+    .skill-row,
+    .skill-row:nth-child(2n) {
+        min-height: 200px;
+        padding: 1rem;
+        transform: none;
     }
 
     .skill-description {
-        justify-self: start;
+        font-size: .75rem;
+    }
+}
+
+@media (max-width: 420px) {
+    .skills-list {
+        grid-template-columns: 1fr;
+    }
+
+    .skill-row,
+    .skill-row:nth-child(2n) {
+        min-height: 180px;
     }
 }

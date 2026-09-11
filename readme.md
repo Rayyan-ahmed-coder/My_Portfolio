@@ -107,7 +107,7 @@ To clone the runtime configuration files and spin up local compilation streams:
 
 ```bash
 # Clone the repository workspace
-git clone https://github.com && cd My_Portfolio_2v
+git clone https://github.com && cd My_Portfolio
 
 # Deterministic dependencies initialization
 npm ci

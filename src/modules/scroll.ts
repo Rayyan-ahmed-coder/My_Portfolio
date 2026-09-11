@@ -2,15 +2,10 @@ import { CONFIG } from "../../src/core/config.js";
 import { $, $$, listen, rafThrottle, type Throttled, type Unsubscribe } from "../../src/core/utilities.js";
 import type { Disposable, ScrollDirection } from "../../src/core/types.js";
 
-/**
- * Tracks scroll position to sync the active nav link and the back-to-top
- * button. Section tracking is delegated to IntersectionObserver, and class
- * writes are gated so scrolling never invalidates layout needlessly.
- */
 export default class ScrollManager implements Disposable {
-    #scrollButton: HTMLElement | null = $(".scroll-top");
-    #sections: HTMLElement[] = Array.from($$<HTMLElement>("section[id]"));
-    #links: HTMLAnchorElement[] = Array.from($$<HTMLAnchorElement>(".nav-link"));
+    #scrollButton: HTMLElement | null = null;
+    #sections: HTMLElement[] = [];
+    #links: HTMLAnchorElement[] = [];
     #lastScrollY = 0;
     #scrollDirection: ScrollDirection = "down";
     #activeSection = "";
@@ -23,9 +18,12 @@ export default class ScrollManager implements Disposable {
     }
 
     #initialize(): void {
+        this.#scrollButton = $(".scroll-top");
+        this.#sections = Array.from($$<HTMLElement>("section[id]"));
+        this.#links = Array.from($$<HTMLAnchorElement>(".nav-link"));
+
         this.#updateScrollButtonState(window.scrollY);
 
-        // The throttled reference is cached so destroy() can detach the exact handler.
         this.#throttledScroll = rafThrottle(() => this.#onScroll());
         this.#teardown.push(
             listen(window, "scroll", this.#throttledScroll, { passive: true })
@@ -54,16 +52,13 @@ export default class ScrollManager implements Disposable {
     #updateScrollButtonState(scrollY: number): void {
         const button = this.#scrollButton;
         if (!button) return;
-
         const shouldBeVisible = scrollY > CONFIG.SCROLL_TOP_THRESHOLD;
         if (button.classList.contains("visible") === shouldBeVisible) return;
-
         button.classList.toggle("visible", shouldBeVisible);
     }
 
     #setupSectionObserver(): void {
         if (!this.#sections.length || !("IntersectionObserver" in window)) return;
-
         this.#sectionObserver = new IntersectionObserver(
             (entries) => {
                 for (const entry of entries) {
@@ -85,8 +80,14 @@ export default class ScrollManager implements Disposable {
         this.#activeSection = sectionId;
 
         requestAnimationFrame(() => {
+            if (!this.#links.length) {
+                this.#links = Array.from($$<HTMLAnchorElement>(".nav-link"));
+            }
+
             for (const link of this.#links) {
-                const isActive = link.getAttribute("href") === `#${sectionId}`;
+                const href = link.getAttribute("href");
+                const isActive = href === `#${sectionId}` || (sectionId === "home" && href === "#");
+                
                 if (link.classList.contains("active") === isActive) continue;
 
                 link.classList.toggle("active", isActive);
@@ -95,15 +96,15 @@ export default class ScrollManager implements Disposable {
         });
     }
 
-    /** Single delegated listener handles every in-page anchor. */
     #setupSmoothScrolling(): void {
         this.#teardown.push(
             listen(document, "click", (event) => {
                 const link = (event.target as Element | null)?.closest<HTMLAnchorElement>(".nav-link");
                 const href = link?.getAttribute("href");
-                if (!href?.startsWith("#") || href === "#") return;
+                if (!href?.startsWith("#")) return;
 
-                const target = $(href);
+                const targetId = href === "#" ? "#home" : href;
+                const target = $(targetId);
                 if (!target) return;
 
                 event.preventDefault();

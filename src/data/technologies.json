@@ -1,0 +1,47 @@
+[
+    {
+        "name": "HTML",
+        "description": "Semantic structure",
+        "mark": "H"
+    },
+    {
+        "name": "CSS",
+        "description": "Responsive interfaces",
+        "mark": "C"
+    },
+    {
+        "name": "JavaScript",
+        "description": "Interactive experiences",
+        "mark": "JS"
+    },
+    {
+        "name": "TypeScript",
+        "description": "Faster error catching and type safety",
+        "mark": "TS"
+    },
+    {
+        "name": "React",
+        "description": "Component-driven UI",
+        "mark": "R"
+    },
+    {
+        "name": "Vite",
+        "description": "Fast development",
+        "mark": "V"
+    },
+    {
+        "name": "GitHub",
+        "description": "Collaboration and hosting",
+        "mark": "GH"
+    },
+    {
+        "name": "Git",
+        "description": "Version control",
+        "mark": "G"
+    },
+    {
+        "name": "VS Code",
+        "description": "Focused development",
+        "mark": "VS"
+    }
+]
