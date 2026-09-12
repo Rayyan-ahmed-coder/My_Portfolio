@@ -21,6 +21,8 @@ rad.json
 *.flf
 #Test results file
 TestResults.xml
+#Log files
+*.log
 ### Node ###
 node_modules/
 coverage/
