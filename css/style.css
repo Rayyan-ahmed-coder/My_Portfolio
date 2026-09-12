@@ -24,14 +24,14 @@
     --font-display: Inter, ui-sans-serif, system-ui, sans-serif;
     --font-body: Inter, ui-sans-serif, system-ui, sans-serif;
 
-    --text-xs: .72rem;
-    --text-sm: .875rem;
-    --text-md: 1rem;
-    --text-lg: 1.15rem;
-    --text-xl: 1.5rem;
-    --text-2xl: 2rem;
-    --text-3xl: 3rem;
-    --text-4xl: clamp(3rem, 7vw, 7.5rem);
+    --text-xs: clamp(0.72rem, 0.2vw + 0.68rem, 0.75rem);
+    --text-sm: clamp(0.875rem, 0.3vw + 0.8rem, 0.9rem);
+    --text-md: clamp(1rem, 0.4vw + 0.9rem, 1.05rem);
+    --text-lg: clamp(1.15rem, 0.5vw + 1.05rem, 1.25rem);
+    --text-xl: clamp(1.35rem, 0.8vw + 1.15rem, 1.5rem);
+    --text-2xl: clamp(1.65rem, 1.2vw + 1.4rem, 2rem);
+    --text-3xl: clamp(2.25rem, 2.3vw + 1.75rem, 3rem);
+    --text-4xl: clamp(2.75rem, 5.6vw + 1.5rem, 7.5rem);
 
     --space-1: .25rem;
     --space-2: .5rem;
@@ -132,22 +132,14 @@ main {
     border-radius: 10px;
     border: 3px solid var(--color-surface-strong);
     transition: background-color .2s ease-in-out;
+    &:hover {
+        background-color: var(--color-primary-dark); 
+        cursor: pointer;
+    }
+    &:active {
+        background-color: var(--color-black);
+    }
 }
-
-::-webkit-scrollbar-thumb:hover {
-    background-color: var(--color-primary-dark); 
-    cursor: pointer;
-}
-
-::-webkit-scrollbar-thumb:active {
-    background-color: var(--color-black);
-}
-
-main, section, article {
-    content-visibility: auto;
-    contain-intrinsic-size: auto 600px; 
-}
-
 
 img, 
 video, 
@@ -1062,7 +1054,7 @@ nav.navbar {
 
 .project-card,
 .feature-card,
-.skill-row {
+.skill-card {
     contain: layout style paint;
 }
 
@@ -1370,8 +1362,8 @@ nav.navbar {
     max-width: 680px;
     font-size: clamp(2.7rem, 6vw, 5.8rem);
     font-weight: 800;
-    letter-spacing: -.035em;
-    line-height: 1.1;
+    letter-spacing: -.02em;
+    line-height: 1.125;
 }
 
 .about-content {
@@ -1379,8 +1371,8 @@ nav.navbar {
     p {
         margin-bottom: 1.5rem;
         color: var(--color-text-secondary);
-        font-size: 1rem;
-        line-height: 1.7;
+        font-size: var(--text-md);
+        line-height: 1.5;
         letter-spacing: .03em;
     }
 }
@@ -1416,7 +1408,7 @@ nav.navbar {
     gap: 1rem;
 }
 
-.skill-row {
+.skill-card {
     position: relative;
     min-height: 235px;
     display: flex;
@@ -1441,9 +1433,11 @@ nav.navbar {
         background: var(--color-primary-soft);
         transition: transform var(--transition-normal), opacity var(--transition-normal);
     }
+
     &:nth-child(2n) {
         transform: translateY(1.25rem);
     }
+
     &:hover,
     &:focus-within {
         transform: translateY(-6px);
@@ -1451,10 +1445,11 @@ nav.navbar {
         background: var(--color-surface);
         box-shadow: 0 24px 50px rgba(15, 23, 42, .12);
         &::before {
-            transform: scale(1.7);
+            transform: scale(1.55);
             opacity: .7;
         }
     }
+
     &:nth-child(2n):hover,
     &:nth-child(2n):focus-within {
         transform: translateY(-6px);
@@ -1482,7 +1477,7 @@ nav.navbar {
     place-items: center;
     background: var(--color-primary-soft);
     border: 1px solid rgba(239, 71, 111, .2);
-    border-radius: 14px;
+    border-radius: 12px;
     color: var(--color-primary);
     font-size: .88rem;
     font-weight: 850;
@@ -1503,8 +1498,8 @@ nav.navbar {
 
 .skill-index {
     color: var(--color-primary);
-    font-size: .74rem;
-    font-weight: 800;
+    font-size: .75rem;
+    font-weight: 700;
     letter-spacing: .1em;
 }
 
@@ -1525,8 +1520,8 @@ nav.navbar {
     transition: transform var(--transition-fast);
 }
 
-.skill-row:hover .skill-arrow,
-.skill-row:focus-within .skill-arrow {
+.skill-card:hover .skill-arrow,
+.skill-card:focus-within .skill-arrow {
     transform: translate(3px, -3px);
 }
 
@@ -1852,7 +1847,7 @@ html[data-theme="dark"] {
 
     .about-heading h2,
     .about-lead,
-    .skill-row,
+    .skill-card,
     .skills-list {
         color: var(--color-text);
     }
@@ -1865,7 +1860,7 @@ html[data-theme="dark"] {
         color: var(--color-primary);
     }
 
-    .skill-row:hover {
+    .skill-card:hover {
         background: rgba(148, 163, 184, .04);
     }
 
@@ -2024,12 +2019,14 @@ html[data-theme="dark"] {
 /* SCROLL REVEAL */
 [data-reveal] {
     content-visibility: auto;
+    visibility: hidden;
     opacity: 0;
     transform: translateY(30px);
     transition:
         opacity 700ms cubic-bezier(.2, .8, .2, 1), 
         transform 700ms cubic-bezier(.2, .8, .2, 1);
     &.revealed {
+        visibility: visible;
         opacity: 1;
         transform: translateY(0);
     }

@@ -123,7 +123,7 @@
     .logo-text {
         display: none;
     }
-    /* Keep theme toggle visible on small screens for accessibility */
+
     .theme-toggle {
         display: grid;
         z-index: 1100;
@@ -171,7 +171,7 @@
     .section-heading {
         grid-template-columns: 1fr;
         gap: 1.5rem;
-        & h2 {
+        h2 {
             font-size: clamp(2.4rem, 13vw, 3.6rem);
         }
     }
@@ -181,10 +181,10 @@
         flex-wrap: nowrap;
         padding-bottom: 0.4rem;
         scrollbar-width: none;
-    }
-
-    .project-filters::-webkit-scrollbar {
-        display: none;
+        
+        &::-webkit-scrollbar {
+            display: none;
+        }
     }
 
     .filter-button {
@@ -215,15 +215,13 @@
     }
 
     .skills-list {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: .75rem;
+        grid-template-columns: 1fr;
+        gap: 1.25rem;
     }
 
-    .skill-row,
-    .skill-row:nth-child(2n) {
-        min-height: 200px;
-        padding: 1rem;
-        transform: none;
+    .skill-card,
+    .skill-card:nth-child(even) {
+        transform: translateY(0);
     }
 
     .skill-description {
@@ -236,8 +234,8 @@
         grid-template-columns: 1fr;
     }
 
-    .skill-row,
-    .skill-row:nth-child(2n) {
+    .skill-card,
+    .skill-card:nth-child(even) {
         min-height: 180px;
     }
 }

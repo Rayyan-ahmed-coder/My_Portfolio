@@ -454,7 +454,7 @@ export default class CommandPalette implements Disposable {
             categories: { value: projectCategories.size, label: "Project categories" },
             techTags: { value: new Set(projectTags).size, label: "Technology tags" },
             sections: { value: $$("section[id]").length || navLinks, label: "Section anchors" },
-            skills: { value: $$(".skill-row").length, label: "Skill rows detected" },
+            skills: { value: $$(".skill-card").length, label: "Skill rows detected" },
             filters: { value: this.#countByCategory("Filters"), label: "Filter commands" },
             features: { value: $$(".feature-card").length, label: "Feature cards" },
             commandGroups: {
