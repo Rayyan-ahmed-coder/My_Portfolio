@@ -214,6 +214,20 @@
         gap: 2.5rem;
     }
 
+    .features-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .feature-card {
+        min-height: 0;
+        padding: 1.35rem;
+    }
+
+    .feature-icon {
+        margin-top: 2.5rem;
+    }
+
     .skills-list {
         grid-template-columns: 1fr;
         gap: 1.25rem;

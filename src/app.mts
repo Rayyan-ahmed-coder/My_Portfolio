@@ -26,7 +26,7 @@ type CommandPaletteInstance = {
  * modules during idle time, and the command palette only when first requested.
  * Every tier is isolated so a single failing module cannot break the page.
  */
-export class Portfolio implements Disposable {
+export default class Portfolio implements Disposable {
     readonly modules: Modules = {};
     #teardown: Unsubscribe[] = [];
     #commandPalette: CommandPaletteInstance | null = null;
@@ -162,4 +162,14 @@ export class Portfolio implements Disposable {
     }
 }
 
-export default new Portfolio();
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+        setTimeout(() => {
+            new Portfolio();
+        }, 0);
+    });
+} else {
+    setTimeout(() => {
+        new Portfolio();
+    }, 0);
+}

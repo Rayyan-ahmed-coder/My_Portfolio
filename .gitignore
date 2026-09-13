@@ -26,3 +26,6 @@ TestResults.xml
 ### Node ###
 node_modules/
 coverage/
+.env
+.env.*
+!.env.example

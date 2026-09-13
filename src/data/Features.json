@@ -1,0 +1,42 @@
+[
+    {
+        "icon": "⚡",
+        "title": "Performance",
+        "description": "Lightweight code, efficient rendering and a loading strategy designed to keep the experience fast.",
+        "bullets": [
+            "Minimal dependencies",
+            "Deferred JavaScript",
+            "Optimized assets"
+        ]
+    },
+    {
+        "icon": "◇",
+        "title": "Responsive",
+        "description": "Carefully designed layouts that adapt smoothly across phones, tablets, laptops and large displays.",
+        "bullets": [
+            "Screen Adapting font sizes",
+            "Flexible layouts",
+            "Large-screen support"
+        ]
+    },
+    {
+        "icon": "◎",
+        "title": "Accessible",
+        "description": "Built with semantic HTML, keyboard support and accessibility-conscious interactions.",
+        "bullets": [
+            "Semantic markup",
+            "Keyboard friendly",
+            "Reduced motion support"
+        ]
+    },
+    {
+        "icon": "↗",
+        "title": "Modern",
+        "description": "A clean visual system combining subtle motion, strong typography and intentional spacing.",
+        "bullets": [
+            "Minimal interface",
+            "Micro-interactions",
+            "Consistent design system"
+        ]
+    }
+]
