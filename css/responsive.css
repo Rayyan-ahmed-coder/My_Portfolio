@@ -103,6 +103,16 @@
     .project-card-large {
         grid-column: auto;
     }
+
+    .footer-right {
+        margin-right: 0 !important;
+        gap: var(--space-5, 1.25rem);
+    }
+    
+    .scroll-top {
+        bottom: var(--space-10, 2.5rem);
+        right: var(--space-5, 1.25rem);
+    }
 }
 
 /* MOBILE */
@@ -214,20 +224,6 @@
         gap: 2.5rem;
     }
 
-    .features-grid {
-        grid-template-columns: 1fr;
-        gap: 1rem;
-    }
-
-    .feature-card {
-        min-height: 0;
-        padding: 1.35rem;
-    }
-
-    .feature-icon {
-        margin-top: 2.5rem;
-    }
-
     .skills-list {
         grid-template-columns: 1fr;
         gap: 1.25rem;
@@ -240,6 +236,24 @@
 
     .skill-description {
         font-size: .75rem;
+    }
+
+        .footer-container {
+        flex-direction: column-reverse;
+        gap: var(--space-6, 1.5rem);
+        justify-content: center;
+        min-height: 160px;
+        padding-bottom: var(--space-8);
+        text-align: center;
+    }
+
+    .footer-brand {
+        justify-items: center;
+    }
+
+    .footer-right {
+        width: 100%;
+        justify-content: center;
     }
 }
 

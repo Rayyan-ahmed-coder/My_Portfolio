@@ -161,15 +161,3 @@ export default class Portfolio implements Disposable {
         }
     }
 }
-
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-        setTimeout(() => {
-            new Portfolio();
-        }, 0);
-    });
-} else {
-    setTimeout(() => {
-        new Portfolio();
-    }, 0);
-}

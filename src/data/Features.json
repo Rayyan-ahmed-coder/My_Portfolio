@@ -5,7 +5,7 @@
         "description": "Lightweight code, efficient rendering and a loading strategy designed to keep the experience fast.",
         "bullets": [
             "Minimal dependencies",
-            "Deferred JavaScript",
+            "Code compression",
             "Optimized assets"
         ]
     },

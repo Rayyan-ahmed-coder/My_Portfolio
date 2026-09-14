@@ -1,16 +1,19 @@
 import type React from 'react';
-import { useState } from 'react';
+import { useState, useTransition } from 'react';
 
 type FormStatus = 'idle' | 'submitting' | 'success' | 'error';
 
 const EMAIL_ADDRESS = 'rayyan.workhost@gmail.com';
-const WEB3FORMS_ENDPOINT = 'https://api.web3forms.com/submit';
+const WEB3FORMS_ENDPOINT = 'https://web3forms.com';
+
+/* 🔑 Vite Context Hook mapping out secure background token declarations */
 const ACCESS_KEY = import.meta.env.VITE_WEB3FORMS_ACCESS_KEY;
 
 export default function ContactSection(): React.JSX.Element {
-    const [emailCopied, setEmailCopied] = useState(false);
+    const [emailCopied, setEmailCopied] = useState<boolean>(false);
     const [formStatus, setFormStatus] = useState<FormStatus>('idle');
-    const [messageLength, setMessageLength] = useState(0);
+    const [messageLength, setMessageLength] = useState<number>(0);
+    const [isPending, startTransition] = useTransition();
 
     const handleCopyEmail = async (): Promise<void> => {
         try {
@@ -24,17 +27,19 @@ export default function ContactSection(): React.JSX.Element {
 
     const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
         e.preventDefault();
-        if (formStatus === 'submitting') return;
+        if (formStatus === 'submitting' || isPending) return;
 
         const form = e.currentTarget;
         const formData = new FormData(form);
+
+        /* 🛡️ HONEYPOT SPAM SHIELD */
         if (formData.get('_honeypot_clearance_')) {
             form.reset();
             setMessageLength(0);
             return;
         }
 
-        setFormStatus('submitting');
+        /* Fallback logic handling message delivery if local env parameters fail */
         if (!ACCESS_KEY) {
             const name = String(formData.get('name') ?? '');
             const message = String(formData.get('message') ?? '');
@@ -44,25 +49,30 @@ export default function ContactSection(): React.JSX.Element {
         }
 
         formData.set('access_key', ACCESS_KEY);
-        formData.set('subject', `Portfolio inquiry from ${formData.get('name') ?? 'website visitor'}`);
-        formData.set('from_name', 'Rayyan Portfolio');
+        formData.set('subject', `💼 Portfolio Inquiry from ${formData.get('name') ?? 'Visitor'}`);
+        formData.set('from_name', 'Rayyan Portfolio Pipeline');
 
-        try {
-            const response = await fetch(WEB3FORMS_ENDPOINT, {
-                method: 'POST',
-                headers: { Accept: 'application/json' },
-                body: formData,
-            });
-            const result: { success?: boolean } = await response.json();
+        setFormStatus('submitting');
 
-            if (!response.ok || !result.success) throw new Error('Contact submission failed');
-            form.reset();
-            setMessageLength(0);
-            setFormStatus('success');
-        } catch (error) {
-            console.error('Contact form submission failed', error);
-            setFormStatus('error');
-        }
+        startTransition(async () => {
+            try {
+                const response = await fetch(WEB3FORMS_ENDPOINT, {
+                    method: 'POST',
+                    headers: { 'Accept': 'application/json' },
+                    body: formData,
+                });
+                const result: { success?: boolean } = await response.json();
+
+                if (!response.ok || !result.success) throw new Error('Network validation failed');
+                
+                form.reset();
+                setMessageLength(0);
+                setFormStatus('success');
+            } catch (error) {
+                console.error('[Form Pipeline Exception]:', error);
+                setFormStatus('error');
+            }
+        });
     };
 
     return (
@@ -115,8 +125,8 @@ export default function ContactSection(): React.JSX.Element {
 
                 <div className="contact-form-block" data-reveal>
                     <form onSubmit={handleFormSubmit} className="interactive-contact-form" noValidate={false}>
-                        {/* Invisible field to trap spam bots */}
-                        <div hidden aria-hidden="true">
+                        
+                        <div hidden aria-hidden="true" style={{ display: 'none' }}>
                             <input 
                                 type="text" 
                                 name="_honeypot_clearance_" 
@@ -135,7 +145,7 @@ export default function ContactSection(): React.JSX.Element {
                                     required 
                                     placeholder="Your full name"
                                     autoComplete="name"
-                                    disabled={formStatus === 'submitting'}
+                                    disabled={formStatus === 'submitting' || isPending}
                                 />
                             </div>
                             <div className="form-input-wrapper">
@@ -147,17 +157,16 @@ export default function ContactSection(): React.JSX.Element {
                                     required 
                                     placeholder="your@email.com"
                                     autoComplete="email"
-                                    disabled={formStatus === 'submitting'}
+                                    disabled={formStatus === 'submitting' || isPending}
                                 />
                             </div>
                         </div>
 
                         <div className="form-input-wrapper">
                             <div className="textarea-label-row">
-                                <label htmlFor="user-message">Message</label> 
-                                {/* 📊 LIVE CHARACTER COUNTER: Tracks composition layout sizes in real time */}
+                                <label htmlFor="user-message">Message</label>
                                 <span className={`char-counter ${messageLength > 400 ? 'limit-near' : ''}`} aria-hidden="true">
-                                    {messageLength} / 500
+                                    &#40;{messageLength} / 500&#41;
                                 </span>
                             </div>
                             <textarea 
@@ -169,14 +178,14 @@ export default function ContactSection(): React.JSX.Element {
                                 required 
                                 placeholder="Tell me about your amazing project idea..."
                                 onChange={(e) => setMessageLength(e.target.value.length)}
-                                disabled={formStatus === 'submitting'}
+                                disabled={formStatus === 'submitting' || isPending}
                             />
                         </div>
 
                         <button 
                             type="submit" 
                             className={`submit-form-btn ${formStatus === 'submitting' ? 'loading-state' : ''}`} 
-                            disabled={formStatus === 'submitting'}
+                            disabled={formStatus === 'submitting' || isPending}
                         >
                             {formStatus === 'submitting' ? 'Sending Message...' : 'Send Message ↗'}
                         </button>

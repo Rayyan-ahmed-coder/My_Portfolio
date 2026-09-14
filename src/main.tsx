@@ -14,3 +14,13 @@ createRoot(container).render(
         <App />
     </StrictMode>
 );
+
+const startEnhancements = (): void => {
+    void import("./app.mts").then(({ default: Portfolio }) => new Portfolio());
+};
+
+if (typeof window.requestIdleCallback === "function") {
+    window.requestIdleCallback(startEnhancements, { timeout: 1500 });
+} else {
+    setTimeout(startEnhancements, 200);
+}

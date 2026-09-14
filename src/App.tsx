@@ -1,4 +1,5 @@
 import React from 'react';
+import UpdateNotification from './components/UpdateNotification';
 import MainNavbar from './components/MainNavbar'
 import HeroSection from './components/Hero'
 import WorkSection from './components/Work'
@@ -6,10 +7,12 @@ import AboutSection from "./components/About";
 import FeaturesSection from './components/Features';
 import TechnologiesSection from "./components/Technologies";
 import ContactSection from './components/Contact';
+import SiteFooter from './components/Footer';
 
 export default function App(): React.JSX.Element {
     return (
         <>
+            <UpdateNotification/>
             <header className="site-header" id="site-header">
                 <MainNavbar/>
             </header>
@@ -23,24 +26,7 @@ export default function App(): React.JSX.Element {
                 <TechnologiesSection/>
                 <ContactSection/>
             </main>
-
-            <footer className="site-footer">
-                <div className="container footer-container">
-                    <div className="footer-brand">
-                        <a className="logo" href="#home">
-                            <span className="logo-mark">R</span>
-                            <span className="logo-text">Rayyan</span>
-                        </a>
-                        <p>Building for the web.</p>
-                    </div>
-
-                    <div className="footer-right">
-                        <p><span aria-hidden="true">©</span> <span id="made-year" aria-label='when was made'>2025 July 14th</span> | Rayyan Khan.</p>
-                        <a href="#home">Back to top ↑</a>
-                    </div>
-                </div>
-            </footer>
-
+            <SiteFooter/>
             <div className="command-panel" id="command-panel" aria-hidden="true" role="dialog" aria-label="Command center">
                 <div className="command-panel-shell">
                     <div className="command-panel-header">
