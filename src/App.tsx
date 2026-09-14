@@ -8,6 +8,7 @@ import FeaturesSection from './components/Features';
 import TechnologiesSection from "./components/Technologies";
 import ContactSection from './components/Contact';
 import SiteFooter from './components/Footer';
+import ImpactStrip from './components/ImpactStrip';
 
 export default function App(): React.JSX.Element {
     return (
@@ -19,10 +20,10 @@ export default function App(): React.JSX.Element {
             <a className="skip-link" href="#main-content">Skip to content</a>
             <main id="main-content">
                 <HeroSection/>
+                <ImpactStrip/>
                 <WorkSection/>
-                <AboutSection/>
                 <FeaturesSection/>
-                <div id="prjects-grid"></div>
+                <AboutSection/>
                 <TechnologiesSection/>
                 <ContactSection/>
             </main>

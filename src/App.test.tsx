@@ -8,5 +8,6 @@ describe("App", () => {
 
         expect(html).toContain('id="work"');
         expect(html).toContain('id="projects-grid"');
+        expect((html.match(/id="availability-card"/g) ?? []).length).toBe(1);
     });
 });

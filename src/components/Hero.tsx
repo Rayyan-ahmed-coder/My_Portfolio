@@ -1,4 +1,5 @@
 import React from "react";
+import AvailabilityCard from "./AvailabilityCard";
 
 export default function HeroSection(): React.JSX.Element {
     return (
@@ -47,8 +48,8 @@ export default function HeroSection(): React.JSX.Element {
                     </div>
                 </div>
 
-                <div className="hero-visual" aria-hidden="true" data-reveal>
-                    <div className="hero-card">
+                <div className="hero-visual" data-reveal>
+                    <div className="hero-card" aria-hidden="true">
                         <div className="hero-card-top">
                             <span/>
                             <span/>
@@ -61,6 +62,7 @@ export default function HeroSection(): React.JSX.Element {
                             <span>JS</span>
                         </div>
                     </div>
+                    <AvailabilityCard />
                 </div>
             </div>
 

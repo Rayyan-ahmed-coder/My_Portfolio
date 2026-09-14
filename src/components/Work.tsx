@@ -28,7 +28,7 @@ export default function WorkSection() {
                     </button>
                 </div>
                 
-                <div className="project-grid" id="projects-grid"></div>
+                <div className="projects-grid" id="projects-grid"></div>
             </div>
         </section>
     )

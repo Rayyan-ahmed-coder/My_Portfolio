@@ -83,6 +83,10 @@
         grid-template-columns: 1fr;
     }
 
+    .impact-strip-grid {
+        grid-template-columns: 1fr;
+    }
+
     .hero-actions {
         grid-template-columns: 1fr;
     }
