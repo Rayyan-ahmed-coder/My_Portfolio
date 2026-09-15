@@ -2,7 +2,7 @@ import type React from 'react';
 import { useState, useEffect, useRef } from 'react';
 
 /* 🚀 TARGET CONFIG: Change this value to instantly trigger the toast for users */
-const PORTFOLIO_VERSION_HASH = 'v3.2_max_production';
+const PORTFOLIO_VERSION_HASH = 'v4.1_new_sections_|_style_imporvements';
 const VISIBLE_DURATION_MS = 6500;
 
 export default function UpdateNotification(): React.JSX.Element | null {
