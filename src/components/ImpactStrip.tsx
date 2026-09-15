@@ -13,7 +13,7 @@ export default function ImpactStrip(): React.JSX.Element {
                 {principles.map(({ icon: Icon, label, text }) => (
                     <article className="impact-item" key={label}>
                         <Icon className="impact-icon" size={20} aria-hidden="true" />
-                        <div>
+                        <div className='impact-content-wrapper'>
                             <h2>{label}</h2>
                             <p>{text}</p>
                         </div>

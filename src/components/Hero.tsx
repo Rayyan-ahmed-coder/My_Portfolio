@@ -14,9 +14,8 @@ export default function HeroSection(): React.JSX.Element {
                 <div className="hero-content">
                     <p className="eyebrow" data-reveal>FRONTEND DEVELOPER</p>
                     <h1 className="hero-title" id="hero-title" data-reveal>
-                        Building <span className="accent-text">digital experiences</span> that matter.
+                        Building <span className="accent-text hero-accent-text">digital experiences</span> that matter.
                     </h1>
-
                     <p className="hero-description" data-reveal>
                         I'm Rayyan Khan, a frontend developer focused 
                         on creating fast, responsive and thoughtfully 
@@ -51,15 +50,15 @@ export default function HeroSection(): React.JSX.Element {
                 <div className="hero-visual" data-reveal>
                     <div className="hero-card" aria-hidden="true">
                         <div className="hero-card-top">
-                            <span/>
-                            <span/>
-                            <span/>
+                            <span></span>
+                            <span></span>
+                            <span></span>
                         </div>
                         <div className="hero-letter">R</div>
                         <div className="hero-card-bottom">
-                            <span>HTML</span>
+                            <span>React</span>
                             <span>CSS</span>
-                            <span>JS</span>
+                            <span>TS</span>
                         </div>
                     </div>
                     <AvailabilityCard />

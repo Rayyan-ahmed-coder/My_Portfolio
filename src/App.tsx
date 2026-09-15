@@ -9,6 +9,7 @@ import TechnologiesSection from "./components/Technologies";
 import ContactSection from './components/Contact';
 import SiteFooter from './components/Footer';
 import ImpactStrip from './components/ImpactStrip';
+import BuildApproach from './components/BuildApproach';
 
 export default function App(): React.JSX.Element {
     return (
@@ -21,6 +22,7 @@ export default function App(): React.JSX.Element {
             <main id="main-content">
                 <HeroSection/>
                 <ImpactStrip/>
+                <BuildApproach/>
                 <WorkSection/>
                 <FeaturesSection/>
                 <AboutSection/>

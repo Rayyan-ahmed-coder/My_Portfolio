@@ -87,6 +87,23 @@
         grid-template-columns: 1fr;
     }
 
+    .approach-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .approach-tabs {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .approach-tab {
+        grid-template-columns: auto 1fr;
+        min-height: 86px;
+    }
+
+    .approach-tab-arrow {
+        display: none;
+    }
+
     .hero-actions {
         grid-template-columns: 1fr;
     }
@@ -180,6 +197,35 @@
 
     .hero-letter {
         font-size: 11rem;
+    }
+
+    .approach-tabs {
+        display: flex;
+        overflow-x: auto;
+        gap: .55rem;
+        padding-bottom: .35rem;
+        scrollbar-width: none;
+    }
+
+    .approach-tabs::-webkit-scrollbar {
+        display: none;
+    }
+
+    .approach-tab {
+        flex: 0 0 145px;
+        grid-template-columns: auto 1fr;
+        min-height: 76px;
+        padding: .8rem;
+    }
+
+    .approach-tab:hover,
+    .approach-tab:focus-visible,
+    .approach-tab.active {
+        transform: translateY(-2px);
+    }
+
+    .approach-panel {
+        min-height: 360px;
     }
 
     .section-heading {

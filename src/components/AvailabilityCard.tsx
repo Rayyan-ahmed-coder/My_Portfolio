@@ -35,7 +35,7 @@ export default function AvailabilityCard(): React.JSX.Element {
         <aside className="availability-card" id="availability-card" aria-label="Current availability">
             <div className="availability-card-header">
                 <span className="availability-status"><span aria-hidden="true" /> Available for select projects</span>
-                <Sparkles size={16} aria-hidden="true" />
+                <Sparkles size={16} aria-hidden="true"/>
             </div>
             <p className="availability-title">Have a thoughtful idea?</p>
             <p className="availability-copy">I am currently open to focused frontend work, collaborations and ambitious experiments.</p>

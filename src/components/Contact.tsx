@@ -140,7 +140,8 @@ export default function ContactSection(): React.JSX.Element {
                                 <label htmlFor="user-name">Name</label>
                                 <input 
                                     type="text" 
-                                    id="user-name" 
+                                    autoCapitalize='on' 
+                                    id="user-name"  
                                     name="name" 
                                     required 
                                     placeholder="Your full name"
@@ -152,6 +153,7 @@ export default function ContactSection(): React.JSX.Element {
                                 <label htmlFor="user-email">Email</label>
                                 <input 
                                     type="email" 
+                                    autoCapitalize='off'
                                     id="user-email" 
                                     name="email" 
                                     required 
@@ -170,6 +172,7 @@ export default function ContactSection(): React.JSX.Element {
                                 </span>
                             </div>
                             <textarea 
+                                autoCapitalize='sentences'
                                 id="user-message" 
                                 name="message" 
                                 spellCheck="true" 
