@@ -2,7 +2,7 @@
 
 import { precacheAndRoute, cleanupOutdatedCaches } from "workbox-precaching";
 import { registerRoute, NavigationRoute } from "workbox-routing";
-import { CacheFirst, NetworkFirst, StaleWhileRevalidate } from "workbox-strategies";
+import { CacheFirst, NetworkFirst } from "workbox-strategies";
 import { ExpirationPlugin } from "workbox-expiration";
 
 declare const self: ServiceWorkerGlobalScope;
@@ -13,23 +13,24 @@ self.addEventListener("activate", (event) => event.waitUntil(self.clients.claim(
 cleanupOutdatedCaches();
 precacheAndRoute(self.__WB_MANIFEST || []);
 
-// HTML must prefer fresh deployments, while still working offline.
+// Prefer a fresh document so deployments become visible quickly, with an
+// offline fallback when the network is unavailable.
 registerRoute(new NavigationRoute(new NetworkFirst({
     cacheName: "portfolio-navigation-v2",
     networkTimeoutSeconds: 3,
     plugins: [new ExpirationPlugin({ maxEntries: 5, maxAgeSeconds: 24 * 60 * 60 })],
 })));
 
-// Hashed Vite assets are immutable; cache them without a network round trip.
+// Vite filenames are content-hashed. Cache hits are safe and avoid a network
+// request on repeat visits; precaching still handles the initial visit.
 registerRoute(
     ({ request }) => request.destination === "script" || request.destination === "style",
-    new StaleWhileRevalidate({
-        cacheName: "portfolio-bundles-v2",
-        plugins: [new ExpirationPlugin({ maxEntries: 40, maxAgeSeconds: 30 * 24 * 60 * 60 })],
+    new CacheFirst({
+        cacheName: "portfolio-bundles-v3",
+        plugins: [new ExpirationPlugin({ maxEntries: 50, maxAgeSeconds: 30 * 24 * 60 * 60 })],
     }),
 );
 
-// Match the actual Google Fonts hosts, including www.gstatic.com.
 registerRoute(
     ({ url, request }) =>
         request.destination === "font" &&
