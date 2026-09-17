@@ -1,35 +1,49 @@
-import React from 'react';
+import React, { Suspense, lazy } from 'react';
 import UpdateNotification from './components/UpdateNotification';
-import MainNavbar from './components/MainNavbar'
-import HeroSection from './components/Hero'
-import WorkSection from './components/Work'
-import AboutSection from "./components/About";
-import FeaturesSection from './components/Features';
-import TechnologiesSection from "./components/Technologies";
-import ContactSection from './components/Contact';
-import SiteFooter from './components/Footer';
-import ImpactStrip from './components/ImpactStrip';
-import BuildApproach from './components/BuildApproach';
+import MainNavbar from './components/MainNavbar';
+import HeroSection from './components/Hero';
+
+const ImpactStrip = lazy(() => import('./components/ImpactStrip'));
+const BuildApproach = lazy(() => import('./components/BuildApproach'));
+const WorkSection = lazy(() => import('./components/Work'));
+const FeaturesSection = lazy(() => import('./components/Features'));
+const AboutSection = lazy(() => import('./components/About'));
+const TechnologiesSection = lazy(() => import('./components/Technologies'));
+const ContactSection = lazy(() => import('./components/Contact'));
+const SiteFooter = lazy(() => import('./components/Footer'));
+
+const SectionFallback = (): React.JSX.Element => (
+    <div aria-hidden="true" style={{ minHeight: '340px' }} />
+);
 
 export default function App(): React.JSX.Element {
     return (
         <>
-            <UpdateNotification/>
+            <UpdateNotification />
             <header className="site-header" id="site-header">
-                <MainNavbar/>
+                <MainNavbar />
             </header>
+
             <a className="skip-link" href="#main-content">Skip to content</a>
+
             <main id="main-content">
-                <HeroSection/>
-                <ImpactStrip/>
-                <BuildApproach/>
-                <WorkSection/>
-                <FeaturesSection/>
-                <AboutSection/>
-                <TechnologiesSection/>
-                <ContactSection/>
+                <HeroSection />
+
+                <Suspense fallback={<SectionFallback />}>
+                    <ImpactStrip />
+                    <BuildApproach />
+                    <WorkSection />
+                    <FeaturesSection />
+                    <AboutSection />
+                    <TechnologiesSection />
+                    <ContactSection />
+                </Suspense>
             </main>
-            <SiteFooter/>
+
+            <Suspense fallback={<SectionFallback />}>
+                <SiteFooter />
+            </Suspense>
+
             <div className="command-panel" id="command-panel" aria-hidden="true" role="dialog" aria-label="Command center">
                 <div className="command-panel-shell">
                     <div className="command-panel-header">
@@ -56,12 +70,7 @@ export default function App(): React.JSX.Element {
                 </div>
             </div>
 
-            <button
-                className="scroll-top"
-                id="scroll-top"
-                type="button"
-                aria-label="Scroll to top"
-            >
+            <button className="scroll-top" id="scroll-top" type="button" aria-label="Scroll to top">
                 ↑
             </button>
         </>

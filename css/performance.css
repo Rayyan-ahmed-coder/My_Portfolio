@@ -1,8 +1,13 @@
 /* Keep below-the-fold sections out of the initial rendering work. The intrinsic
    size preserves the scrollbar and prevents layout shifts before content is painted. */
-section:not(.hero) {
+main > section:not(.hero) {
     content-visibility: auto;
-    contain-intrinsic-size: auto 760px;
+    contain-intrinsic-size: 1200px 760px;
+    contain: layout paint style;
+}
+
+main > section.hero {
+    contain: layout paint style;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -17,5 +22,12 @@ section:not(.hero) {
         animation-iteration-count: 1 !important;
         scroll-behavior: auto !important;
         transition-duration: 0.01ms !important;
+    }
+}
+
+@media (max-width: 900px) {
+    .site-header {
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
     }
 }

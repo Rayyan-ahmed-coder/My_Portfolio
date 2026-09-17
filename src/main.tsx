@@ -20,10 +20,13 @@ const startEnhancements = (): void => {
     void import("./app.mts").then(({ default: Portfolio }) => new Portfolio());
 };
 
-// Keep the critical React render path free of enhancement-module work. The
-// fallback also yields once on browsers without requestIdleCallback.
-if (typeof window.requestIdleCallback === "function") {
-    window.requestIdleCallback(startEnhancements, { timeout: 1200 });
-} else {
+const scheduleEnhancements = () => {
+    if (typeof window.requestIdleCallback === "function") {
+        window.requestIdleCallback(startEnhancements, { timeout: 1200 });
+        return;
+    }
+
     window.setTimeout(startEnhancements, 100);
-}
+};
+
+scheduleEnhancements();

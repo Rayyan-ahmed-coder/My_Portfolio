@@ -1,21 +1,17 @@
-import { Check, Clock3, Copy, Mail, Sparkles } from "lucide-react";
-import { useEffect, useState } from "react";
+const formatTime = new Intl.DateTimeFormat(undefined, {
+    hour: 'numeric',
+    minute: '2-digit',
+});
 
-const EMAIL = "rayyan.workhost@gmail.com";
+const EMAIL = 'rayyan.workhost@gmail.com';
 
 export default function AvailabilityCard(): React.JSX.Element {
     const [copied, setCopied] = useState(false);
-    const [time, setTime] = useState(() => new Intl.DateTimeFormat([], {
-        hour: "numeric",
-        minute: "2-digit",
-    }).format());
+    const [time, setTime] = useState(() => formatTime.format(new Date()));
 
     useEffect(() => {
         const timer = window.setInterval(() => {
-            setTime(new Intl.DateTimeFormat([], {
-                hour: "numeric",
-                minute: "2-digit",
-            }).format());
+            setTime(formatTime.format(new Date()));
         }, 60_000);
 
         return () => window.clearInterval(timer);
@@ -35,7 +31,7 @@ export default function AvailabilityCard(): React.JSX.Element {
         <aside className="availability-card" id="availability-card" aria-label="Current availability">
             <div className="availability-card-header">
                 <span className="availability-status"><span aria-hidden="true" /> Available for select projects</span>
-                <Sparkles size={16} aria-hidden="true"/>
+                <Sparkles size={16} aria-hidden="true" />
             </div>
             <p className="availability-title">Have a thoughtful idea?</p>
             <p className="availability-copy">I am currently open to focused frontend work, collaborations and ambitious experiments.</p>
@@ -45,7 +41,7 @@ export default function AvailabilityCard(): React.JSX.Element {
             </div>
             <button className="availability-copy-button" type="button" onClick={copyEmail}>
                 {copied ? <Check size={16} aria-hidden="true" /> : <Copy size={16} aria-hidden="true" />}
-                {copied ? "Email copied" : "Copy my email"}
+                {copied ? 'Email copied' : 'Copy my email'}
             </button>
         </aside>
     );
