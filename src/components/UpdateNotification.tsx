@@ -1,69 +1,68 @@
 import type React from 'react';
-import { useState, useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
-/* 🚀 TARGET CONFIG: Change this value to instantly trigger the toast for users */
 const PORTFOLIO_VERSION_HASH = 'v4.1_new_sections_|_style_imporvements';
 const VISIBLE_DURATION_MS = 6500;
+const FADE_DURATION_MS = 400;
 
 export default function UpdateNotification(): React.JSX.Element | null {
-    const [shouldRender, setShouldRender] = useState<boolean>(false);
+    const [shouldRender, setShouldRender] = useState(false);
     const toastRef = useRef<HTMLDivElement | null>(null);
 
     useEffect(() => {
-        let isMounted = true;
-        try {
-            const cachedVersion = localStorage.getItem('portfolio_version_key');
+        let mounted = true;
+        let showFrame = 0;
+        let dismissTimer = 0;
+        let fadeAnimation: Animation | null = null;
 
-            if (cachedVersion !== PORTFOLIO_VERSION_HASH) {
-                requestAnimationFrame(() => {
-                    if (!isMounted) return;
+        try {
+            if (localStorage.getItem('portfolio_version_key') !== PORTFOLIO_VERSION_HASH) {
+                showFrame = requestAnimationFrame(() => {
+                    if (!mounted) return;
                     setShouldRender(true);
 
-                    const dismissTimeout = setTimeout(() => {
-                        if (!toastRef.current) {
+                    dismissTimer = window.setTimeout(() => {
+                        const toast = toastRef.current;
+                        if (!toast) {
                             setShouldRender(false);
                             return;
                         }
 
-                        /* 🚀 HARDWARE COMPOSITOR FADE: Triggers a native animation layer directly on the GPU */
-                        const fadeAnimation = toastRef.current.animate(
+                        fadeAnimation = toast.animate(
                             [
                                 { opacity: 1, transform: 'translate3d(-50%, 0, 0)' },
-                                { opacity: 0, transform: 'translate3d(-50%, -16px, 0)' }
+                                { opacity: 0, transform: 'translate3d(-50%, -16px, 0)' },
                             ],
-                            { duration: 400, easing: 'cubic-bezier(0.4, 0, 1, 1)', fill: 'forwards' }
+                            { duration: FADE_DURATION_MS, easing: 'cubic-bezier(0.4, 0, 1, 1)', fill: 'forwards' },
                         );
 
                         fadeAnimation.onfinish = () => {
                             try {
                                 localStorage.setItem('portfolio_version_key', PORTFOLIO_VERSION_HASH);
-                            } catch { /* Suppress storage write constraints */ }
-                            
-                            if (isMounted) setShouldRender(false);
+                            } catch {
+                                // Storage can be unavailable in privacy-restricted contexts.
+                            }
+                            if (mounted) setShouldRender(false);
                         };
                     }, VISIBLE_DURATION_MS);
-
-                    return () => clearTimeout(dismissTimeout);
                 });
             }
-        } catch (storageError) {
-            console.warn('[Update Engine Sync Restricted]:', storageError);
+        } catch (error) {
+            console.warn('[Update notification unavailable]:', error);
         }
 
         return () => {
-            isMounted = false;
+            mounted = false;
+            if (showFrame) cancelAnimationFrame(showFrame);
+            if (dismissTimer) window.clearTimeout(dismissTimer);
+            fadeAnimation?.cancel();
         };
     }, []);
 
     if (!shouldRender) return null;
 
     return (
-        <div 
-            ref={toastRef}
-            className="update-toast-pill" 
-            role="status" 
-            aria-live="polite"
-        >
+        <div ref={toastRef} className="update-toast-pill" role="status" aria-live="polite">
             <span className="update-toast-text">Updated</span>
             <span className="update-toast-tick" aria-hidden="true">✓</span>
         </div>
