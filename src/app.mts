@@ -149,7 +149,6 @@ export default class Portfolio implements Disposable {
 
     destroy(): void {
         this.#teardown.splice(0).forEach((off) => off());
-
         for (const module of Object.values(this.modules)) {
             if (module && typeof module.destroy === "function") {
                 try {

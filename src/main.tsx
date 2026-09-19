@@ -11,12 +11,20 @@ if (!container) {
 
 createRoot(container).render(
     <StrictMode>
-        <App />
+        <App/>
     </StrictMode>
 );
 
-const startEnhancements = (): void => {
-    void import("./app.mts").then(({ default: Portfolio }) => new Portfolio());
+const startEnhancements = async (): Promise<void> => {
+    const module = await import("./app.mjs");
+    const Portfolio = module.default;
+    // .then(({ default: Portfolio }) => new Portfolio())
+    if (typeof Portfolio === "function") {
+        new Portfolio();
+        console.log("Portfolio enhancements initialized successfully!");
+    } else {
+        console.warn("Expected a default class export from app.mjs, but received:", typeof Portfolio);
+    }
 };
 
 if (typeof window.requestIdleCallback === "function") {
