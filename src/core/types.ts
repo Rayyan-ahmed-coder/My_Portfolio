@@ -1,7 +1,5 @@
 /** Shared domain types for the portfolio runtime. */
-
 export type ThemeName = "light" | "dark";
-
 export type ScrollDirection = "up" | "down";
 
 /** Shape of a single entry in js/JSON/projects.json after validation. */
