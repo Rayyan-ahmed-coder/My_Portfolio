@@ -6,5 +6,5 @@
     "types": [],
     "noEmit": true
   },
-  "include": ["sw.mts"]
+  "include": ["sw.ts"]
 }

@@ -1,45 +1,19 @@
-import { defineConfig, type PluginOption } from "vite";
+import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
-import { ViteMinifyPlugin } from "vite-plugin-minify";
 import tsconfigPaths from "vite-tsconfig-paths";
 import UnpluginFonts from "unplugin-fonts/vite";
-import { compression } from "vite-plugin-compression2";
+import { compression, defineAlgorithm } from "vite-plugin-compression2";
 import { VitePWA } from "vite-plugin-pwa";
 
 export default defineConfig(({ command }) => {
     const isBuild = command === "build";
 
-    const minifyPlugin = (isBuild ? ViteMinifyPlugin({
-        minifyCSS: true,
-        collapseWhitespace: true,
-        removeComments: true,
-    }) : null) as any;
-
-    const brotliPlugin = (isBuild ? compression({ 
-        exclude: [/\.(br)$/, /\.(gz)$/],
-        threshold: 1024, // Raised to 1KB so tiny structural files aren't double-processed
-        ...({
-            algorithm: "brotliCompress",
-            level: 11
-        } as any)
-    }) : null) as any;
-
-    const gzipPlugin = (isBuild ? compression({ 
-        exclude: [/\.(br)$/, /\.(gz)$/],
-        threshold: 1024,
-        ...({
-            algorithm: "gzip",
-            level: 9
-        } as any)
-    }) : null) as any;
-
     return {
         base: "./",
-        
         css: {
             transformer: "lightningcss",
             lightningcss: {
-                targets: { chrome: 111, safari: 16 },
+                targets: { chrome: 115, safari: 16, edge: 115, firefox: 115 },
                 cssModules: { pattern: "[hash:base64:5]" }
             }
         },
@@ -50,13 +24,11 @@ export default defineConfig(({ command }) => {
             
             VitePWA({
                 strategies: "injectManifest",
-                srcDir: ".", 
-                filename: "sw.mts",
+                srcDir: "src",
+                filename: "sw.ts",
                 registerType: "autoUpdate",
                 injectRegister: "inline", 
-                devOptions: {
-                    enabled: false, 
-                },
+                devOptions: { enabled: false },
                 manifest: {
                     name: "Rayyan Khan — Frontend Developer",
                     short_name: "Rayyan Khan",
@@ -69,35 +41,28 @@ export default defineConfig(({ command }) => {
                     theme_color: "#e63946",
                     categories: ["development", "productivity"],
                     icons: [
-                        {
-                            src: "assets/icons/icon-192.png",
-                            sizes: "192x192",
-                            type: "image/png",
-                            purpose: "any"
-                        },
-                        {
-                            src: "assets/icons/icon-512.png",
-                            sizes: "512x512",
-                            type: "image/png",
-                            purpose: "any"
-                        },
-                        {
-                            src: "assets/icons/maskable-icon-512x512.svg",
-                            sizes: "512x512",
-                            type: "image/svg+xml",
-                            purpose: "maskable"
-                        }
+                        { src: "assets/icons/icon-192.png", sizes: "192x192", type: "image/png", purpose: "any" },
+                        { src: "assets/icons/icon-512.png", sizes: "512x512", type: "image/png", purpose: "any" },
+                        { src: "assets/icons/maskable-icon-512x512.svg", sizes: "512x512", type: "image/svg+xml", purpose: "maskable" }
                     ]
                 },
                 injectManifest: {
-                    globPatterns: ["**/*.{js,css,html,ico,png,svg,webp,avif,woff2}"],
-                    maximumFileSizeToCacheInBytes: 5 * 1024 * 1024 
+                    globPatterns: ["assets/*.{js,css}", "index.html", "manifest.webmanifest"],
+                    globIgnores: ["**/*.gz", "**/*.br"],
+                    maximumFileSizeToCacheInBytes: 3 * 1024 * 1024 
                 }
             }),
 
-            minifyPlugin,
-            brotliPlugin,
-            gzipPlugin,
+            ...(isBuild ? [
+                compression({
+                    exclude: [/\.(br)$/, /\.(gz)$/],
+                    threshold: 1400,
+                    algorithms: [
+                        defineAlgorithm("brotliCompress", { level: 11 }),
+                        defineAlgorithm("gzip", { level: 9 })
+                    ]
+                })
+            ] : []),
 
             UnpluginFonts({
                 google: {
@@ -110,30 +75,33 @@ export default defineConfig(({ command }) => {
                     ],
                 },
             })
-        ].filter((p): p is PluginOption => p !== null && p !== undefined && p !== false),
+        ],
+
         build: {
-            target: "esnext",
+            target: "esnext", 
             minify: "esbuild", 
-            assetsInlineLimit: 2048, 
+            assetsInlineLimit: 0, 
             modulePreload: { polyfill: false },
             reportCompressedSize: false,
             cssCodeSplit: true,
             sourcemap: false,
             
             rollupOptions: {
-                input: {
-                    main: "index.html"
-                },
+                input: { main: "index.html" },
                 output: {
                     entryFileNames: "assets/[name]-[hash].js",
                     chunkFileNames: "assets/[name]-[hash].js",
                     assetFileNames: "assets/[name]-[hash][extname]",
+                    experimentalMinChunkSize: 8192,
                     manualChunks(id) {
                         if (id.includes("node_modules")) {
-                            if (id.includes("react-dom")) return "vendor-react-dom";
-                            if (id.includes("react")) return "vendor-react";
-                            if (id.includes("framer-motion")) return "vendor-framer-motion";
-                            return "vendor-packages"; 
+                            if (id.includes("react") || id.includes("react-dom") || id.includes("scheduler")) {
+                                return "vendor-core";
+                            }
+                            if (id.includes("framer-motion")) {
+                                return "vendor-motion";
+                            }
+                            return "vendor-utils"; 
                         }
                     },
                 },
