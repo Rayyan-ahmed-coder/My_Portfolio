@@ -12,7 +12,6 @@ interface Modules {
     observer?: Disposable;
     scroll?: Disposable;
     cursor?: Disposable;
-    content?: Disposable;
     command?: Disposable;
 }
 
@@ -63,22 +62,19 @@ export default class Portfolio implements Disposable {
     }
 
     async #initializeDeferredModules(): Promise<void> {
-        const [observer, scroll, cursor, content] = await Promise.all([
+        const [observer, scroll, cursor] = await Promise.all([
             this.#importModule("observer", () => import("./core/observer.js")),
             this.#importModule("scroll", () => import("./modules/scroll.js")),
             this.#importModule("cursor", () => import("./modules/cursor.js")),
-            this.#importModule("content", () => import("./core/contentLoader.js")),
         ]);
 
         if (observer) this.#start("observer", () => new observer());
         if (scroll) this.#start("scroll", () => new scroll());
         if (cursor) this.#start("cursor", () => new cursor());
-        if (content) this.#start("content", () => new content());
 
         const observerInstance = this.modules.observer;
         if (!observerInstance || !("observe" in observerInstance)) return;
 
-        // Cards are injected after load, so they are handed to the reveal observer once ready.
         this.#teardown.push(
             listen(
                 document,
