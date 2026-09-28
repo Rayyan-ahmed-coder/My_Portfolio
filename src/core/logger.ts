@@ -71,6 +71,10 @@ export const guardAsync = async <T>(
 
 /** Installs the window-level safety net for otherwise invisible failures. */
 export const installGlobalErrorHandlers = (): (() => void) => {
+    if (typeof window === "undefined") {
+        return () => undefined;
+    }
+
     const onRejection = (event: PromiseRejectionEvent): void => {
         warn("global", "Unhandled promise rejection", event.reason);
     };

@@ -30,8 +30,15 @@ export default class Portfolio implements Disposable {
     #teardown: Unsubscribe[] = [];
     #commandPalette: CommandPaletteInstance | null = null;
     #commandLoader: Promise<CommandPaletteInstance | null> | null = null;
+    #initialized = false;
+    #commandTriggersBound = false;
 
     constructor() {
+        if (typeof window === "undefined" || typeof document === "undefined") {
+            this.#initialized = true;
+            return;
+        }
+
         this.#teardown.push(installGlobalErrorHandlers());
 
         if (document.readyState === "loading") {
@@ -45,6 +52,9 @@ export default class Portfolio implements Disposable {
     }
 
     initialize(): void {
+        if (this.#initialized) return;
+        this.#initialized = true;
+
         this.#start("theme", () => new Theme());
         this.#start("navigation", () => new NavigationManager());
 
@@ -54,6 +64,8 @@ export default class Portfolio implements Disposable {
 
     /** Instantiates one module, reporting instead of aborting the rest of the boot. */
     #start<K extends keyof Modules>(name: K, factory: () => NonNullable<Modules[K]>): void {
+        if (this.modules[name]) return;
+
         try {
             this.modules[name] = factory();
         } catch (error) {
@@ -98,6 +110,9 @@ export default class Portfolio implements Disposable {
     }
 
     #registerCommandPaletteTriggers(): void {
+        if (this.#commandTriggersBound) return;
+        this.#commandTriggersBound = true;
+
         const toggle = document.getElementById("command-toggle");
         if (toggle) {
             this.#teardown.push(
@@ -110,8 +125,6 @@ export default class Portfolio implements Disposable {
             warn(SCOPE, "Command palette toggle button not found");
         }
 
-        // Ctrl/Cmd+K only bootstraps the palette here; once loaded the palette owns
-        // the shortcut itself, so the two handlers never both toggle it.
         this.#teardown.push(
             listen(document, "keydown", (event) => {
                 const keyboardEvent = event as KeyboardEvent;
@@ -131,7 +144,11 @@ export default class Portfolio implements Disposable {
         this.#commandLoader ??= import("./modules/commandPalette.js")
             .then(({ default: CommandPalette }) => {
                 this.#commandPalette = CommandPalette.create();
-                if (this.#commandPalette) this.modules.command = this.#commandPalette;
+                if (this.#commandPalette) {
+                    this.modules.command = this.#commandPalette;
+                } else {
+                    this.#commandLoader = null;
+                }
                 return this.#commandPalette;
             })
             .catch((error: unknown) => {
@@ -145,6 +162,11 @@ export default class Portfolio implements Disposable {
 
     destroy(): void {
         this.#teardown.splice(0).forEach((off) => off());
+        this.#initialized = false;
+        this.#commandTriggersBound = false;
+        this.#commandLoader = null;
+        this.#commandPalette = null;
+
         for (const module of Object.values(this.modules)) {
             if (module && typeof module.destroy === "function") {
                 try {

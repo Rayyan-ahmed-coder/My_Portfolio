@@ -38,7 +38,6 @@ export default class NavigationManager implements Disposable {
             })
         );
 
-        // One delegated listener closes the overlay for every current and future link.
         this.#teardown.push(
             listen(menu, "click", (event) => {
                 const link = (event.target as Element | null)?.closest("a");
@@ -54,7 +53,6 @@ export default class NavigationManager implements Disposable {
 
         const mobile = mediaQuery(MOBILE_QUERY);
         if (mobile?.addEventListener) {
-            // Leaving the mobile breakpoint must not leave the page scroll-locked.
             this.#teardown.push(
                 listen(mobile, "change", (event) => {
                     if (!(event as MediaQueryListEvent).matches) this.close();

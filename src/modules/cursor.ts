@@ -1,10 +1,4 @@
-import {
-    FINE_POINTER_QUERY,
-    listen,
-    matchesMedia,
-    prefersReducedMotion,
-    type Unsubscribe,
-} from "../../src/core/utilities.js";
+import { FINE_POINTER_QUERY, listen, matchesMedia, type Unsubscribe } from "../../src/core/utilities.js";
 import type { Disposable } from "../../src/core/types.js";
 
 const CURSOR_SIZE_OFFSET = 10;
@@ -26,9 +20,7 @@ export default class CustomCursor implements Disposable {
     #teardown: Unsubscribe[] = [];
 
     constructor() {
-        // A custom cursor adds no value for reduced-motion users and should not
-        // create listeners or animation work for them.
-        if (prefersReducedMotion() || !matchesMedia(FINE_POINTER_QUERY)) return;
+        if (!matchesMedia(FINE_POINTER_QUERY)) return;
 
         this.#createCursorElement();
         this.#init();
@@ -50,6 +42,8 @@ export default class CustomCursor implements Disposable {
             display: "none",
             willChange: "transform",
         } satisfies Partial<CSSStyleDeclaration>);
+
+        document.documentElement.classList.add("cursor-enabled");
         document.body.appendChild(cursor);
         this.#cursor = cursor;
     }
@@ -92,7 +86,11 @@ export default class CustomCursor implements Disposable {
     }
 
     #paint(x: number, y: number): void {
-        this.#cursor?.style.setProperty("transform", `translate3d(${Math.round(x - CURSOR_SIZE_OFFSET)}px, ${Math.round(y - CURSOR_SIZE_OFFSET)}px, 0)`);
+        const scale = this.#isActiveState ? 1.6 : 1;
+        this.#cursor?.style.setProperty(
+            "transform",
+            `translate3d(${Math.round(x - CURSOR_SIZE_OFFSET)}px, ${Math.round(y - CURSOR_SIZE_OFFSET)}px, 0) scale(${scale})`
+        );
     }
 
     #handleInteractivity(event: MouseEvent): void {

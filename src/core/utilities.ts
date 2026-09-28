@@ -3,34 +3,28 @@
 export type ParentNodeLike = Document | DocumentFragment | Element;
 
 export const $ = <E extends Element = HTMLElement>(
-    selector: string,
-    parent: ParentNodeLike = document
-): E | null => parent.querySelector<E>(selector);
+    s: string,
+    p: ParentNodeLike = document
+): E | null => p.querySelector<E>(s);
 
 export const $$ = <E extends Element = HTMLElement>(
-    selector: string,
-    parent: ParentNodeLike = document
-): NodeListOf<E> => parent.querySelectorAll<E>(selector);
+    s: string,
+    p: ParentNodeLike = document
+): NodeListOf<E> => p.querySelectorAll<E>(s);
 
-export const clamp = (value: number, min: number, max: number): number =>
-    value < min ? min : value > max ? max : value;
+export const clamp = (v: number, min: number, max: number): number =>
+    v < min ? min : v > max ? max : v;
 
-/**
- * matchMedia is missing in non-browser targets and expensive to re-parse, so
- * every query is created at most once and failures degrade to "no match".
- */
-const mediaQueryCache = new Map<string, MediaQueryList | null>();
+const mqCache = new Map<string, MediaQueryList | null>();
 
-export const mediaQuery = (query: string): MediaQueryList | null => {
-    const cached = mediaQueryCache.get(query);
-    if (cached !== undefined) return cached;
-
-    const list = typeof window.matchMedia === "function" ? window.matchMedia(query) : null;
-    mediaQueryCache.set(query, list);
-    return list;
+export const mediaQuery = (q: string): MediaQueryList | null => {
+    if (typeof window === "undefined" || !window.matchMedia) return null;
+    if (!mqCache.has(q)) mqCache.set(q, window.matchMedia(q));
+    return mqCache.get(q)!;
 };
 
-export const matchesMedia = (query: string): boolean => mediaQuery(query)?.matches ?? false;
+export const clearMediaQueryCache = (): void => mqCache.clear();
+export const matchesMedia = (q: string): boolean => mediaQuery(q)?.matches ?? false;
 
 export const MOBILE_QUERY = "(max-width: 850px)";
 export const REDUCED_MOTION_QUERY = "(prefers-reduced-motion: reduce)";
@@ -38,108 +32,94 @@ export const DARK_SCHEME_QUERY = "(prefers-color-scheme: dark)";
 export const FINE_POINTER_QUERY = "(pointer: fine)";
 
 export const isMobile = (): boolean => matchesMedia(MOBILE_QUERY);
-
 export const prefersReducedMotion = (): boolean => matchesMedia(REDUCED_MOTION_QUERY);
 
 export const nextFrame = (): Promise<number> =>
-    new Promise((resolve) => requestAnimationFrame(resolve));
+    new Promise((r) => requestAnimationFrame(r));
 
-/**
- * Defers non-critical work to browser idle time, falling back to a timeout on
- * engines without requestIdleCallback (Safari).
- */
-export const onIdle = (callback: () => void, timeout = 200): void => {
-    const idle = window.requestIdleCallback;
-    if (typeof idle === "function") {
-        idle(() => callback(), { timeout });
-        return;
+export const onIdle = (
+    cb: (deadline: IdleDeadline | { didTimeout: boolean; timeRemaining: () => number }) => void,
+    timeout = 200
+): void => {
+    if (typeof window !== "undefined" && window.requestIdleCallback) {
+        window.requestIdleCallback(cb, { timeout });
+    } else {
+        const start = Date.now();
+        setTimeout(() => cb({ didTimeout: false, timeRemaining: () => Math.max(0, 50 - (Date.now() - start)) }), Math.min(timeout, 200));
     }
-    window.setTimeout(callback, Math.min(timeout, 200));
 };
 
 export type Throttled<A extends unknown[]> = ((...args: A) => void) & { cancel(): void };
 
-/** Coalesces bursts of calls (scroll, resize, pointermove) into one per frame. */
-export const rafThrottle = <A extends unknown[]>(callback: (...args: A) => void): Throttled<A> => {
-    let frameId: number | null = null;
-    let scheduled = false;
-    let latestArgs: A | null = null;
+export const rafThrottle = <A extends unknown[]>(cb: (...args: A) => void): Throttled<A> => {
+    let id: number | null = null;
+    let lastArgs: A | null = null;
 
-    const throttled = ((...args: A): void => {
-        latestArgs = args;
-        if (scheduled) return;
-        scheduled = true;
-
-        const id = requestAnimationFrame(() => {
-            scheduled = false;
-            frameId = null;
-            const pending = latestArgs;
-            latestArgs = null;
-            if (pending) callback(...pending);
+    const fn = ((...args: A): void => {
+        lastArgs = args;
+        if (id !== null) return;
+        id = requestAnimationFrame(() => {
+            id = null;
+            if (lastArgs) {
+                const a = lastArgs;
+                lastArgs = null;
+                cb(...a);
+            }
         });
-
-        // Guard against a synchronous rAF implementation, where the callback has
-        // already run by the time requestAnimationFrame returns its handle.
-        if (scheduled) frameId = id;
     }) as Throttled<A>;
 
-    throttled.cancel = (): void => {
-        if (frameId !== null) cancelAnimationFrame(frameId);
-        frameId = null;
-        scheduled = false;
-        latestArgs = null;
+    fn.cancel = (): void => {
+        if (id !== null) cancelAnimationFrame(id);
+        id = lastArgs = null;
     };
 
-    return throttled;
+    return fn;
 };
 
 export type Debounced<A extends unknown[]> = ((...args: A) => void) & { cancel(): void };
 
 export const debounce = <A extends unknown[]>(
-    callback: (...args: A) => void,
+    cb: (...args: A) => void,
     delay = 150
 ): Debounced<A> => {
-    let timeout: ReturnType<typeof setTimeout> | undefined;
+    let t: ReturnType<typeof setTimeout> | undefined;
 
-    const debounced = ((...args: A): void => {
-        clearTimeout(timeout);
-        timeout = setTimeout(() => callback(...args), delay);
+    const fn = ((...args: A): void => {
+        if (t !== undefined) clearTimeout(t);
+        t = setTimeout(() => cb(...args), delay);
     }) as Debounced<A>;
 
-    debounced.cancel = (): void => clearTimeout(timeout);
+    fn.cancel = (): void => {
+        if (t !== undefined) clearTimeout(t);
+        t = undefined;
+    };
 
-    return debounced;
+    return fn;
 };
 
-export interface Unsubscribe {
-    (): void;
-}
+export type Unsubscribe = () => void;
 
-/** addEventListener that hands back its own removal, keeping teardown honest. */
-export const listen = <T extends EventTarget, K extends string>(
+/** Strongly-typed event listener with automatic cleanup. */
+export const listen = <
+    T extends EventTarget,
+    E extends Event = T extends Window
+        ? WindowEventMap[keyof WindowEventMap]
+        : T extends Document
+        ? DocumentEventMap[keyof DocumentEventMap]
+        : T extends HTMLElement
+        ? HTMLElementEventMap[keyof HTMLElementEventMap]
+        : Event
+>(
     target: T,
-    type: K,
-    handler: (event: Event) => void,
-    options?: AddEventListenerOptions
+    type: string,
+    handler: (event: E) => void,
+    options?: AddEventListenerOptions | boolean
 ): Unsubscribe => {
     target.addEventListener(type, handler as EventListener, options);
     return () => target.removeEventListener(type, handler as EventListener, options);
 };
 
-export const escapeHtml = (value: unknown): string => {
-    if (value === null || value === undefined) return "";
-    return String(value).replace(/[&<>'"]/g, (character) => {
-        switch (character) {
-            case "&":
-                return "&amp;";
-            case "<":
-                return "&lt;";
-            case ">":
-                return "&gt;";
-            case "'":
-                return "&#39;";
-            default:
-                return "&quot;";
-        }
-    });
-};
+const MAP: Record<string, string> = { "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" };
+
+export const escapeHtml = (v: unknown): string =>
+    v == null ? "" : String(v).replace(/[&<>'"]/g, (c) => MAP[c]);

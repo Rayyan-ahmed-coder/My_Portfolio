@@ -1,8 +1,7 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
-import "../css/style.css";
-import "../css/responsive.css";
+import "./css/style.css";
 
 const container = document.getElementById("root");
 if (!container) {
@@ -18,7 +17,7 @@ createRoot(container).render(
 const startEnhancements = async (): Promise<void> => {
     const module = await import("./app.mjs");
     const Portfolio = module.default;
-    // .then(({ default: Portfolio }) => new Portfolio())
+
     if (typeof Portfolio === "function") {
         new Portfolio();
         console.log("Portfolio enhancements initialized successfully!");
@@ -27,8 +26,21 @@ const startEnhancements = async (): Promise<void> => {
     }
 };
 
-if (typeof window.requestIdleCallback === "function") {
-    window.requestIdleCallback(startEnhancements, { timeout: 1500 });
+const scheduleEnhancements = (): void => {
+    const run = (): void => {
+        void startEnhancements();
+    };
+
+    if (typeof window.requestIdleCallback === "function") {
+        window.requestIdleCallback(run, { timeout: 350 });
+        return;
+    }
+
+    window.setTimeout(run, 150);
+};
+
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", scheduleEnhancements, { once: true });
 } else {
-    setTimeout(startEnhancements, 200);
+    window.requestAnimationFrame(scheduleEnhancements);
 }
