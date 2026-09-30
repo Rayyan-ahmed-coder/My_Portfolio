@@ -22,6 +22,6 @@
     "exactOptionalPropertyTypes": false,
     "forceConsistentCasingInFileNames": true
   },
-  "include": ["src", "src/sw.ts", "vite.config.mts"],
+  "include": ["src", "src/sw.ts", "vite.config.ts"],
   "exclude": ["node_modules", "dist"]
 }

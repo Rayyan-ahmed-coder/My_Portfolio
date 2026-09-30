@@ -13,19 +13,16 @@ function TechnologiesList(): React.JSX.Element {
             {(technologiesData as readonly TechnologyItem[]).map((technology, index) => {
                 const { name = "Tech Skill", mark = "✔", description } = technology;
                 const displayIndex = index + 1 < 10 ? `0${index + 1}` : `${index + 1}`;
-
                 return (
                     <article className="skill-card" data-reveal key={name}>
                         <div className="skill-card-top">
                             <span className="skill-index">{displayIndex}</span>
                             <h3 className="skill-mark" aria-hidden="true">{mark}</h3>
                         </div>
-                        
                         <div className="skill-card-content">
                             <h2>{name}</h2>
                             <p className="skill-description">{description}</p>
                         </div>
-                        
                         <span className="skill-arrow" aria-hidden="true">↗</span>
                     </article>
                 );

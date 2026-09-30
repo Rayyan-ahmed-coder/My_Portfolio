@@ -12,17 +12,17 @@ export default function HeroSection(): React.JSX.Element {
 
             <div className="container hero-container">
                 <div className="hero-content">
-                    <p className="eyebrow" data-reveal>FRONTEND DEVELOPER</p>
-                    <h1 className="hero-title" id="hero-title" data-reveal>
+                    <p className="eyebrow">FRONTEND DEVELOPER</p>
+                    <h1 className="hero-title" id="hero-title">
                         Building <span className="accent-text hero-accent-text">digital experiences</span> that matter.
                     </h1>
-                    <p className="hero-description" data-reveal>
+                    <p className="hero-description">
                         I'm Rayyan Khan, a frontend developer focused 
                         on creating fast, responsive and thoughtfully 
                         designed experiences for the web.
                     </p>
 
-                    <div className="hero-actions" data-reveal>
+                    <div className="hero-actions">
                         <a className="button button-primary" href="#work">
                             View my work <span aria-hidden="true">→</span>
                         </a>
@@ -31,7 +31,7 @@ export default function HeroSection(): React.JSX.Element {
                         </a>
                     </div>
 
-                    <div className="hero-stats" data-reveal>
+                    <div className="hero-stats">
                         <div className="stat">
                             <strong>03+</strong>
                             <span>Projects</span>
@@ -47,7 +47,7 @@ export default function HeroSection(): React.JSX.Element {
                     </div>
                 </div>
 
-                <div className="hero-visual" data-reveal>
+                <div className="hero-visual">
                     <div className="hero-card" aria-hidden="true">
                         <div className="hero-card-top">
                             <span></span>

@@ -1,9 +1,9 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import tsconfigPaths from "vite-tsconfig-paths";
-import UnpluginFonts from "unplugin-fonts/vite";
 import { compression, defineAlgorithm } from "vite-plugin-compression2";
 import { VitePWA } from "vite-plugin-pwa";
+import { ViteMinifyPlugin } from "vite-plugin-minify"; // 1. Clean ESM Import
 
 export default defineConfig(({ command }) => {
     const isBuild = command === "build";
@@ -21,6 +21,19 @@ export default defineConfig(({ command }) => {
         plugins: [
             react(),
             tsconfigPaths(),
+            
+            // 2. Modern Native HTML Minifier Engine
+            ViteMinifyPlugin({
+                collapseWhitespace: true,
+                removeComments: true,
+                minifyCSS: true,
+                minifyJS: true,
+                removeRedundantAttributes: true,
+                removeScriptTypeAttributes: true,
+                removeStyleLinkTypeAttributes: true,
+                useShortDoctype: true,
+                removeAttributeQuotes: true
+            }),
             
             VitePWA({
                 strategies: "injectManifest",
@@ -47,7 +60,7 @@ export default defineConfig(({ command }) => {
                     ]
                 },
                 injectManifest: {
-                    globPatterns: ["assets/*.{js,css}", "index.html", "manifest.webmanifest"],
+                    globPatterns: ["assets/*.{js,css,woff2}", "index.html", "manifest.webmanifest"],
                     globIgnores: ["**/*.gz", "**/*.br"],
                     maximumFileSizeToCacheInBytes: 3 * 1024 * 1024 
                 }
@@ -55,36 +68,30 @@ export default defineConfig(({ command }) => {
 
             ...(isBuild ? [
                 compression({
-                    exclude: [/\.(br)$/, /\.(gz)$/],
-                    threshold: 1400,
+                    exclude: [/\.(br)$/, /\.(gz)$/, /\.(woff2)$/],
+                    threshold: 0,
                     algorithms: [
                         defineAlgorithm("brotliCompress", { level: 11 }),
                         defineAlgorithm("gzip", { level: 9 })
                     ]
                 })
             ] : []),
-
-            UnpluginFonts({
-                google: {
-                    families: [
-                        {
-                            name: "Inter",
-                            styles: "wght@400;600;700",
-                            defer: true,
-                        },
-                    ],
-                },
-            })
         ],
 
         build: {
             target: "esnext", 
             minify: "esbuild", 
-            assetsInlineLimit: 0, 
+            assetsInlineLimit: 4096,
             modulePreload: { polyfill: false },
             reportCompressedSize: false,
             cssCodeSplit: true,
             sourcemap: false,
+            
+            esbuild: {
+                legalComments: "none",
+                treeShaking: true,
+                drop: ["console", "debugger"]
+            },
             
             rollupOptions: {
                 input: { main: "index.html" },
@@ -92,7 +99,7 @@ export default defineConfig(({ command }) => {
                     entryFileNames: "assets/[name]-[hash].js",
                     chunkFileNames: "assets/[name]-[hash].js",
                     assetFileNames: "assets/[name]-[hash][extname]",
-                    experimentalMinChunkSize: 8192,
+                    experimentalMinChunkSize: 12288,
                     manualChunks(id) {
                         if (id.includes("node_modules")) {
                             if (id.includes("react") || id.includes("react-dom") || id.includes("scheduler")) {

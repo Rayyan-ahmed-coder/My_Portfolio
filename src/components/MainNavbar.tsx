@@ -16,7 +16,6 @@ export default function MainNavbar(): React.JSX.Element {
                 <span className="logo-mark" aria-hidden="true">R</span>
                 <span className="logo-text">Rayyan</span>
             </a>
-            
             <div className="nav-wrapper" id="navigation-menu" data-nav-container>
                 <ul className="nav-list">
                     {navItems.map((item, index) => (

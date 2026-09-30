@@ -8,25 +8,19 @@ const FADE_DURATION_MS = 400;
 export default function UpdateNotification(): React.JSX.Element | null {
     const [shouldRender, setShouldRender] = useState(false);
     const toastRef = useRef<HTMLDivElement | null>(null);
-
     useEffect(() => {
         let mounted = true;
         let showFrame = 0;
         let dismissTimer = 0;
         let fadeAnimation: Animation | null = null;
-
         try {
             if (localStorage.getItem('portfolio_version_key') !== PORTFOLIO_VERSION_HASH) {
                 showFrame = requestAnimationFrame(() => {
                     if (!mounted) return;
                     setShouldRender(true);
-
                     dismissTimer = window.setTimeout(() => {
                         const toast = toastRef.current;
-                        if (!toast) {
-                            setShouldRender(false);
-                            return;
-                        }
+                        if (!toast) { setShouldRender(false); return; }
 
                         fadeAnimation = toast.animate(
                             [
@@ -60,7 +54,6 @@ export default function UpdateNotification(): React.JSX.Element | null {
     }, []);
 
     if (!shouldRender) return null;
-
     return (
         <div ref={toastRef} className="update-toast-pill" role="status" aria-live="polite">
             <span className="update-toast-text">Updated</span>
