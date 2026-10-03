@@ -41,11 +41,14 @@ const parseProjects = (payload: unknown): Project[] => {
 };
 
 const PROJECTS = parseProjects(projectsData as unknown);
+const hasCategory = (project: Project, category: FilterValue): boolean =>
+    project.category.split(/\s+/).includes(category);
+
 const FILTERED_PROJECTS: Record<FilterValue, Project[]> = {
     all: PROJECTS,
-    web: PROJECTS.filter((project) => project.category.includes("web")),
-    javascript: PROJECTS.filter((project) => project.category.includes("javascript")),
-    game: PROJECTS.filter((project) => project.category.includes("game")),
+    web: PROJECTS.filter((project) => hasCategory(project, "web")),
+    javascript: PROJECTS.filter((project) => hasCategory(project, "javascript")),
+    game: PROJECTS.filter((project) => hasCategory(project, "game")),
 };
 
 export default function WorkSection(): React.JSX.Element {
@@ -83,12 +86,19 @@ export default function WorkSection(): React.JSX.Element {
                     })}
                 </div>
 
-                <div className="projects-grid" id="projects-grid">
+                <p className="visually-hidden" role="status" aria-live="polite">
+                    Showing {visibleProjects.length} {visibleProjects.length === 1 ? "project" : "projects"}
+                </p>
+                <div
+                    className={visibleProjects.length === 1 ? "projects-grid projects-grid-single" : "projects-grid"}
+                    id="projects-grid"
+                >
                     {!visibleProjects.length && <p className="error-msg">No projects match this filter.</p>}
-                    {visibleProjects.map((project) => {
+                    {PROJECTS.map((project) => {
+                        const isVisible = filter === "all" || hasCategory(project, filter);
                         const number = String(project.number).padStart(2, "0");
                         return (
-                            <article key={project.number} className={project.main ? "project-card project-card-large" : "project-card"} data-category={project.category} data-reveal>
+                            <article key={project.number} hidden={!isVisible} className={project.main ? "project-card project-card-large" : "project-card"} data-category={project.category} data-reveal>
                                 <div className="project-preview">
                                     <div className="project-number" aria-hidden="true">{number}</div>
                                     <div className="project-preview-content">

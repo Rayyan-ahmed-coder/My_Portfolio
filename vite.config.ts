@@ -3,13 +3,13 @@ import react from "@vitejs/plugin-react-swc";
 import tsconfigPaths from "vite-tsconfig-paths";
 import { compression, defineAlgorithm } from "vite-plugin-compression2";
 import { VitePWA } from "vite-plugin-pwa";
-import { ViteMinifyPlugin } from "vite-plugin-minify"; // 1. Clean ESM Import
+import { ViteMinifyPlugin } from "vite-plugin-minify"; 
 
 export default defineConfig(({ command }) => {
     const isBuild = command === "build";
 
     return {
-        base: "./",
+        base: '/My_Portfolio_2v/',
         css: {
             transformer: "lightningcss",
             lightningcss: {
@@ -22,7 +22,6 @@ export default defineConfig(({ command }) => {
             react(),
             tsconfigPaths(),
             
-            // 2. Modern Native HTML Minifier Engine
             ViteMinifyPlugin({
                 collapseWhitespace: true,
                 removeComments: true,
@@ -46,21 +45,21 @@ export default defineConfig(({ command }) => {
                     name: "Rayyan Khan — Frontend Developer",
                     short_name: "Rayyan Khan",
                     description: "Portfolio of Rayyan Khan, a Frontend Developer building fast, modern, and interactive web experiences.",
-                    start_url: "./index.html",
-                    id: "./index.html",
+                    start_url: "/My_Portfolio_2v/",
+                    id: "/My_Portfolio_2v/",
                     display: "standalone",
                     orientation: "portrait-primary",
                     background_color: "#1d3557",
                     theme_color: "#e63946",
                     categories: ["development", "productivity"],
                     icons: [
-                        { src: "assets/icons/icon-192.png", sizes: "192x192", type: "image/png", purpose: "any" },
-                        { src: "assets/icons/icon-512.png", sizes: "512x512", type: "image/png", purpose: "any" },
-                        { src: "assets/icons/maskable-icon-512x512.svg", sizes: "512x512", type: "image/svg+xml", purpose: "maskable" }
+                        { src: "/My_Portfolio_2v/assets/icons/icon-192.png", sizes: "192x192", type: "image/png", purpose: "any" },
+                        { src: "/My_Portfolio_2v/assets/icons/icon-512.png", sizes: "512x512", type: "image/png", purpose: "any" },
+                        { src: "/My_Portfolio_2v/assets/icons/maskable-icon-512x512.svg", sizes: "512x512", type: "image/svg+xml", purpose: "maskable" }
                     ]
                 },
                 injectManifest: {
-                    globPatterns: ["assets/*.{js,css,woff2}", "index.html", "manifest.webmanifest"],
+                    globPatterns: ["assets/*.{js,css,woff2}", "index.html", "*.webmanifest"],
                     globIgnores: ["**/*.gz", "**/*.br"],
                     maximumFileSizeToCacheInBytes: 3 * 1024 * 1024 
                 }

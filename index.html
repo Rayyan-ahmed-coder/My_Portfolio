@@ -39,7 +39,8 @@
     <!-- <link rel="preconnect" href="https://googleapis.com">
     <link rel="preconnect" href="https://gstatic.com" crossorigin> -->
     <link rel="stylesheet" href="/src/css/style.css" fetchpriority="high">
-    <script type="module" src="/src/main.tsx"></script>
+    <link rel="modulepreload" href="/src/main.tsx" fetchpriority="high">
+    <script type="module" src="/src/main.tsx" defer></script>
     <!-- FAVICONS & PWA -->
     <link rel="icon" href="/assets/icons/favicon.png" type="image/png" fetchpriority="high">
     <link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png">

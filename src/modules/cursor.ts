@@ -14,6 +14,7 @@ export default class CustomCursor implements Disposable {
     #currentY = 0;
     #isAnimating = false;
     #rafId: number | null = null;
+    #hideTimeout: number | null = null;
     #lastMoveTime = 0;
     #isActiveState = false;
     #glide = 0.55;
@@ -62,6 +63,10 @@ export default class CustomCursor implements Disposable {
         this.#mouseX = event.clientX;
         this.#mouseY = event.clientY;
         this.#lastMoveTime = performance.now();
+        if (this.#hideTimeout !== null) {
+            window.clearTimeout(this.#hideTimeout);
+            this.#hideTimeout = null;
+        }
         if (this.#isAnimating) return;
         this.#isAnimating = true;
         cursor.style.display = "block";
@@ -76,10 +81,14 @@ export default class CustomCursor implements Disposable {
         this.#paint(this.#currentX, this.#currentY);
         const deltaX = this.#mouseX - this.#currentX;
         const deltaY = this.#mouseY - this.#currentY;
-        if (deltaX * deltaX + deltaY * deltaY < 0.01 && timestamp - this.#lastMoveTime > IDLE_HIDE_DELAY_MS) {
-            cursor.style.display = "none";
+        if (deltaX * deltaX + deltaY * deltaY < 0.01) {
             this.#isAnimating = false;
             this.#rafId = null;
+            const hideDelay = Math.max(0, IDLE_HIDE_DELAY_MS - (timestamp - this.#lastMoveTime));
+            this.#hideTimeout = window.setTimeout(() => {
+                if (!this.#isAnimating && this.#cursor) this.#cursor.style.display = "none";
+                this.#hideTimeout = null;
+            }, hideDelay);
             return;
         }
         this.#rafId = requestAnimationFrame((next) => this.#tick(next));
@@ -104,7 +113,9 @@ export default class CustomCursor implements Disposable {
 
     destroy(): void {
         if (this.#rafId !== null) cancelAnimationFrame(this.#rafId);
+        if (this.#hideTimeout !== null) window.clearTimeout(this.#hideTimeout);
         this.#rafId = null;
+        this.#hideTimeout = null;
         this.#isAnimating = false;
         this.#teardown.splice(0).forEach((off) => off());
         this.#cursor?.remove();

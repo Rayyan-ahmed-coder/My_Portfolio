@@ -1,14 +1,13 @@
 import { CONFIG } from "../../src/core/config.js";
-import { $,$$, listen, type Unsubscribe } from "../core/utilities.js";
+import { $, $$, listen, type Unsubscribe } from "../core/utilities.js";
 import type { Disposable, ScrollDirection } from "../core/types.js";
 
 export function getSectionScrollTop(
     target: HTMLElement,
-    header: HTMLElement | null = null,
+    cachedHeaderHeight = 76,
     currentScrollY = typeof window === "undefined" ? 0 : window.scrollY
 ): number {
-    const headerHeight = Math.max(header?.offsetHeight ?? 0, 76);
-    const targetTop = target.getBoundingClientRect().top + currentScrollY - headerHeight;
+    const targetTop = target.getBoundingClientRect().top + currentScrollY - cachedHeaderHeight;
     const maxScroll = typeof document === "undefined" ? 0 : Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
     return Math.min(Math.max(0, targetTop), maxScroll);
 }
@@ -16,7 +15,7 @@ export function getSectionScrollTop(
 export default class ScrollManager implements Disposable {
     #scrollBtn = $(".scroll-top");
     #header = $(".site-header");
-    #sections = Array.from($$("section[id]"));
+    #sections = Array.from($$("section[id]"));     
     #links = Array.from($$(".nav-link"));
 
     #lastScrollY = 0;
@@ -24,6 +23,7 @@ export default class ScrollManager implements Disposable {
     #activeSection = "";
     #isManualScrolling = false;
     #manualTimeout = 0;
+    #cachedHeaderHeight = 76; // Caching avoids continuous layout thrashing
 
     #observer: IntersectionObserver | null = null;
     #teardown: Unsubscribe[] = [];
@@ -33,7 +33,8 @@ export default class ScrollManager implements Disposable {
     }
 
     #init(): void {
-        this.#syncPadding();
+        this.#measureAndSync();
+
         // High-performance scroll tracking (zero layout recalculations)
         this.#teardown.push(
             listen(window, "scroll", () => {
@@ -43,7 +44,10 @@ export default class ScrollManager implements Disposable {
                 this.#scrollBtn?.classList.toggle("visible", y > CONFIG.SCROLL_TOP_THRESHOLD);
             }, { passive: true }),
 
-            listen(window, "resize", () => this.#syncPadding(), { passive: true }),
+            // Throttled to the next available browser paint frame
+            listen(window, "resize", () => {
+                requestAnimationFrame(() => this.#measureAndSync());
+            }, { passive: true }),
 
             listen(document, "click", (e) => this.#handleClick(e))
         );
@@ -63,21 +67,21 @@ export default class ScrollManager implements Disposable {
     get direction(): ScrollDirection { return this.#scrollDirection; }
     get activeSection(): string { return this.#activeSection; }
 
-    #getHeaderHeight(): number {
-        return Math.max(this.#header?.offsetHeight ?? 0, 76);
-    }
-
-    #syncPadding(): void {
-        if (typeof document !== "undefined") {
-            document.documentElement.style.setProperty("--scroll-padding", `${this.#getHeaderHeight() + 12}px`);
-        }
+    /** Reads dimensions and batches style updates to rule out forced reflows */
+    #measureAndSync(): void {
+        if (typeof document === "undefined") return;
+        this.#cachedHeaderHeight = Math.max(this.#header?.offsetHeight ?? 0, 76);
+        requestAnimationFrame(() => {
+            document.documentElement.style.setProperty(
+                "--scroll-padding", 
+                `${this.#cachedHeaderHeight + 12}px`
+            );
+        });
     }
 
     /** IntersectionObserver offloads section detection to the browser compositor thread */
     #setupObserver(): void {
         if (!this.#sections.length || !("IntersectionObserver" in window)) return;
-
-        const headerHeight = this.#getHeaderHeight();
         this.#observer = new IntersectionObserver(
             (entries) => {
                 if (this.#isManualScrolling) return;
@@ -90,7 +94,7 @@ export default class ScrollManager implements Disposable {
                 }
             },
             {
-                rootMargin: `-${headerHeight + 20}px 0px -55% 0px`,
+                rootMargin: `-${this.#cachedHeaderHeight + 20}px 0px -55% 0px`,
                 threshold: 0
             }
         );
@@ -103,13 +107,18 @@ export default class ScrollManager implements Disposable {
         if (cleanId === this.#activeSection) return;
         this.#activeSection = cleanId;
 
-        // Batch link DOM updates
-        for (const link of this.#links) {
-            const href = link.getAttribute("href");
-            const isActive = href === `#${cleanId}` || (cleanId === "home" && href === "#");
-            link.classList.toggle("active", isActive);
-            link.setAttribute("aria-current", isActive ? "page" : "false");
-        }
+        // Optimized Batch execution for link DOM updates
+        requestAnimationFrame(() => {
+            const totalLinks = this.#links.length;
+            for (let i = 0; i < totalLinks; i++) {
+                const link = this.#links[i];
+                const href = link.getAttribute("href");
+                const isActive = href === `#${cleanId}` || (cleanId === "home" && href === "#");
+                
+                link.classList.toggle("active", isActive);
+                link.setAttribute("aria-current", isActive ? "page" : "false");
+            }
+        });
     }
 
     #lockScroll(targetId: string): void {
@@ -141,7 +150,7 @@ export default class ScrollManager implements Disposable {
         if (target) {
             target.setAttribute("tabindex", "-1");
             target.focus({ preventScroll: true });
-            const top = getSectionScrollTop(target, this.#header);
+            const top = getSectionScrollTop(target, this.#cachedHeaderHeight);
             window.scrollTo({ top, behavior: "smooth" });
         }
     }

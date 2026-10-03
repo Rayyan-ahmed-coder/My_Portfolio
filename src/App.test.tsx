@@ -4,7 +4,8 @@ import App from "./App.tsx";
 import Portfolio from "./app.mts";
 import { getSectionScrollTop } from "./modules/scroll.js";
 
-describe("App", () => {
+describe("App Architecture & Layout", () => {
+    
     it("renders the work section and project grid so project content can load", () => {
         const html = renderToStaticMarkup(<App />);
 
@@ -36,12 +37,13 @@ describe("App", () => {
             },
         });
 
-        const header = { offsetHeight: 80 } as HTMLElement;
-        const section = {
+        const mockHeaderHeight = 80;
+        const mockSection = {
             getBoundingClientRect: () => ({ top: 640 }),
         } as HTMLElement;
 
-        expect(getSectionScrollTop(section, header)).toBe(728);
+        expect(getSectionScrollTop(mockSection, mockHeaderHeight)).toBe(740);
+        
         vi.unstubAllGlobals();
     });
 });

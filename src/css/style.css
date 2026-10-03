@@ -1,3 +1,27 @@
+@font-face {
+    font-family: Inter;
+    font-style: normal;
+    font-display: swap;
+    font-weight: 400;
+    src: url("../../node_modules/@fontsource/inter/files/inter-latin-400-normal.woff2") format("woff2");
+}
+
+@font-face {
+    font-family: Inter;
+    font-style: normal;
+    font-display: swap;
+    font-weight: 600;
+    src: url("../../node_modules/@fontsource/inter/files/inter-latin-600-normal.woff2") format("woff2");
+}
+
+@font-face {
+    font-family: Inter;
+    font-style: normal;
+    font-display: swap;
+    font-weight: 700;
+    src: url("../../node_modules/@fontsource/inter/files/inter-latin-700-normal.woff2") format("woff2");
+}
+
 /* portfolio design system */
 @layer reset, tokens, base, components, responsive, utilities;
 
@@ -25,8 +49,8 @@
         /* Primary brand colors */
         --color-primary: #ef476f;
         --color-primary-dark: #d92e5d;
-        --color-primary-soft: #ef476f1a;
-        --color-glow: #ef476f24;
+        --color-primary-soft: #ef476f;
+        --color-glow: #ef476f;
 
         --color-black: #0b1220;
         --color-white: #ffffff;
@@ -213,11 +237,9 @@
     }
 
     button {
-        will-change: transform;
         border: 0;
         cursor: pointer;
         background: transparent;
-        transform: translateZ(0);
     }
 
     a {
@@ -377,10 +399,6 @@
             background var(--transition-fast), 
             box-shadow var(--transition-fast);
 
-        &.scrolled {
-            background: rgba(255, 255, 255, .94);
-            box-shadow: var(--shadow-soft);
-        }
     }
 
     nav.navbar {
@@ -1243,6 +1261,20 @@
         margin-bottom: 2.2rem;
     }
 
+    .projects-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: clamp(1rem, 2vw, 1.5rem);
+    }
+
+    .projects-grid-single {
+        grid-template-columns: 1fr;
+    }
+
+    .project-card[hidden] {
+        display: none;
+    }
+
     .filter-button {
         min-height: 44px;
         padding-inline: 1.1rem;
@@ -1269,12 +1301,6 @@
             border-color: var(--color-text);
             color: var(--color-white);
         }
-    }
-
-    .project-grid {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 1rem;
     }
 
     .project-card {
@@ -1307,9 +1333,6 @@
             opacity: .7;
         }
 
-        &.is-hidden {
-            display: none;
-        }
     }
 
     .project-card-large {
@@ -2458,9 +2481,6 @@
             background: rgba(7, 12, 22, .9);
             border-color: rgba(148, 163, 184, .12);
 
-            &.scrolled {
-                background: rgba(7, 12, 22, .95);
-            }
         }
 
         .theme-toggle:hover,
@@ -2791,7 +2811,7 @@
             width: min(100%, 420px);
         }
 
-        .project-grid {
+        .projects-grid {
             grid-template-columns: 1fr;
         }
 
@@ -3021,7 +3041,6 @@
     .hero-glow,
     .hero-card,
     .project-preview-content strong,
-    .project-card,
     .feature-card {
         will-change: transform;
         contain: paint;

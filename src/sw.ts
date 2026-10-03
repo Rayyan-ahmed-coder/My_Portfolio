@@ -1,11 +1,13 @@
 /// <reference lib="webworker" />
 
+import { StaleWhileRevalidate } from "workbox-strategies"
 import { precacheAndRoute, cleanupOutdatedCaches } from "workbox-precaching";
 import { registerRoute, NavigationRoute } from "workbox-routing";
 import { CacheFirst, NetworkFirst } from "workbox-strategies";
 import { ExpirationPlugin } from "workbox-expiration";
 
 declare const self: ServiceWorkerGlobalScope;
+
 // Fast installation cycles
 self.addEventListener("install", () => self.skipWaiting());
 self.addEventListener("activate", (event) => event.waitUntil(self.clients.claim()));
@@ -28,19 +30,18 @@ registerRoute(
         url.origin === self.location.origin && 
         (request.destination === "script" || request.destination === "style"),
     async ({ request, url }) => {
-        // Since we cannot read Accept-Encoding directly in SW scripts, we check browser feature support safely 
-        // Modern browsers that support Service Workers + ESNext targets universally support Brotli compression natively!
-        const brotliUrl = url.pathname + ".br";
+        // Safe cross-platform absolute path resolution for GitHub Pages subfolders
+        const brotliUrl = url.href + ".br";
+        
         try {
             const response = await fetch(brotliUrl);
             
             // If GitHub Pages fails to find the pre-compressed asset file, fall back to standard asset routing
-            if (!response.ok) return fetch(request);
+            if (!response.ok) return fetch(request.clone());
 
             const newHeaders = new Headers(response.headers);
             newHeaders.set("Content-Encoding", "br");
             
-            // Lock down explicit MIME type descriptors for browser validation
             if (url.pathname.endsWith(".js")) {
                 newHeaders.set("Content-Type", "application/javascript");
             } else if (url.pathname.endsWith(".css")) {
@@ -53,7 +54,7 @@ registerRoute(
                 headers: newHeaders,
             });
         } catch {
-            return fetch(request);
+            return fetch(request.clone());
         }
     }
 );
@@ -77,3 +78,8 @@ registerRoute(
         plugins: [new ExpirationPlugin({ maxEntries: 60, maxAgeSeconds: 30 * 24 * 60 * 60 })],
     }),
 );
+
+registerRoute(new NavigationRoute(new StaleWhileRevalidate({
+    cacheName: "portfolio-navigation-v2",
+    plugins: [new ExpirationPlugin({ maxEntries: 5, maxAgeSeconds: 7 * 24 * 60 * 60 })],
+})));

@@ -1,7 +1,7 @@
 import type React from 'react';
 import { useEffect, useRef, useState } from 'react';
 
-const PORTFOLIO_VERSION_HASH = 'v5.1';
+const PORTFOLIO_VERSION_HASH = 'v5.2';
 const VISIBLE_DURATION_MS = 6500;
 const FADE_DURATION_MS = 400;
 
@@ -56,7 +56,7 @@ export default function UpdateNotification(): React.JSX.Element | null {
     if (!shouldRender) return null;
     return (
         <div ref={toastRef} className="update-toast-pill" role="status" aria-live="polite">
-            <span className="update-toast-text">Updated</span>
+            <span className="update-toast-text" aria-label="Portfolio Update notification">Updated</span>
             <span className="update-toast-tick" aria-hidden="true">✓</span>
         </div>
     );
