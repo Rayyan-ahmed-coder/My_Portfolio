@@ -44,6 +44,8 @@ jobs:
         run: npm ci
 
       - name: Execute Optimization Build
+        env:
+            VITE_WEB3FORMS_KEY: ${{ secrets.VITE_WEB3FORMS_KEY }}
         run: npm run build
 
       - name: Setup GitHub Pages Deployment Context

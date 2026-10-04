@@ -5,9 +5,9 @@ export default function HeroSection(): React.JSX.Element {
     return (
         <section className="hero section" id="home" aria-labelledby="hero-title">
             <div className="hero-background" aria-hidden="true">
-                <div className="hero-grid" />
-                <div className="hero-glow hero-glow-one" />
-                <div className="hero-glow hero-glow-two" />
+                <div className="hero-grid"></div>
+                <div className="hero-glow hero-glow-one"></div>
+                <div className="hero-glow hero-glow-two"></div>
             </div>
 
             <div className="container hero-container">

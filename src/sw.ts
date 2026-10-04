@@ -1,6 +1,5 @@
 /// <reference lib="webworker" />
 
-import { StaleWhileRevalidate } from "workbox-strategies"
 import { precacheAndRoute, cleanupOutdatedCaches } from "workbox-precaching";
 import { registerRoute, NavigationRoute } from "workbox-routing";
 import { CacheFirst, NetworkFirst } from "workbox-strategies";
@@ -10,7 +9,14 @@ declare const self: ServiceWorkerGlobalScope;
 
 // Fast installation cycles
 self.addEventListener("install", () => self.skipWaiting());
-self.addEventListener("activate", (event) => event.waitUntil(self.clients.claim()));
+self.addEventListener("activate", (event) => {
+    event.waitUntil(
+        Promise.all([
+            self.clients.claim(),
+            caches.delete("portfolio-navigation-v2"),
+        ])
+    );
+});
 
 cleanupOutdatedCaches();
 
@@ -19,7 +25,7 @@ precacheAndRoute(self.__WB_MANIFEST || []);
 
 // HTML must prefer fresh deployments, while still working offline.
 registerRoute(new NavigationRoute(new NetworkFirst({
-    cacheName: "portfolio-navigation-v2",
+    cacheName: "portfolio-navigation-v3",
     networkTimeoutSeconds: 3,
     plugins: [new ExpirationPlugin({ maxEntries: 5, maxAgeSeconds: 24 * 60 * 60 })],
 })));
@@ -78,8 +84,3 @@ registerRoute(
         plugins: [new ExpirationPlugin({ maxEntries: 60, maxAgeSeconds: 30 * 24 * 60 * 60 })],
     }),
 );
-
-registerRoute(new NavigationRoute(new StaleWhileRevalidate({
-    cacheName: "portfolio-navigation-v2",
-    plugins: [new ExpirationPlugin({ maxEntries: 5, maxAgeSeconds: 7 * 24 * 60 * 60 })],
-})));

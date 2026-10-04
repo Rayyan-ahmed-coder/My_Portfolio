@@ -74,10 +74,11 @@ export default class Portfolio implements Disposable {
     }
 
     async #initializeDeferredModules(): Promise<void> {
+        // CRITICAL VITE FIX: Removed .js extensions from runtime dynamic imports so chunk hashing maps correctly.
         const [observer, scroll, cursor] = await Promise.all([
-            this.#importModule("observer", () => import("./core/observer.js")),
-            this.#importModule("scroll", () => import("./modules/scroll.js")),
-            this.#importModule("cursor", () => import("./modules/cursor.js")),
+            this.#importModule("observer", () => import("./core/observer")),
+            this.#importModule("scroll", () => import("./modules/scroll")),
+            this.#importModule("cursor", () => import("./modules/cursor")),
         ]);
 
         if (observer) this.#start("observer", () => new observer());
@@ -129,7 +130,7 @@ export default class Portfolio implements Disposable {
             listen(document, "keydown", (event) => {
                 const keyboardEvent = event as KeyboardEvent;
                 if (!(keyboardEvent.ctrlKey || keyboardEvent.metaKey)) return;
-                if (keyboardEvent.key.toLowerCase() !== "k" || this.#commandPalette) return;
+                if (keyboardEvent.key.toLowerCase() !== "k") return; // CRITICAL FIX: Removed this.#commandPalette block flag
 
                 keyboardEvent.preventDefault();
                 void this.loadCommandPalette().then((palette) => palette?.open());
@@ -141,7 +142,8 @@ export default class Portfolio implements Disposable {
     loadCommandPalette(): Promise<CommandPaletteInstance | null> {
         if (this.#commandPalette) return Promise.resolve(this.#commandPalette);
 
-        this.#commandLoader ??= import("./modules/commandPalette.js")
+        // CRITICAL VITE FIX: Strip out .js from module template strings for compiler resolution mapping
+        this.#commandLoader ??= import("./modules/commandPalette")
             .then(({ default: CommandPalette }) => {
                 this.#commandPalette = CommandPalette.create();
                 if (this.#commandPalette) {
@@ -167,10 +169,15 @@ export default class Portfolio implements Disposable {
         this.#commandLoader = null;
         this.#commandPalette = null;
 
-        for (const module of Object.values(this.modules)) {
-            if (module && typeof module.destroy === "function") {
+        // Optimized dictionary iteration footprint
+        const activeModules = Object.values(this.modules);
+        const totalModules = activeModules.length;
+        
+        for (let i = 0; i < totalModules; i++) {
+            const m = activeModules[i];
+            if (m && typeof m.destroy === "function") {
                 try {
-                    module.destroy();
+                    m.destroy();
                 } catch (error) {
                     reportError(SCOPE, "Module teardown failed", error);
                 }

@@ -391,7 +391,7 @@
         inset-inline: 0;
         border-radius: var(--radius-lg);
         border: 3px solid var(--color-border);
-        background: rgba(255, 255, 255, .80);
+        background: rgba(255, 255, 255, .65);
         backdrop-filter: blur(22px);
         -webkit-backdrop-filter: blur(22px);
         transition: 
@@ -1700,6 +1700,7 @@
             position: absolute;
             width: 130px;
             height: 130px;
+            aspect-ratio: 1 / 1;
             right: -42px;
             bottom: -54px;
             border-radius: 50%;
@@ -1748,6 +1749,7 @@
         display: grid;
         width: 48px;
         height: 48px;
+        aspect-ratio: 1 / 1;
         place-items: center;
         background: var(--color-primary-soft);
         border: 1px solid rgba(239, 71, 111, .2);
@@ -2478,7 +2480,7 @@
        ------------------------------------------------------------------------- */
     html[data-theme="dark"] {
         .site-header {
-            background: rgba(7, 12, 22, .9);
+            background: rgba(7, 12, 22, .7);
             border-color: rgba(148, 163, 184, .12);
 
         }

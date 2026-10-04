@@ -9,7 +9,7 @@ export default defineConfig(({ command }) => {
     const isBuild = command === "build";
 
     return {
-        base: '/My_Portfolio_2v/',
+        base: '/My_Portfolio/',
         css: {
             transformer: "lightningcss",
             lightningcss: {
@@ -45,17 +45,17 @@ export default defineConfig(({ command }) => {
                     name: "Rayyan Khan — Frontend Developer",
                     short_name: "Rayyan Khan",
                     description: "Portfolio of Rayyan Khan, a Frontend Developer building fast, modern, and interactive web experiences.",
-                    start_url: "/My_Portfolio_2v/",
-                    id: "/My_Portfolio_2v/",
+                    start_url: "/My_Portfolio/",
+                    id: "/My_Portfolio/",
                     display: "standalone",
                     orientation: "portrait-primary",
                     background_color: "#1d3557",
                     theme_color: "#e63946",
                     categories: ["development", "productivity"],
                     icons: [
-                        { src: "/My_Portfolio_2v/assets/icons/icon-192.png", sizes: "192x192", type: "image/png", purpose: "any" },
-                        { src: "/My_Portfolio_2v/assets/icons/icon-512.png", sizes: "512x512", type: "image/png", purpose: "any" },
-                        { src: "/My_Portfolio_2v/assets/icons/maskable-icon-512x512.svg", sizes: "512x512", type: "image/svg+xml", purpose: "maskable" }
+                        { src: "/My_Portfolio/assets/icons/icon-192.png", sizes: "192x192", type: "image/png", purpose: "any" },
+                        { src: "/My_Portfolio/assets/icons/icon-512.png", sizes: "512x512", type: "image/png", purpose: "any" },
+                        { src: "/My_Portfolio/assets/icons/maskable-icon-512x512.svg", sizes: "512x512", type: "image/svg+xml", purpose: "maskable" }
                     ]
                 },
                 injectManifest: {
