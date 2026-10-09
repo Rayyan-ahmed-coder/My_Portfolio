@@ -25,7 +25,10 @@ TestResults.xml
 *.log
 ### Node ###
 node_modules/
+.pnp
+.pnp.js
 coverage/
 .env
 .env.*
+*.local
 !.env.example
