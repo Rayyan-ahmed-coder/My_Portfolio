@@ -13,7 +13,7 @@ export default function SiteFooter(): React.JSX.Element {
                 </div>
 
                 <div className="footer-right">
-                    <p><span aria-hidden="true">©</span> <span id="made-year" aria-label='when was made'>Made in: 2025 July 14th</span> | Rayyan Khan.</p>
+                    <p><span aria-hidden="true">©</span> {new Date().getFullYear()} Rayyan Khan. Built with care.</p>
                     <a href="#home">Back to top ↑</a>
                 </div>
             </div>

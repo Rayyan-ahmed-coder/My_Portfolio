@@ -13,20 +13,15 @@ export default function AboutSection(): React.JSX.Element {
 
                 <div className="about-content">
                     <p className="about-lead">
-                        I'm a frontend developer who enjoys
-                        understanding how things work and then
-                        building them from the ground up.
+                        I build responsive, interactive web experiences with React, TypeScript and modern CSS.
                     </p>
                     <p>
-                        My current focus is frontend development,
-                        where I'm learning how to combine clean
-                        interfaces with efficient JavaScript and
-                        thoughtful user experiences.
+                        I care about the details that make a site feel right: clear layouts, useful feedback and
+                        performance that keeps everything feeling quick.
                     </p>
                     <p>
-                        I don't just want to make websites that
-                        look good. I want to understand the
-                        engineering and thoughts behind them.
+                        This portfolio is where I turn those interests into projects, experiment with new ideas and
+                        share what I'm learning along the way.
                     </p>
                     <a className="text-link" href="#contact" >
                         Get in touch <span aria-hidden="true">→</span>

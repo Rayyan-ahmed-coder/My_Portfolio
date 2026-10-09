@@ -3,20 +3,14 @@
 
 # 📥 Primary Vulnerability Ingestion Endpoints
 Contact: mailto:rayyan.workhost@gmail.com
-Contact: https://github.com
-
-# 🔐 Cryptographic Encryption Keys (Bypasses Cleartext Interceptions)
-Encryption: https://github.io
+Contact: https://github.com/Rayyan-ahmed-coder
 
 # 📜 Operational Governance & Vulnerability Policies
-Policy: https://github.com
-Acknowledgements: https://github.com
+Policy: https://github.com/Rayyan-ahmed-coder/My_Portfolio/blob/main/SECURITY.md
+Acknowledgements: https://github.com/Rayyan-ahmed-coder/My_Portfolio/graphs/contributors
 
 # ⏱️ System Validation Boundaries (ISO 8601 Compliance Tracking)
 Expires: 2027-08-16T12:00:00.000Z
 
 # 🌐 Localization Parameters
 Preferred-Languages: en
-
-# 🏹 Professional Bug Bounty Program Declaration
-Hiring: https://github.com

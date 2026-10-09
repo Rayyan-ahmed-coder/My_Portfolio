@@ -113,11 +113,8 @@ export default function ContactSection(): React.JSX.Element {
                         </div>
 
                         <nav className="contact-links" aria-label="Social profiles and channels">
-                            <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="social-link">
+                            <a href="https://github.com/Rayyan-ahmed-coder" target="_blank" rel="noopener noreferrer" className="social-link">
                                 GitHub <span aria-hidden="true" className="arrow-icon">↗</span>
-                            </a>
-                            <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="social-link">
-                                LinkedIn <span aria-hidden="true" className="arrow-icon">↗</span>
                             </a>
                         </nav>
                     </div>

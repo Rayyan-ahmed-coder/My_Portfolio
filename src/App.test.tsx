@@ -12,6 +12,8 @@ describe("App Architecture & Layout", () => {
         expect(html).toContain('id="work"');
         expect(html).toContain('id="projects-grid"');
         expect((html.match(/id="availability-card"/g) ?? []).length).toBe(1);
+        expect(html).toContain('href="https://github.com/Rayyan-ahmed-coder"');
+        expect(html).not.toContain('href="#"');
     });
 
     it("keeps initialization idempotent so modules are not recreated on a second boot", () => {

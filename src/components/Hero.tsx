@@ -14,12 +14,10 @@ export default function HeroSection(): React.JSX.Element {
                 <div className="hero-content">
                     <p className="eyebrow">FRONTEND DEVELOPER</p>
                     <h1 className="hero-title" id="hero-title">
-                        Building <span className="accent-text hero-accent-text">digital experiences</span> that matter.
+                        I build <span className="accent-text hero-accent-text">thoughtful experiences</span> for the web.
                     </h1>
                     <p className="hero-description">
-                        I'm Rayyan Khan, a frontend developer focused 
-                        on creating fast, responsive and thoughtfully 
-                        designed experiences for the web.
+                        I'm Rayyan Khan, a frontend developer building responsive interfaces with React, TypeScript and JavaScript.
                     </p>
 
                     <div className="hero-actions">
@@ -33,12 +31,12 @@ export default function HeroSection(): React.JSX.Element {
 
                     <div className="hero-stats">
                         <div className="stat">
-                            <strong>03+</strong>
+                            <strong>03</strong>
                             <span>Projects</span>
                         </div>
                         <div className="stat">
-                            <strong>04</strong>
-                            <span>Core skills</span>
+                            <strong>09</strong>
+                            <span>Technologies</span>
                         </div>
                         <div className="stat">
                             <strong>∞</strong>

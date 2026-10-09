@@ -120,37 +120,34 @@ export default class CommandPalette implements Disposable {
             nav("Go to Skills", "View the technology toolkit", "#skills", "5"),
             nav("Go to Contact", "Open the contact section", "#contact", "6"),
             nav("Jump to projects", "Open the project gallery", "#work", "7"),
-            { title: "Open resume", subtitle: "View or download resume (new tab)", category: "Actions", shortcut: "8", action: () => this.openLink("/resume.pdf") },
-            { title: "Open GitHub", subtitle: "Jump to my GitHub profile", category: "Social", shortcut: "9", action: () => this.openLink("https://github.com/") },
-            { title: "Open LinkedIn", subtitle: "Jump to my LinkedIn profile", category: "Social", shortcut: "0", action: () => this.openLink("https://www.linkedin.com/") },
+            { title: "Open GitHub", subtitle: "Jump to my GitHub profile", category: "Social", shortcut: "9", action: () => this.openLink("https://github.com/Rayyan-ahmed-coder") },
 
             filter("Show all projects", "Reset project filters", "all", "f"),
             filter("Show web projects", "Filter to Web projects", "web", "w"),
             filter("Show JavaScript projects", "Filter to JavaScript projects", "javascript", "j"),
             filter("Show games", "Filter to Game projects", "game", "g"),
 
-            { title: "Toggle theme", subtitle: "Switch between light and dark mode", category: "Actions", shortcut: "Alt+Shift+T", action: () => this.dispatchCommand("theme-toggle") },
-            { title: "Open navigation menu", subtitle: "Toggle the mobile navigation", category: "Actions", shortcut: "Alt+Shift+M", action: () => this.dispatchCommand("menu-toggle") },
+            { title: "Toggle theme", subtitle: "Switch between light and dark mode", category: "Actions", shortcut: "Alt+Shift+T", action: () => { this.dispatchCommand("theme-toggle"); } },
+            { title: "Open navigation menu", subtitle: "Toggle the mobile navigation", category: "Actions", shortcut: "Alt+Shift+M", action: () => { this.dispatchCommand("menu-toggle"); } },
             { title: "Copy email address", subtitle: "Copy the contact email to clipboard", category: "Actions", shortcut: "Alt+Shift+C", action: () => this.copyEmail() },
             { title: "Copy creator name", subtitle: "Copy my name to clipboard", category: "Actions", shortcut: "Alt+Shift+P", action: () => this.copyText("Rayyan Khan") },
-            { title: "Open email client", subtitle: "Create a new message to contact me", category: "Actions", shortcut: "Alt+Shift+E", action: () => this.dispatchSelector(".contact-email") },
+            { title: "Open email client", subtitle: "Create a new message to contact me", category: "Actions", shortcut: "Alt+Shift+E", action: () => { this.dispatchSelector(".contact-email"); } },
             { title: "Copy site URL", subtitle: "Copy the current page URL", category: "Actions", shortcut: "Alt+Shift+U", action: () => this.copyText(window.location.href) },
-            { title: "Toggle animations", subtitle: "Enable/disable page motion effects", category: "Actions", shortcut: "Alt+Shift+A", action: () => document.documentElement.classList.toggle("reduced-motion") },
-            { title: "Download resume", subtitle: "Download the resume PDF", category: "Actions", shortcut: "Alt+Shift+R", action: () => this.openLink("/resume.pdf") },
+            { title: "Toggle animations", subtitle: "Enable/disable page motion effects", category: "Actions", shortcut: "Alt+Shift+A", action: () => { document.documentElement.classList.toggle("reduced-motion"); } },
             { title: "Focus search", subtitle: "Open command palette and focus the search", category: "Actions", shortcut: "Alt+Shift+S", action: () => this.focusSearch() },
 
             { title: "Increase text size", subtitle: "Increase base font size for readability", category: "Accessibility", shortcut: "Alt+Shift++", action: () => document.documentElement.style.setProperty("font-size", `${rootFontSize() + 1}px`) },
             { title: "Decrease text size", subtitle: "Decrease base font size", category: "Accessibility", shortcut: "Alt+Shift+-", action: () => document.documentElement.style.setProperty("font-size", `${Math.max(12, rootFontSize() - 1)}px`) },
-            { title: "Toggle high contrast", subtitle: "Enable/disable high contrast mode", category: "Accessibility", shortcut: "Alt+Shift+H", action: () => document.documentElement.classList.toggle("high-contrast") },
+            { title: "Toggle high contrast", subtitle: "Enable/disable high contrast mode", category: "Accessibility", shortcut: "Alt+Shift+H", action: () => { document.documentElement.classList.toggle("high-contrast"); } },
 
             { title: "Print page", subtitle: "Open browser print dialog", category: "Tools", shortcut: "p", action: () => window.print() },
             { title: "Open devtools (hint)", subtitle: "Suggestion: use browser devtools", category: "Tools", shortcut: "d", action: () => this.openLink("about:blank") },
-            { title: "View source (GitHub)", subtitle: "Open repository source", category: "Tools", shortcut: "v", action: () => this.openLink("https://github.com/") },
+            { title: "View source (GitHub)", subtitle: "Open repository source", category: "Tools", shortcut: "v", action: () => this.openLink("https://github.com/Rayyan-ahmed-coder/My_Portfolio") },
 
             { title: "Scroll to top", subtitle: "Return to the top of the page", category: "Navigation", shortcut: "Home", action: () => window.scrollTo({ top: 0, behavior: "smooth" }) },
             { title: "Scroll to bottom", subtitle: "Jump to bottom of page", category: "Navigation", shortcut: "End", action: () => window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" }) },
             nav("Open contact links", "Open contact links area", "#contact", "k"),
-            { title: "Open projects grid", subtitle: "Focus the projects area", category: "Navigation", shortcut: "x", action: () => this.dispatchSelector("#projects-grid") },
+            { title: "Open projects grid", subtitle: "Focus the projects area", category: "Navigation", shortcut: "x", action: () => { this.dispatchSelector("#projects-grid"); } },
         ];
     }
 

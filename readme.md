@@ -76,26 +76,10 @@ graph LR
 > This repository uses maximum asset minification structures. Dev files (`sw.ts`, `vite.config.ts`) are completely decoupled from main process compilation cycles to preserve performance overhead.
 
 <details>
-<summary><strong>🔍 [OPTIMIZATION] High-Volume Asset Multiplexing</strong></summary>
+<summary><strong>Production bundle and caching</strong></summary>
 <br />
 <p style="line-height: 1.8;">
-The project asset tuning threshold (<code>assetsInlineLimit</code>) is mathematically restricted to precisely <code>4096 bytes</code>. This prevents large graphic vectors from bleeding into compiled JavaScript strings, forcing client devices to leverage simultaneous multiplexed HTTP/2 streams to load assets concurrently without causing main thread layout blockage.
-</p>
-</details>
-
-<details>
-<summary><strong>🔍 [NETWORKING] Workbox Multi-Threaded Cache Stratum</strong></summary>
-<br />
-<p style="line-height: 1.8;">
-Using background compilation worker threads via native service worker contexts, the caching tree operates completely independent from standard render workflows. A strict, optimized <code>StaleWhileRevalidate</code> pattern applied against primary document routes coupled with <code>CacheFirst</code> strategies for layout fonts guarantees local access latency drops to zero immediately following system boot.
-</p>
-</details>
-
-<details>
-<summary><strong>🔍 [COMPRESSION] Level 11 Algorithmic Data Crushing</strong></summary>
-<br />
-<p style="line-height: 1.8;">
-Vite's production build pipeline runs twin compression loops during final output generation. Application script strings are forced into physical binary packets using Level 11 Brotli compression engines (<code>vite-plugin-compression2</code>) coupled with fallback Level 9 Gzip structures to minimize initial connection file sizes.
+Vite minifies once with esbuild, splits React into a shared hashed chunk, and emits Brotli quality 11 and gzip level 9 sidecars for text assets larger than 1 KB. Small assets below <code>4096 bytes</code> may be inlined. Workbox precaches HTML, scripts, styles, and fonts, uses network-first navigation, and caches same-origin images. GitHub Pages does not automatically serve <code>.br</code>/<code>.gz</code> sidecars with the required <code>Content-Encoding</code> header; use a CDN or host configured for precompressed assets to benefit from those sidecars over the network.
 </p>
 </details>
 
