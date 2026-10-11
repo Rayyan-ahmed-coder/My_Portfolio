@@ -14,6 +14,9 @@ describe("App Architecture & Layout", () => {
         expect((html.match(/id="availability-card"/g) ?? []).length).toBe(1);
         expect(html).toContain('href="https://github.com/Rayyan-ahmed-coder"');
         expect(html).not.toContain('href="#"');
+        expect(html).toContain("Launch project");
+        expect(html).toContain("View source");
+        expect(html).toContain('aria-label="Launch project: Calculator"');
     });
 
     it("keeps initialization idempotent so modules are not recreated on a second boot", () => {

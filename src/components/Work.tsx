@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { ArrowUpRight, ExternalLink } from "lucide-react";
 import type { Project } from "../core/types.js";
 import projectsData from "../data/projects.json";
 
@@ -97,13 +98,36 @@ export default function WorkSection(): React.JSX.Element {
                     {PROJECTS.map((project) => {
                         const isVisible = filter === "all" || hasCategory(project, filter);
                         const number = String(project.number).padStart(2, "0");
+                        const linkLabel = project.link.startsWith("https://github.com/")
+                            ? "View source"
+                            : "Launch project";
                         return (
-                            <article key={project.number} hidden={!isVisible} className={project.main ? "project-card project-card-large" : "project-card"} data-category={project.category} data-reveal>
-                                <div className="project-preview">
-                                    <div className="project-number" aria-hidden="true">{number}</div>
-                                    <div className="project-preview-content">
-                                        <span>{project.preview[0]}</span>
-                                        <strong>{project.preview[1]}</strong>
+                            <article
+                                key={project.number}
+                                hidden={!isVisible}
+                                className={project.main ? "project-card project-card-large" : "project-card"}
+                                data-category={project.category}
+                                data-reveal
+                            >
+                                <div className="project-preview" aria-hidden="true">
+                                    <div className="project-preview-top">
+                                        <span className="project-number">{number}</span>
+                                        <span className="project-preview-label">
+                                            <span className="project-preview-dot" />
+                                            Selected build
+                                        </span>
+                                    </div>
+                                    <div className="project-preview-art">
+                                        <span className="project-preview-orbit project-preview-orbit-one" />
+                                        <span className="project-preview-orbit project-preview-orbit-two" />
+                                        <div className="project-preview-content">
+                                            <span>{project.preview[0]}</span>
+                                            <strong>{project.preview[1]}</strong>
+                                        </div>
+                                    </div>
+                                    <div className="project-preview-bottom">
+                                        <span>{project.type}</span>
+                                        <ArrowUpRight size={18} strokeWidth={1.8} />
                                     </div>
                                 </div>
                                 <div className="project-content">
@@ -114,17 +138,22 @@ export default function WorkSection(): React.JSX.Element {
                                     </div>
                                     <div className="project-footer">
                                         <div className="project-tags" role="list" aria-label="Project technologies">
-                                            {project.tags.map((tag) => <span key={`${project.number}-${tag}`}>{tag}</span>)}
+                                            {project.tags.map((tag) => (
+                                                <span role="listitem" key={`${project.number}-${tag}`}>{tag}</span>
+                                            ))}
                                         </div>
                                         <a
                                             className="project-link"
                                             href={project.link}
-                                            title={`Explore ${project.heading}`}
+                                            title={`${linkLabel}: ${project.heading}`}
                                             target={project.openInNewTab ? "_blank" : "_self"}
                                             rel={project.openInNewTab ? "noopener noreferrer" : undefined}
-                                            aria-describedby={`project-title-${number}`}
+                                            aria-label={`${linkLabel}: ${project.heading}`}
                                         >
-                                            View <span className="link-arrow" aria-hidden="true">↗</span>
+                                            <span>{linkLabel}</span>
+                                            <span className="project-link-icon" aria-hidden="true">
+                                                <ExternalLink size={16} strokeWidth={2} />
+                                            </span>
                                         </a>
                                     </div>
                                 </div>

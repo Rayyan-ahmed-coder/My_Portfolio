@@ -53,11 +53,11 @@ export default function HeroSection(): React.JSX.Element {
                             <span></span>
                         </div>
                         <div className="hero-letter">R</div>
-                        <div className="hero-card-bottom">
-                            <span>React</span>
-                            <span>CSS</span>
-                            <span>TS</span>
-                        </div>
+                        <ul className="hero-card-bottom">
+                            <li>React</li>
+                            <li>CSS</li>
+                            <li>TS</li>
+                        </ul>
                     </div>
                     <AvailabilityCard />
                 </div>

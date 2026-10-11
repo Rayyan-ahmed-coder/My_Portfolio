@@ -1,7 +1,7 @@
 import type React from 'react';
 import { useEffect, useRef, useState } from 'react';
 
-const PORTFOLIO_VERSION_HASH = 'v5.2';
+const PORTFOLIO_VERSION_HASH = 'v5.4';
 const VISIBLE_DURATION_MS = 6500;
 const FADE_DURATION_MS = 400;
 

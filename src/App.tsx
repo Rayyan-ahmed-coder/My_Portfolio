@@ -10,6 +10,7 @@ import ContactSection from './components/Contact';
 import SiteFooter from './components/Footer';
 import ImpactStrip from './components/ImpactStrip';
 import BuildApproach from './components/BuildApproach';
+import './css/style.css';
 
 export default function App(): React.JSX.Element {
     return (
