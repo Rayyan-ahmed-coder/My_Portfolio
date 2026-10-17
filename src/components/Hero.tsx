@@ -52,7 +52,7 @@ export default function HeroSection(): React.JSX.Element {
                             <span></span>
                             <span></span>
                         </div>
-                        <div className="hero-letter">R</div>
+                        <h1 className="hero-letter">R</h1>
                         <ul className="hero-card-bottom">
                             <li>React</li>
                             <li>CSS</li>

@@ -1,26 +1,51 @@
+import { CONFIG } from '../core/config';
 import type React from 'react';
-import { useState, useTransition } from 'react';
+import { useState, useTransition, useRef } from 'react';
 
 type FormStatus = 'idle' | 'submitting' | 'success' | 'error';
 
-const EMAIL_ADDRESS = 'rayyan.workhost@gmail.com';
+const EMAIL_ADDRESS = CONFIG.EMAIL;
 const WEB3FORMS_ENDPOINT = 'https://web3forms.com';
 
 /* 🔑 Vite Context Hook mapping out secure background token declarations */
 const ACCESS_KEY = import.meta.env.VITE_WEB3FORMS_ACCESS_KEY;
 
 export default function ContactSection(): React.JSX.Element {
+    const copyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const [emailCopied, setEmailCopied] = useState<boolean>(false);
     const [formStatus, setFormStatus] = useState<FormStatus>('idle');
     const [messageLength, setMessageLength] = useState<number>(0);
     const [isPending, startTransition] = useTransition();
 
     const handleCopyEmail = async (): Promise<void> => {
+        // Clear any active running timer to handle rapid/double clicks flawlessly
+        if (copyTimeoutRef.current) {
+            clearTimeout(copyTimeoutRef.current);
+        }
+
         try {
-            await navigator.clipboard.writeText(EMAIL_ADDRESS);
+            if (navigator.clipboard && window.isSecureContext) {
+                await navigator.clipboard.writeText(EMAIL_ADDRESS);
+            } else {
+                const textArea = document.createElement("textarea");
+                textArea.value = EMAIL_ADDRESS;
+                textArea.style.position = "absolute";
+                textArea.style.opacity = "0";
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand("copy");
+                document.body.removeChild(textArea);
+            }
+
             setEmailCopied(true);
-            setTimeout(() => setEmailCopied(false), 2000);
-        } catch {
+            // Store the timer reference so we can wipe it out if clicked again
+            copyTimeoutRef.current = setTimeout(() => {
+                setEmailCopied(false);
+                copyTimeoutRef.current = null;
+            }, 2000);
+
+        } catch (error) {
+            console.error("[Clipboard Pipeline Exception]:", error);
             setEmailCopied(false);
         }
     };
@@ -41,29 +66,32 @@ export default function ContactSection(): React.JSX.Element {
 
         /* Fallback logic handling message delivery if local env parameters fail */
         if (!ACCESS_KEY) {
-            const name = String(formData.get('name') ?? '');
+            const name = String(formData.get('name') ?? 'Visitor');
             const message = String(formData.get('message') ?? '');
             window.location.href = `mailto:${EMAIL_ADDRESS}?subject=${encodeURIComponent(`Portfolio inquiry from ${name}`)}&body=${encodeURIComponent(message)}`;
             setFormStatus('success');
             return;
         }
 
-        formData.set('access_key', ACCESS_KEY);
-        formData.set('subject', `💼 Portfolio Inquiry from ${formData.get('name') ?? 'Visitor'}`);
-        formData.set('from_name', 'Rayyan Portfolio Pipeline');
-
         setFormStatus('submitting');
-
+        // React 19 startTransition expects synchronous wrapping of async state orchestrations
         startTransition(async () => {
             try {
+                // Append target payloads directly before network dispatch
+                formData.set('access_key', ACCESS_KEY);
+                formData.set('subject', `💼 Portfolio Inquiry from ${formData.get('name') ?? 'Visitor'}`);
+                formData.set('from_name', 'Rayyan Portfolio Pipeline');
+
                 const response = await fetch(WEB3FORMS_ENDPOINT, {
                     method: 'POST',
                     headers: { 'Accept': 'application/json' },
                     body: formData,
                 });
-                const result: { success?: boolean } = await response.json();
 
-                if (!response.ok || !result.success) throw new Error('Network validation failed');
+                if (!response.ok) throw new Error(`HTTP Error Status: ${response.status}`);
+                
+                const result: { success?: boolean } = await response.json();
+                if (!result.success) throw new Error('Web3Forms processing failed');
                 
                 form.reset();
                 setMessageLength(0);
@@ -122,8 +150,7 @@ export default function ContactSection(): React.JSX.Element {
 
                 <div className="contact-form-block" data-reveal>
                     <form onSubmit={handleFormSubmit} className="interactive-contact-form" noValidate={false}>
-                        
-                        <div hidden aria-hidden="true" style={{ display: 'none' }}>
+                        <div style={{ position: 'absolute', overflow: 'hidden', height: 0, width: 0, opacity: 0 }} aria-hidden="true">
                             <input 
                                 type="text" 
                                 name="_honeypot_clearance_" 
@@ -137,12 +164,12 @@ export default function ContactSection(): React.JSX.Element {
                                 <label htmlFor="user-name">Name</label>
                                 <input 
                                     type="text" 
-                                    autoCapitalize='on' 
                                     id="user-name"  
                                     name="name" 
                                     required 
                                     placeholder="Your full name"
                                     autoComplete="name"
+                                    autoCapitalize="words"
                                     disabled={formStatus === 'submitting' || isPending}
                                 />
                             </div>
@@ -150,12 +177,12 @@ export default function ContactSection(): React.JSX.Element {
                                 <label htmlFor="user-email">Email</label>
                                 <input 
                                     type="email" 
-                                    autoCapitalize='off'
                                     id="user-email" 
                                     name="email" 
                                     required 
                                     placeholder="your@email.com"
                                     autoComplete="email"
+                                    autoCapitalize="none"
                                     disabled={formStatus === 'submitting' || isPending}
                                 />
                             </div>
@@ -164,12 +191,11 @@ export default function ContactSection(): React.JSX.Element {
                         <div className="form-input-wrapper">
                             <div className="textarea-label-row">
                                 <label htmlFor="user-message">Message</label>
-                                <span className={`char-counter ${messageLength > 400 ? 'limit-near' : ''}`} aria-hidden="true">
-                                    &#40;{messageLength} / 500&#41;
+                                <span className={`char-counter ${messageLength > 400 ? 'limit-near' : ''}`} aria-live="polite">
+                                    ({messageLength} / 500)
                                 </span>
                             </div>
                             <textarea 
-                                autoCapitalize='sentences'
                                 id="user-message" 
                                 name="message" 
                                 spellCheck="true" 
@@ -177,6 +203,7 @@ export default function ContactSection(): React.JSX.Element {
                                 maxLength={500}
                                 required 
                                 placeholder="Tell me about your amazing project idea..."
+                                autoCapitalize="sentences"
                                 onChange={(e) => setMessageLength(e.target.value.length)}
                                 disabled={formStatus === 'submitting' || isPending}
                             />
@@ -186,12 +213,13 @@ export default function ContactSection(): React.JSX.Element {
                             type="submit" 
                             className={`submit-form-btn ${formStatus === 'submitting' ? 'loading-state' : ''}`} 
                             disabled={formStatus === 'submitting' || isPending}
+                            aria-busy={formStatus === 'submitting'}
                         >
                             {formStatus === 'submitting' ? 'Sending Message...' : 'Send Message ↗'}
                         </button>
 
                         {formStatus === 'success' && (
-                            <p className="form-alert alert-success" role="alert">
+                            <p className="form-alert alert-success" role="status"> {/* Swapped to 'status' for elegant screen-reader announcements */}
                                 Thanks. Your message is on its way.
                             </p>
                         )}

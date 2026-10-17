@@ -1,10 +1,11 @@
-import { $, $$, DARK_SCHEME_QUERY, debounce, escapeHtml, listen, matchesMedia, type Debounced, type Unsubscribe } from "../../src/core/utilities.js";
+import { $, $$, DARK_SCHEME_QUERY, prefersReducedMotion, debounce, escapeHtml, listen, matchesMedia, type Debounced, type Unsubscribe } from "../../src/core/utilities.js";
 import { reportError, warn } from "../../src/core/logger.js";
+import { CONFIG } from "../core/config.js";
 import type { AnalyticsData, Command, CommandCategory, Disposable } from "../../src/core/types.js";
 
 const SCOPE = "commandPalette";
 const FILTER_DELAY_MS = 120;
-const CONTACT_EMAIL_FALLBACK = "rayyan.workhost@gmail.com";
+const CONTACT_EMAIL_FALLBACK = CONFIG.EMAIL;
 
 interface PaletteElements {
     panel: HTMLElement;
@@ -477,24 +478,48 @@ export default class CommandPalette implements Disposable {
         return this.commands.filter((command) => command.category === category).length;
     }
 
-    copyEmail(): Promise<unknown> {
+    async copyEmail(): Promise<boolean> {
         const emailLink = $<HTMLAnchorElement>(".contact-email");
-        const emailAddress =
-            emailLink?.getAttribute("href")?.replace("mailto:", "") || CONTACT_EMAIL_FALLBACK;
+
+        const rawHref = emailLink?.getAttribute("href") || "";
+        const cleanMailto = rawHref.split("?")[0]; 
+        
+        const emailAddress = cleanMailto.startsWith("mailto:") 
+            ? cleanMailto.replace("mailto:", "").trim() 
+            : CONTACT_EMAIL_FALLBACK;
+
         return this.copyText(emailAddress);
     }
 
-    copyText(value: string): Promise<unknown> {
-        const clipboard = navigator.clipboard;
-        if (!clipboard?.writeText) {
-            warn(SCOPE, "Clipboard API unavailable");
-            return Promise.resolve(null);
-        }
+    async copyText(value: string): Promise<boolean> {
+        try {
+            if (navigator.clipboard && window.isSecureContext) {
+                await navigator.clipboard.writeText(value);
+                return true;
+            }
 
-        return clipboard.writeText(value).catch((error: unknown) => {
+            const textArea = document.createElement("textarea");
+            textArea.value = value;
+            textArea.style.position = "absolute";
+            textArea.style.opacity = "0";
+            textArea.style.pointerEvents = "none";
+            
+            document.body.appendChild(textArea);
+            textArea.select();
+            
+            const success = document.execCommand("copy");
+            document.body.removeChild(textArea);
+
+            if (!success) {
+                warn(SCOPE, "Fallback execution command failed");
+                return false;
+            }
+
+            return true;
+        } catch (error: unknown) {
             warn(SCOPE, "Clipboard write rejected", error);
-            return null;
-        });
+            return false; // Safely return false so your UI knows the copy process failed
+        }
     }
 
     focusSearch(): void {
@@ -540,18 +565,35 @@ export default class CommandPalette implements Disposable {
     }
 
     setSelectedIndex(index: number): void {
+        if (this.#selectedIndex === index) return;
         this.#selectedIndex = index;
 
-        for (const item of $$<HTMLElement>(".command-item", this.#elements.list)) {
-            const selected = Number(item.dataset.index) === index;
-            item.setAttribute("aria-selected", String(selected));
-            item.classList.toggle("selected", selected);
+        const listContainer = this.#elements.list;
+        if (!listContainer) return;
+
+        const items = $$<HTMLElement>(".command-item", listContainer);
+        let activeItem: HTMLElement | null = null;
+
+        for (const item of items) {
+            const itemIndex = Number(item.dataset.index);
+            const isSelected = itemIndex === index;
+
+            item.setAttribute("aria-selected", isSelected ? "true" : "false");
+            item.classList.toggle("selected", isSelected);
+
+            if (isSelected) { 
+                activeItem = item;
+            }
         }
 
-        $(`.command-item[data-index="${index}"]`, this.#elements.list)?.scrollIntoView({
-            block: "nearest",
-            inline: "nearest",
-        });
+        if (activeItem) {
+            const motionBehavior: ScrollBehavior = prefersReducedMotion() ? "auto" : "smooth";
+
+            activeItem.scrollIntoView({
+                block: "nearest",
+                behavior: motionBehavior
+            });
+        }
     }
 
     executeCommand(index: number): void {
@@ -571,7 +613,22 @@ export default class CommandPalette implements Disposable {
     }
 
     navigateTo(hash: string): void {
-        $(hash)?.scrollIntoView({ behavior: "smooth" });
+        if (!hash || hash === "#" || typeof hash !== "string") return;
+
+        try {
+            const targetElement = $(CSS.escape(hash));
+            
+            if (targetElement) {
+                const motionBehavior: ScrollBehavior = prefersReducedMotion() ? "auto" : "smooth";
+
+                targetElement.scrollIntoView({ 
+                    behavior: motionBehavior,
+                    block: "start"
+                });
+            }
+        } catch (error) {
+            console.warn(`[Navigation Engine Exception]: Failed to scroll to selector "${hash}"`, error);
+        }
     }
 
     dispatchCommand(elementId: string): boolean {
@@ -600,7 +657,21 @@ export default class CommandPalette implements Disposable {
     }
 
     openLink(url: string): void {
-        window.open(url, "_blank", "noopener,noreferrer");
+        if (!url || typeof url !== "string") return;
+
+        try {
+            const cleanUrl = url.trim();
+            const parsedUrl = new URL(cleanUrl, window.location.origin);
+
+            if (parsedUrl.protocol === "javascript:" || parsedUrl.protocol === "data:") {
+                console.warn(`[Security Guard Alert]: Blocked unsafe protocol execution template: "${parsedUrl.protocol}"`);
+                return;
+            }
+
+            window.open(parsedUrl.href, "_blank", "noopener=true,noreferrer=true");
+        } catch (error) {
+            console.warn(`[Navigation Engine Exception]: URL parsing failed for value "${url}"`, error);
+        }
     }
 
     destroy(): void {

@@ -4,18 +4,21 @@ import type { Disposable, ScrollDirection } from "../core/types.js";
 
 export function getSectionScrollTop(
     target: HTMLElement,
-    cachedHeaderHeight = 76,
-    currentScrollY = typeof window === "undefined" ? 0 : window.scrollY
+    cachedHeaderHeight = 76
 ): number {
+    if (typeof window === "undefined" || typeof document === "undefined") return 0;
+    
+    const currentScrollY = window.scrollY;
     const targetTop = target.getBoundingClientRect().top + currentScrollY - cachedHeaderHeight;
-    const maxScroll = typeof document === "undefined" ? 0 : Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+    const maxScroll = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+    
     return Math.min(Math.max(0, targetTop), maxScroll);
 }
 
 export default class ScrollManager implements Disposable {
     #scrollBtn = $(".scroll-top");
     #header = $(".site-header");
-    #sections = Array.from($$("section[id]"));     
+    #sections = Array.from($$("section[id]"));
     #links = Array.from($$(".nav-link"));
 
     #lastScrollY = 0;
@@ -23,10 +26,11 @@ export default class ScrollManager implements Disposable {
     #activeSection = "";
     #isManualScrolling = false;
     #manualTimeout = 0;
-    #cachedHeaderHeight = 76; // Caching avoids continuous layout thrashing
+    #cachedHeaderHeight = 76; 
 
     #observer: IntersectionObserver | null = null;
     #teardown: Unsubscribe[] = [];
+    #resizeTimeoutId = 0;
 
     constructor() {
         this.#init();
@@ -35,7 +39,6 @@ export default class ScrollManager implements Disposable {
     #init(): void {
         this.#measureAndSync();
 
-        // High-performance scroll tracking (zero layout recalculations)
         this.#teardown.push(
             listen(window, "scroll", () => {
                 const y = window.scrollY;
@@ -44,9 +47,11 @@ export default class ScrollManager implements Disposable {
                 this.#scrollBtn?.classList.toggle("visible", y > CONFIG.SCROLL_TOP_THRESHOLD);
             }, { passive: true }),
 
-            // Throttled to the next available browser paint frame
             listen(window, "resize", () => {
-                requestAnimationFrame(() => this.#measureAndSync());
+                window.clearTimeout(this.#resizeTimeoutId);
+                this.#resizeTimeoutId = window.setTimeout(() => {
+                    requestAnimationFrame(() => this.#measureAndSync());
+                }, 150);
             }, { passive: true }),
 
             listen(document, "click", (e) => this.#handleClick(e))
@@ -67,7 +72,6 @@ export default class ScrollManager implements Disposable {
     get direction(): ScrollDirection { return this.#scrollDirection; }
     get activeSection(): string { return this.#activeSection; }
 
-    /** Reads dimensions and batches style updates to rule out forced reflows */
     #measureAndSync(): void {
         if (typeof document === "undefined") return;
         this.#cachedHeaderHeight = Math.max(this.#header?.offsetHeight ?? 0, 76);
@@ -79,9 +83,9 @@ export default class ScrollManager implements Disposable {
         });
     }
 
-    /** IntersectionObserver offloads section detection to the browser compositor thread */
     #setupObserver(): void {
         if (!this.#sections.length || !("IntersectionObserver" in window)) return;
+        
         this.#observer = new IntersectionObserver(
             (entries) => {
                 if (this.#isManualScrolling) return;
@@ -89,12 +93,12 @@ export default class ScrollManager implements Disposable {
                 for (const entry of entries) {
                     if (entry.isIntersecting) {
                         this.#setActive(entry.target.id);
-                        break;
+                        break; // Stop looping once we find the matching visible item
                     }
                 }
             },
             {
-                rootMargin: `-${this.#cachedHeaderHeight + 20}px 0px -55% 0px`,
+                rootMargin: "-25% 0px -45% 0px",
                 threshold: 0
             }
         );
@@ -107,7 +111,6 @@ export default class ScrollManager implements Disposable {
         if (cleanId === this.#activeSection) return;
         this.#activeSection = cleanId;
 
-        // Optimized Batch execution for link DOM updates
         requestAnimationFrame(() => {
             const totalLinks = this.#links.length;
             for (let i = 0; i < totalLinks; i++) {
@@ -166,6 +169,7 @@ export default class ScrollManager implements Disposable {
 
     destroy(): void {
         this.#unlockScroll();
+        window.clearTimeout(this.#resizeTimeoutId); // Clean up custom optimization timers
         this.#observer?.disconnect();
         this.#teardown.forEach((off) => off());
         this.#teardown = [];

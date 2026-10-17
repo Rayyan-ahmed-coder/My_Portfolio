@@ -1,5 +1,5 @@
-import { ArrowUpRight, Check, Compass, Code2, Rocket } from "lucide-react";
-import { useState } from "react";
+import { ArrowUpRight, Check, CodeXml, Compass, Rocket } from "lucide-react";
+import { useRef, useState } from "react";
 
 const phases = [
     {
@@ -11,7 +11,7 @@ const phases = [
         deliverables: ["Goals and constraints", "Content direction", "A focused first milestone"],
     },
     {
-        icon: Code2,
+        icon: CodeXml,
         number: "02",
         label: "Build",
         title: "Make the experience feel inevitable.",
@@ -30,8 +30,41 @@ const phases = [
 
 export default function BuildApproach(): React.JSX.Element {
     const [activePhase, setActivePhase] = useState(0);
-    const phase = phases[activePhase];
+    const tabRefs = useRef<Array<HTMLButtonElement | null>>([]);
+    const phase = phases[activePhase] ?? phases[0];
     const Icon = phase.icon;
+
+    const handleTabChange = (index: number) => {
+        setActivePhase(index);
+        tabRefs.current[index]?.focus();
+    };
+
+    const handleTabKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>, index: number) => {
+        const totalPhases = phases.length;
+
+        if (event.key === "ArrowRight" || event.key === "ArrowDown") {
+            event.preventDefault();
+            handleTabChange((index + 1) % totalPhases);
+            return;
+        }
+
+        if (event.key === "ArrowLeft" || event.key === "ArrowUp") {
+            event.preventDefault();
+            handleTabChange((index - 1 + totalPhases) % totalPhases);
+            return;
+        }
+
+        if (event.key === "Home") {
+            event.preventDefault();
+            handleTabChange(0);
+            return;
+        }
+
+        if (event.key === "End") {
+            event.preventDefault();
+            handleTabChange(totalPhases - 1);
+        }
+    };
 
     return (
         <section className="approach section" id="approach" aria-labelledby="approach-title">
@@ -46,24 +79,40 @@ export default function BuildApproach(): React.JSX.Element {
 
                 <div className="approach-layout">
                     <div className="approach-tabs" role="tablist" aria-label="Project phases">
-                        {phases.map(({ icon: TabIcon, number, label }, index) => (
-                            <button
-                                className={`approach-tab${activePhase === index ? " active" : ""}`} 
-                                key={label} 
-                                type="button" 
-                                role="tab" 
-                                aria-selected={activePhase === index} 
-                                aria-controls={`approach-panel-${number}`} 
-                                onClick={() => setActivePhase(index)}
-                            >
-                                <TabIcon size={18} aria-hidden="true" />
-                                <span><b>{number}</b>{label}</span>
-                                <ArrowUpRight className="approach-tab-arrow" size={16} aria-hidden="true" />
-                            </button>
-                        ))}
+                        {phases.map(({ icon: TabIcon, number, label }, index) => {
+                            const isActive = activePhase === index;
+
+                            return (
+                                <button
+                                    ref={(element) => {
+                                        tabRefs.current[index] = element;
+                                    }}
+                                    key={label}
+                                    id={`approach-tab-${number}`}
+                                    className={`approach-tab${isActive ? " active" : ""}`}
+                                    type="button"
+                                    role="tab"
+                                    aria-selected={isActive}
+                                    aria-controls={`approach-panel-${number}`}
+                                    tabIndex={isActive ? 0 : -1}
+                                    onClick={() => handleTabChange(index)}
+                                    onKeyDown={(event) => handleTabKeyDown(event, index)}
+                                >
+                                    <TabIcon size={18} aria-hidden="true" />
+                                    <span><b>{number}</b>{label}</span>
+                                    <ArrowUpRight className="approach-tab-arrow" size={16} aria-hidden="true" />
+                                </button>
+                            );
+                        })}
                     </div>
 
-                    <div className="approach-panel" id={`approach-panel-${phase.number}`} role="tabpanel" aria-live="polite">
+                    <div
+                        className="approach-panel"
+                        id={`approach-panel-${phase.number}`}
+                        role="tabpanel"
+                        aria-live="polite"
+                        aria-labelledby={`approach-tab-${phase.number}`}
+                    >
                         <div className="approach-panel-top">
                             <span className="approach-panel-icon"><Icon size={28} aria-hidden="true" /></span>
                             <span className="approach-progress">{phase.number} / 03</span>
@@ -71,7 +120,9 @@ export default function BuildApproach(): React.JSX.Element {
                         <h3>{phase.title}</h3>
                         <p>{phase.text}</p>
                         <ul>
-                            {phase.deliverables.map((deliverable) => <li key={deliverable}><Check size={15} aria-hidden="true" />{deliverable}</li>)}
+                            {phase.deliverables.map((deliverable) => (
+                                <li key={deliverable}><Check size={15} aria-hidden="true" />{deliverable}</li>
+                            ))}
                         </ul>
                     </div>
                 </div>

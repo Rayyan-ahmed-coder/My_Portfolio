@@ -117,13 +117,9 @@ export default function WorkSection(): React.JSX.Element {
                                             Selected build
                                         </span>
                                     </div>
-                                    <div className="project-preview-art">
-                                        <span className="project-preview-orbit project-preview-orbit-one" />
-                                        <span className="project-preview-orbit project-preview-orbit-two" />
-                                        <div className="project-preview-content">
-                                            <span>{project.preview[0]}</span>
-                                            <strong>{project.preview[1]}</strong>
-                                        </div>
+                                    <div className="project-preview-content">
+                                        <span>{project.preview[0]}</span>
+                                        <strong>{project.preview[1]}</strong>
                                     </div>
                                     <div className="project-preview-bottom">
                                         <span>{project.type}</span>
