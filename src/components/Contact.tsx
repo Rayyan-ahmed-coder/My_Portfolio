@@ -8,7 +8,7 @@ const EMAIL_ADDRESS = CONFIG.EMAIL;
 const WEB3FORMS_ENDPOINT = "https://web3forms.com";
 
 /* 🔑 Vite Context Hook mapping out secure background token declarations */
-const ACCESS_KEY = import.meta.env.VITE_WEB3FORMS_ACCESS_KEY;
+const ACCESS_KEY = import.meta.env.VITE_WEB3FORMS_KEY;
 
 export default function ContactSection(): React.JSX.Element {
   const copyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
