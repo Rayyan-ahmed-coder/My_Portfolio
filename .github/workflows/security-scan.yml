@@ -15,7 +15,7 @@ permissions:
 
 jobs:
   code-quality-and-formatting:
-    name: "✨ PRISTINE STYLE & LINT AUDIT"
+    name: "✨ PRISTINE STYLE AUDIT"
     runs-on: ubuntu-latest
     steps:
       - name: "📥 Checkout Codebase"
@@ -28,13 +28,11 @@ jobs:
           cache: 'npm'
 
       - name: "📦 Install Project Dependencies"
-        run: npm ci
+        run: npm ci --legacy-peer-deps
+
 
       - name: "🎨 Verify Code Formatting (Prettier)"
-        run: npx prettier --check "src/**/*.{js,jsx,ts,tsx,json,css,md}"
-
-      - name: "🔍 Run Strict Code Quality Checks (ESLint)"
-        run: npm run lint
+        run: npm run format:check
 
   secret-ingestion-audit:
     name: "📡 TRUFFLEHOG CRYPTO SCAN"

@@ -2,30 +2,17 @@
 
 <!-- HEADER LOGO GRAPHIC -->
 <kbd>
-  <img src="https://githubusercontent.com" width="96" height="96" alt="Engine Core Code" style="border-radius: 16px; box-shadow: 0px 8px 32px rgba(0, 255, 102, 0.3);" />
+  <img src="https://githubusercontent.com" width="96" height="96" alt="Engine Core Code" style="border-radius: 12px; box-shadow: 0px 8px 30px rgba(0, 255, 102, 0.25);" />
 </kbd>
 
 # ⚡ CORE ENGINE: ENGINE_RAYYAN_KHAN
 ### HIGH-PERFORMANCE FRONTEND ARCHITECTURE • REACT 19 • COMPRESSED DISTRIBUTION TREE
 
-[![Live Edge Deployment](https://img.shields.io/badge/Deployment-Edge_Live-00FF66?style=for-the-badge&logo=github&logoColor=black)](https://github.io)
-[![Core Framework](https://img.shields.io/badge/Framework-React_19-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev)
-[![Asset Streamer](https://img.shields.io/badge/Compiler-Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vite.dev)
+[![Live Edge Deployment](https://shields.io)](https://github.io)
+[![Core Framework](https://shields.io)](https://react.dev)
+[![Asset Streamer](https://shields.io)](https://vite.dev)
 
-<!-- RUNTIME SECURITY DEVOPS STATUS BLOCKS -->
-<p style="margin-top: 12px; display: flex; justify-content: center; gap: 8px; flex-wrap: wrap;">
-  <a href="https://github.com/Rayyan-ahmed-coder/My_Portfolio/actions/workflows/security-scan.yml">
-    <img src="https://github.com/Rayyan-ahmed-coder/My_Portfolio/actions/workflows/security-scan.yml/badge.svg" alt="Security Pipeline Status" />
-  </a>
-  <a href="https://github.com/trufflesecurity/trufflehog">
-    <img src="https://img.shields.io/badge/Secret_Scanner-TruffleHog-ff69b4?style=flat&logo=securityscorecard&logoColor=white" alt="TruffleHog Shield" />
-  </a>
-  <a href="https://codeql.github.com/">
-    <img src="https://img.shields.io/badge/SAST_Engine-CodeQL-blue?style=flat&logo=githubactions&logoColor=white" alt="CodeQL Engine" />
-  </a>
-</p>
-
-<p style="line-height: 1.8; font-size: 16px; max-width: 780px; color: #cccccc; font-weight: 500;">
+<p style="line-height: 1.8; font-size: 16px; max-width: 780px; color: #b3b3b3; font-weight: 500;">
 An isolated, production-grade interface engineered to demonstrate low-latency asynchronous component rendering, aggressive multi-format chunk splitting pipelines, and autonomous background service worker data-precaching configurations.
 </p>
 

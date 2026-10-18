@@ -9,82 +9,91 @@ export type ObserveTarget = string | Element | Iterable<Element>;
  * them straight away, so the observer set shrinks as the page is consumed.
  */
 export default class ObserverManager implements Disposable {
-    #elements = new Set<Element>();
-    #observer: IntersectionObserver | null = null;
+  #elements = new Set<Element>();
+  #observer: IntersectionObserver | null = null;
 
-    static readonly defaultConfig: IntersectionObserverInit = {
-        threshold: 0.2,
-        rootMargin: "0px 0px -50px 0px",
-    };
+  static readonly defaultConfig: IntersectionObserverInit = {
+    threshold: 0.2,
+    rootMargin: "0px 0px -50px 0px",
+  };
 
-    constructor(customConfig: IntersectionObserverInit = {}) {
-        if (!("IntersectionObserver" in window)) {
-            warn("observer", "IntersectionObserver unsupported; revealing everything eagerly");
-            this.#revealFallback();
-            return;
-        }
-
-        this.#observer = new IntersectionObserver(
-            (entries) => this.#handleReveal(entries),
-            { ...ObserverManager.defaultConfig, ...customConfig }
-        );
-
-        this.observe("[data-reveal]");
+  constructor(customConfig: IntersectionObserverInit = {}) {
+    if (!("IntersectionObserver" in window)) {
+      warn(
+        "observer",
+        "IntersectionObserver unsupported; revealing everything eagerly",
+      );
+      this.#revealFallback();
+      return;
     }
 
-    #handleReveal(entries: IntersectionObserverEntry[]): void {
-        for (const entry of entries) {
-            if (!entry.isIntersecting) continue;
+    this.#observer = new IntersectionObserver(
+      (entries) => this.#handleReveal(entries),
+      { ...ObserverManager.defaultConfig, ...customConfig },
+    );
 
-            const { target } = entry;
-            target.classList.add("revealed");
-            this.#observer?.unobserve(target);
-            this.#elements.delete(target);
-        }
+    this.observe("[data-reveal]");
+  }
+
+  #handleReveal(entries: IntersectionObserverEntry[]): void {
+    for (const entry of entries) {
+      if (!entry.isIntersecting) continue;
+
+      const { target } = entry;
+      target.classList.add("revealed");
+      this.#observer?.unobserve(target);
+      this.#elements.delete(target);
+    }
+  }
+
+  /** Tracks elements injected after construction; duplicates are ignored. */
+  observe(target: ObserveTarget): void {
+    const targets = this.#resolveTargets(target);
+    if (!targets.length) return;
+
+    if (!this.#observer) {
+      this.#reveal(targets);
+      return;
     }
 
-    /** Tracks elements injected after construction; duplicates are ignored. */
-    observe(target: ObserveTarget): void {
-        const targets = this.#resolveTargets(target);
-        if (!targets.length) return;
+    for (const element of targets) {
+      if (this.#elements.has(element)) continue;
+      this.#elements.add(element);
+      this.#observer.observe(element);
+    }
+  }
 
-        if (!this.#observer) {
-            this.#reveal(targets);
-            return;
-        }
+  #resolveTargets(target: ObserveTarget): Element[] {
+    if (typeof target === "string") return Array.from($$(target));
+    if (target instanceof Element) return [target];
 
-        for (const element of targets) {
-            if (this.#elements.has(element)) continue;
-            this.#elements.add(element);
-            this.#observer.observe(element);
-        }
+    // Callers reach this from untyped code (JSON payloads, event handlers),
+    // so a non-iterable value must not throw inside the observer.
+    if (
+      target === null ||
+      typeof target !== "object" ||
+      !(Symbol.iterator in target)
+    ) {
+      warn("observer", "Ignoring unsupported observe() target");
+      return [];
     }
 
-    #resolveTargets(target: ObserveTarget): Element[] {
-        if (typeof target === "string") return Array.from($$(target));
-        if (target instanceof Element) return [target];
+    return Array.from(target).filter(
+      (element): element is Element => element instanceof Element,
+    );
+  }
 
-        // Callers reach this from untyped code (JSON payloads, event handlers),
-        // so a non-iterable value must not throw inside the observer.
-        if (target === null || typeof target !== "object" || !(Symbol.iterator in target)) {
-            warn("observer", "Ignoring unsupported observe() target");
-            return [];
-        }
+  #revealFallback(target: ObserveTarget = "[data-reveal]"): void {
+    this.#reveal(this.#resolveTargets(target));
+  }
 
-        return Array.from(target).filter((element): element is Element => element instanceof Element);
-    }
+  #reveal(elements: readonly Element[]): void {
+    for (const element of elements) element.classList.add("revealed");
+  }
 
-    #revealFallback(target: ObserveTarget = "[data-reveal]"): void {
-        this.#reveal(this.#resolveTargets(target));
-    }
-
-    #reveal(elements: readonly Element[]): void {
-        for (const element of elements) element.classList.add("revealed");
-    }
-
-    destroy(): void {
-        this.#observer?.disconnect();
-        this.#observer = null;
-        this.#elements.clear();
-    }
+  destroy(): void {
+    this.#observer?.disconnect();
+    this.#observer = null;
+    this.#elements.clear();
+  }
 }
