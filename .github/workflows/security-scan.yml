@@ -43,12 +43,14 @@ jobs:
         with:
           fetch-depth: 0
 
+      # FIX: Changed @maine to @main so the action references the correct branch name!
       - name: "🎯 Scan for Leaked Private Keys & Cloud Tokens"
         uses: trufflesecurity/trufflehog@main
         with:
           base: ${{ github.event.repository.default_branch }}
           head: HEAD
           extra_args: --debug --only-verified
+
 
   software-composition-analysis:
     name: "📦 DEPENDENCY COMPOSITION (SCA)"

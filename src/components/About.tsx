@@ -4,13 +4,13 @@ export default function AboutSection(): React.JSX.Element {
   return (
     <section className="about section" id="about" aria-labelledby="about-title">
       <div className="container about-container">
-        <div className="about-heading">
+        <header className="about-heading">
           <p className="eyebrow">ABOUT ME</p>
           <h2 id="about-title">
             I enjoy turning <span className="accent-text">ideas</span> into
             reality.
           </h2>
-        </div>
+        </header>
 
         <div className="about-content">
           <p className="about-lead">

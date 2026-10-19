@@ -89,13 +89,13 @@ export default function BuildApproach(): React.JSX.Element {
     >
       <div className="container">
         <div className="section-heading approach-heading">
-          <div>
+          <header>
             <p className="eyebrow">HOW I WORK</p>
             <h2 id="approach-title">
-              From first thought to{" "}
+              From first thought to
               <span className="accent-text">real thing.</span>
             </h2>
-          </div>
+          </header>
           <p className="section-description">
             A simple, collaborative process that keeps the big picture visible
             while the details get better.
@@ -103,7 +103,7 @@ export default function BuildApproach(): React.JSX.Element {
         </div>
 
         <div className="approach-layout">
-          <div
+          <ol
             className="approach-tabs"
             role="tablist"
             aria-label="Project phases"
@@ -112,35 +112,37 @@ export default function BuildApproach(): React.JSX.Element {
               const isActive = activePhase === index;
 
               return (
-                <button
-                  ref={(element) => {
-                    tabRefs.current[index] = element;
-                  }}
-                  key={label}
-                  id={`approach-tab-${number}`}
-                  className={`approach-tab${isActive ? " active" : ""}`}
-                  type="button"
-                  role="tab"
-                  aria-selected={isActive}
-                  aria-controls={`approach-panel-${number}`}
-                  tabIndex={isActive ? 0 : -1}
-                  onClick={() => handleTabChange(index)}
-                  onKeyDown={(event) => handleTabKeyDown(event, index)}
-                >
-                  <TabIcon size={18} aria-hidden="true" />
-                  <span>
-                    <b>{number}</b>
-                    {label}
-                  </span>
-                  <ArrowUpRight
-                    className="approach-tab-arrow"
-                    size={16}
-                    aria-hidden="true"
-                  />
-                </button>
+                <li>
+                  <button
+                    ref={(element) => {
+                      tabRefs.current[index] = element;
+                    }}
+                    key={label}
+                    id={`approach-tab-${number}`}
+                    className={`approach-tab${isActive ? " active" : ""}`}
+                    type="button"
+                    role="tab"
+                    aria-selected={isActive}
+                    aria-controls={`approach-panel-${number}`}
+                    tabIndex={isActive ? 0 : -1}
+                    onClick={() => handleTabChange(index)}
+                    onKeyDown={(event) => handleTabKeyDown(event, index)}
+                  >
+                    <TabIcon size={18} aria-hidden="true" />
+                    <span>
+                      <b>{number}</b>
+                      {label}
+                    </span>
+                    <ArrowUpRight
+                      className="approach-tab-arrow"
+                      size={16}
+                      aria-hidden="true"
+                    />
+                  </button>
+                </li>
               );
             })}
-          </div>
+          </ol>
 
           <div
             className="approach-panel"
