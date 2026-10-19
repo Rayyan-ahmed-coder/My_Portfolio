@@ -43,14 +43,13 @@ jobs:
         with:
           fetch-depth: 0
 
-      # FIX: Changed @maine to @main so the action references the correct branch name!
+      # ⚙️ THE SECURE ARCHITECTURE MODIFIER:
       - name: "🎯 Scan for Leaked Private Keys & Cloud Tokens"
         uses: trufflesecurity/trufflehog@main
         with:
-          base: ${{ github.event.repository.default_branch }}
-          head: HEAD
-          extra_args: --debug --only-verified
-
+          base: "" # Clear this out so it automatically evaluates the whole branch dynamically!
+          head: ${{ github.ref_name }} 
+          extra_args: --results=verified,unknown
 
   software-composition-analysis:
     name: "📦 DEPENDENCY COMPOSITION (SCA)"
