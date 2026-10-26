@@ -1,10 +1,6 @@
 import NavigationManager from "./modules/navigation.js";
 import Theme from "./modules/theme.js";
-import {
-  installGlobalErrorHandlers,
-  reportError,
-  warn,
-} from "./core/logger.js";
+import { installGlobalErrorHandlers, reportError, warn } from "./core/logger.js";
 import { listen, onIdle, type Unsubscribe } from "./core/utilities.js";
 import type { Disposable } from "./core/types.js";
 
@@ -19,21 +15,13 @@ interface Modules {
   command?: Disposable;
 }
 
-type CommandPaletteInstance = {
-  open(): void;
-  togglePanel(): void;
-} & Disposable;
-
 /**
  * Boots the site in three tiers: critical modules synchronously, secondary
- * modules during idle time, and the command palette only when first requested.
- * Every tier is isolated so a single failing module cannot break the page.
+ * modules during idle time, and the command palette via decoupled hardware broadcasts.
  */
 export default class Portfolio implements Disposable {
   readonly modules: Modules = {};
   #teardown: Unsubscribe[] = [];
-  #commandPalette: CommandPaletteInstance | null = null;
-  #commandLoader: Promise<CommandPaletteInstance | null> | null = null;
   #initialized = false;
   #commandTriggersBound = false;
 
@@ -68,11 +56,7 @@ export default class Portfolio implements Disposable {
     this.#registerCommandPaletteTriggers();
   }
 
-  /** Instantiates one module, reporting instead of aborting the rest of the boot. */
-  #start<K extends keyof Modules>(
-    name: K,
-    factory: () => NonNullable<Modules[K]>,
-  ): void {
+  #start<K extends keyof Modules>(name: K, factory: () => NonNullable<Modules[K]>): void {
     if (this.modules[name]) return;
 
     try {
@@ -83,7 +67,6 @@ export default class Portfolio implements Disposable {
   }
 
   async #initializeDeferredModules(): Promise<void> {
-    // CRITICAL VITE FIX: Removed .js extensions from runtime dynamic imports so chunk hashing maps correctly.
     const [observer, scroll, cursor] = await Promise.all([
       this.#importModule("observer", () => import("./core/observer")),
       this.#importModule("scroll", () => import("./modules/scroll")),
@@ -101,19 +84,13 @@ export default class Portfolio implements Disposable {
       listen(
         document,
         "content:loaded",
-        () =>
-          (observerInstance as { observe(selector: string): void }).observe(
-            "[data-reveal]",
-          ),
+        () => (observerInstance as { observe(selector: string): void }).observe("[data-reveal]"),
         { once: true },
       ),
     );
   }
 
-  async #importModule<T>(
-    name: string,
-    loader: () => Promise<{ default: new () => T }>,
-  ): Promise<(new () => T) | null> {
+  async #importModule<T>(name: string, loader: () => Promise<{ default: new () => T }>): Promise<(new () => T) | null> {
     try {
       return (await loader()).default;
     } catch (error) {
@@ -131,7 +108,7 @@ export default class Portfolio implements Disposable {
       this.#teardown.push(
         listen(toggle, "click", (event) => {
           event.preventDefault();
-          void this.loadCommandPalette().then((palette) => palette?.open());
+          this.broadcastPaletteTrigger();
         }),
       );
     } else {
@@ -142,46 +119,27 @@ export default class Portfolio implements Disposable {
       listen(document, "keydown", (event) => {
         const keyboardEvent = event as KeyboardEvent;
         if (!(keyboardEvent.ctrlKey || keyboardEvent.metaKey)) return;
-        if (keyboardEvent.key.toLowerCase() !== "k") return; // CRITICAL FIX: Removed this.#commandPalette block flag
+        if (keyboardEvent.key.toLowerCase() !== "k") return;
 
         keyboardEvent.preventDefault();
-        void this.loadCommandPalette().then((palette) => palette?.open());
+        this.broadcastPaletteTrigger();
       }),
     );
   }
 
-  /** Idempotent lazy loader: concurrent triggers share a single import. */
-  loadCommandPalette(): Promise<CommandPaletteInstance | null> {
-    if (this.#commandPalette) return Promise.resolve(this.#commandPalette);
-
-    // CRITICAL VITE FIX: Strip out .js from module template strings for compiler resolution mapping
-    this.#commandLoader ??= import("./modules/commandPalette")
-      .then(({ default: CommandPalette }) => {
-        this.#commandPalette = CommandPalette.create();
-        if (this.#commandPalette) {
-          this.modules.command = this.#commandPalette;
-        } else {
-          this.#commandLoader = null;
-        }
-        return this.#commandPalette;
-      })
-      .catch((error: unknown) => {
-        reportError(SCOPE, "Command palette failed to load", error);
-        this.#commandLoader = null;
-        return null;
-      });
-
-    return this.#commandLoader;
+  /**
+   * 📡 MAXIMUM OPTIMIZED EVENT BRIDGE: Fires a wireless, native browser signal.
+   * This completely detaches React code layouts from your clean TypeScript orchestrator!
+   */
+  broadcastPaletteTrigger(): void {
+    window.dispatchEvent(new CustomEvent("core-engine:toggle-palette"));
   }
 
   destroy(): void {
     this.#teardown.splice(0).forEach((off) => off());
     this.#initialized = false;
     this.#commandTriggersBound = false;
-    this.#commandLoader = null;
-    this.#commandPalette = null;
 
-    // Optimized dictionary iteration footprint
     const activeModules = Object.values(this.modules);
     const totalModules = activeModules.length;
 

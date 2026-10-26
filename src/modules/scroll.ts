@@ -2,20 +2,12 @@ import { CONFIG } from "../../src/core/config.js";
 import { $, $$, listen, type Unsubscribe } from "../core/utilities.js";
 import type { Disposable, ScrollDirection } from "../core/types.js";
 
-export function getSectionScrollTop(
-  target: HTMLElement,
-  cachedHeaderHeight = 76,
-): number {
-  if (typeof window === "undefined" || typeof document === "undefined")
-    return 0;
+export function getSectionScrollTop(target: HTMLElement, cachedHeaderHeight = 76): number {
+  if (typeof window === "undefined" || typeof document === "undefined") return 0;
 
   const currentScrollY = window.scrollY;
-  const targetTop =
-    target.getBoundingClientRect().top + currentScrollY - cachedHeaderHeight;
-  const maxScroll = Math.max(
-    0,
-    document.documentElement.scrollHeight - window.innerHeight,
-  );
+  const targetTop = target.getBoundingClientRect().top + currentScrollY - cachedHeaderHeight;
+  const maxScroll = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
 
   return Math.min(Math.max(0, targetTop), maxScroll);
 }
@@ -52,10 +44,7 @@ export default class ScrollManager implements Disposable {
           const y = window.scrollY;
           this.#scrollDirection = y > this.#lastScrollY ? "down" : "up";
           this.#lastScrollY = y;
-          this.#scrollBtn?.classList.toggle(
-            "visible",
-            y > CONFIG.SCROLL_TOP_THRESHOLD,
-          );
+          this.#scrollBtn?.classList.toggle("visible", y > CONFIG.SCROLL_TOP_THRESHOLD);
         },
         { passive: true },
       ),
@@ -85,9 +74,7 @@ export default class ScrollManager implements Disposable {
 
     this.#setupObserver();
     if (this.#scrollBtn) {
-      this.#teardown.push(
-        listen(this.#scrollBtn, "click", () => this.#scrollTo("#home")),
-      );
+      this.#teardown.push(listen(this.#scrollBtn, "click", () => this.#scrollTo("#home")));
     }
   }
 
@@ -102,10 +89,7 @@ export default class ScrollManager implements Disposable {
     if (typeof document === "undefined") return;
     this.#cachedHeaderHeight = Math.max(this.#header?.offsetHeight ?? 0, 76);
     requestAnimationFrame(() => {
-      document.documentElement.style.setProperty(
-        "--scroll-padding",
-        `${this.#cachedHeaderHeight + 12}px`,
-      );
+      document.documentElement.style.setProperty("--scroll-padding", `${this.#cachedHeaderHeight + 12}px`);
     });
   }
 
@@ -142,8 +126,7 @@ export default class ScrollManager implements Disposable {
       for (let i = 0; i < totalLinks; i++) {
         const link = this.#links[i];
         const href = link.getAttribute("href");
-        const isActive =
-          href === `#${cleanId}` || (cleanId === "home" && href === "#");
+        const isActive = href === `#${cleanId}` || (cleanId === "home" && href === "#");
 
         link.classList.toggle("active", isActive);
         link.setAttribute("aria-current", isActive ? "page" : "false");
@@ -186,9 +169,7 @@ export default class ScrollManager implements Disposable {
   }
 
   #handleClick(e: Event): void {
-    const link = (e.target as Element | null)?.closest<HTMLAnchorElement>(
-      ".nav-link",
-    );
+    const link = (e.target as Element | null)?.closest<HTMLAnchorElement>(".nav-link");
     const href = link?.getAttribute("href");
     if (!href?.startsWith("#")) return;
 

@@ -31,17 +31,12 @@ const parseProjects = (payload: unknown): Project[] => {
     projects.push({
       main: record.main === true,
       number: Number.isFinite(number) ? number : index + 1,
-      preview: [
-        asString(preview[0], "Not Defined"),
-        asString(preview[1], "Not Defined"),
-      ] as const,
+      preview: [asString(preview[0], "Not Defined"), asString(preview[1], "Not Defined")] as const,
       type: asString(record.type, "Type Value not set"),
       heading: asString(content.heading, "Untitled Project"),
       description: asString(content.description, "Description not set"),
       category: asString(record.category, "unknown").toLowerCase().trim(),
-      tags: Array.isArray(record.tags)
-        ? record.tags.filter((tag): tag is string => typeof tag === "string")
-        : [],
+      tags: Array.isArray(record.tags) ? record.tags.filter((tag): tag is string => typeof tag === "string") : [],
       link: asString(record.link, "#"),
       openInNewTab: target.includes("blank"),
       preFetch: record.preFetch === true,
@@ -75,16 +70,11 @@ export default function WorkSection(): React.JSX.Element {
             <h2 id="work-title">Things I've built.</h2>
           </div>
           <p className="section-description">
-            A selection of projects where I experiment, learn and turn ideas
-            into working experiences.
+            A selection of projects where I experiment, learn and turn ideas into working experiences.
           </p>
         </div>
 
-        <div
-          className="project-filters"
-          role="group"
-          aria-label="Filter projects"
-        >
+        <div className="project-filters" role="group" aria-label="Filter projects">
           {FILTERS.map((option) => {
             const active = filter === option;
             return (
@@ -103,35 +93,22 @@ export default function WorkSection(): React.JSX.Element {
         </div>
 
         <p className="visually-hidden" role="status" aria-live="polite">
-          Showing {visibleProjects.length}{" "}
-          {visibleProjects.length === 1 ? "project" : "projects"}
+          Showing {visibleProjects.length} {visibleProjects.length === 1 ? "project" : "projects"}
         </p>
         <div
-          className={
-            visibleProjects.length === 1
-              ? "projects-grid projects-grid-single"
-              : "projects-grid"
-          }
+          className={visibleProjects.length === 1 ? "projects-grid projects-grid-single" : "projects-grid"}
           id="projects-grid"
         >
-          {!visibleProjects.length && (
-            <p className="error-msg">No projects match this filter.</p>
-          )}
+          {!visibleProjects.length && <p className="error-msg">No projects match this filter.</p>}
           {PROJECTS.map((project) => {
             const isVisible = filter === "all" || hasCategory(project, filter);
             const number = String(project.number).padStart(2, "0");
-            const linkLabel = project.link.startsWith("https://github.com/")
-              ? "View source"
-              : "Launch project";
+            const linkLabel = project.link.startsWith("https://github.com/") ? "View source" : "Launch project";
             return (
               <article
                 key={project.number}
                 hidden={!isVisible}
-                className={
-                  project.main
-                    ? "project-card project-card-large"
-                    : "project-card"
-                }
+                className={project.main ? "project-card project-card-large" : "project-card"}
                 data-category={project.category}
                 data-reveal
               >
@@ -159,11 +136,7 @@ export default function WorkSection(): React.JSX.Element {
                     <p>{project.description}</p>
                   </div>
                   <div className="project-footer">
-                    <div
-                      className="project-tags"
-                      role="list"
-                      aria-label="Project technologies"
-                    >
+                    <div className="project-tags" role="list" aria-label="Project technologies">
                       {project.tags.map((tag) => (
                         <span role="listitem" key={`${project.number}-${tag}`}>
                           {tag}
@@ -175,9 +148,7 @@ export default function WorkSection(): React.JSX.Element {
                       href={project.link}
                       title={`${linkLabel}: ${project.heading}`}
                       target={project.openInNewTab ? "_blank" : "_self"}
-                      rel={
-                        project.openInNewTab ? "noopener noreferrer" : undefined
-                      }
+                      rel={project.openInNewTab ? "noopener noreferrer" : undefined}
                       aria-label={`${linkLabel}: ${project.heading}`}
                     >
                       <span>{linkLabel}</span>

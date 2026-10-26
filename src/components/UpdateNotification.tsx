@@ -14,9 +14,7 @@ export default function UpdateNotification(): React.JSX.Element | null {
     let dismissTimer = 0;
     let fadeAnimation: Animation | null = null;
     try {
-      if (
-        localStorage.getItem("portfolio_version_key") !== PORTFOLIO_VERSION_HASH
-      ) {
+      if (localStorage.getItem("portfolio_version_key") !== PORTFOLIO_VERSION_HASH) {
         showFrame = requestAnimationFrame(() => {
           if (!mounted) return;
           setShouldRender(true);
@@ -41,10 +39,7 @@ export default function UpdateNotification(): React.JSX.Element | null {
 
             fadeAnimation.onfinish = () => {
               try {
-                localStorage.setItem(
-                  "portfolio_version_key",
-                  PORTFOLIO_VERSION_HASH,
-                );
+                localStorage.setItem("portfolio_version_key", PORTFOLIO_VERSION_HASH);
               } catch {
                 // Storage can be unavailable in privacy-restricted contexts.
               }
@@ -67,16 +62,8 @@ export default function UpdateNotification(): React.JSX.Element | null {
 
   if (!shouldRender) return null;
   return (
-    <div
-      ref={toastRef}
-      className="update-toast-pill"
-      role="status"
-      aria-live="polite"
-    >
-      <span
-        className="update-toast-text"
-        aria-label="Portfolio Update notification"
-      >
+    <div ref={toastRef} className="update-toast-pill" role="status" aria-live="polite">
+      <span className="update-toast-text" aria-label="Portfolio Update notification">
         Updated
       </span>
       <span className="update-toast-tick" aria-hidden="true">

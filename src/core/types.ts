@@ -17,14 +17,7 @@ export interface Project {
   preFetch: boolean;
 }
 
-export type CommandCategory =
-  | "Navigation"
-  | "Actions"
-  | "Filters"
-  | "Social"
-  | "Accessibility"
-  | "Tools"
-  | "Other";
+export type CommandCategory = "Navigation" | "Actions" | "Filters" | "Social" | "Accessibility" | "Tools" | "Other";
 
 export interface Command {
   readonly title: string;

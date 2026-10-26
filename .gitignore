@@ -1,36 +1,46 @@
-### AL ###
-#Template for AL projects for Dynamics 365 Business Central
-#launch.json folder
+# 🚀 1. AL & DYNAMICS 365 BUSINESS CENTRAL CONFIGURATIONS
 .vscode/
-#Coverage folder
-coverage/
-#Cache folder
 .alcache/
-#Symbols folder
 .alpackages/
-#Snapshots folder
 .snapshots/
-#Testing Output folder
 .output/
-#Extension App-file
-*.app
-#Rapid Application Development File
 rad.json
-#Translation Base-file
+TestResults.xml
+*.app
 *.g.xlf
-#License-files
 *.bclicense
 *.flf
-#Test results file
-TestResults.xml
-#Log files
 *.log
-### Node ###
+
+# 🧪 2. VITEST, COVERAGE, AND BUILD TOOLING CACHES
+coverage/
+.vitest/
+html/
+.eslintcache
+.turbo
+.cache/
+
+# 📦 3. NODE DEPENDENCIES AND PACKAGE MANAGERS
 node_modules/
 .pnp
 .pnp.js
-coverage/
+.yarn/
+# Keep yarn plugins and releases if needed, otherwise ignore:
+#.yarn/*
+#!.yarn/releases/
+#!.yarn/plugins/
+
+# 🔑 4. ENVIRONMENT VARIABLES & SENSITIVE SECRETS
+# Blocks plain secrets from ever being tracked in your local tree history
 .env
 .env.*
 *.local
+
+# Whitelist your boilerplate file so the AI/team knows the structure
 !.env.example
+
+# 🖥️ 5. OPERATING SYSTEM ARTIFACTS
+# Prevents binary junk allocations from polluting cross-platform repos
+DS_Store
+Thumbs.db
+desktop.ini

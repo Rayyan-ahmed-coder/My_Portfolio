@@ -49,9 +49,7 @@ export default function ContactSection(): React.JSX.Element {
     }
   };
 
-  const handleFormSubmit = async (
-    e: React.FormEvent<HTMLFormElement>,
-  ): Promise<void> => {
+  const handleFormSubmit = async (e: React.SubmitEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
     if (formStatus === "submitting" || isPending) return;
 
@@ -80,10 +78,7 @@ export default function ContactSection(): React.JSX.Element {
       try {
         // Append target payloads directly before network dispatch
         formData.set("access_key", ACCESS_KEY);
-        formData.set(
-          "subject",
-          `💼 Portfolio Inquiry from ${formData.get("name") ?? "Visitor"}`,
-        );
+        formData.set("subject", `💼 Portfolio Inquiry from ${formData.get("name") ?? "Visitor"}`);
         formData.set("from_name", "Rayyan Portfolio Pipeline");
 
         const response = await fetch(WEB3FORMS_ENDPOINT, {
@@ -92,8 +87,7 @@ export default function ContactSection(): React.JSX.Element {
           body: formData,
         });
 
-        if (!response.ok)
-          throw new Error(`HTTP Error Status: ${response.status}`);
+        if (!response.ok) throw new Error(`HTTP Error Status: ${response.status}`);
 
         const result: { success?: boolean } = await response.json();
         if (!result.success) throw new Error("Web3Forms processing failed");
@@ -109,11 +103,7 @@ export default function ContactSection(): React.JSX.Element {
   };
 
   return (
-    <section
-      className="contact section"
-      id="contact"
-      aria-labelledby="contact-title"
-    >
+    <section className="contact section" id="contact" aria-labelledby="contact-title">
       <div className="container contact-container">
         <div className="contact-info-block">
           <div className="contact-heading">
@@ -127,8 +117,8 @@ export default function ContactSection(): React.JSX.Element {
 
           <div className="contact-content">
             <p className="contact-lead">
-              Whether it's a project, collaboration, question or just a
-              conversation about development — I'd love to hear from you.
+              Whether it's a project, collaboration, question or just a conversation about development — I'd love to
+              hear from you.
             </p>
 
             <div className="email-interactive-wrapper">
@@ -143,20 +133,13 @@ export default function ContactSection(): React.JSX.Element {
                 type="button"
                 className="copy-email-btn"
                 onClick={handleCopyEmail}
-                aria-label={
-                  emailCopied
-                    ? "Email copied to clipboard"
-                    : "Copy email address to clipboard"
-                }
+                aria-label={emailCopied ? "Email copied to clipboard" : "Copy email address to clipboard"}
               >
                 {emailCopied ? "Copied! ✓" : "Copy"}
               </button>
             </div>
 
-            <nav
-              className="contact-links"
-              aria-label="Social profiles and channels"
-            >
+            <nav className="contact-links" aria-label="Social profiles and channels">
               <a
                 href="https://github.com/Rayyan-ahmed-coder"
                 target="_blank"
@@ -173,11 +156,7 @@ export default function ContactSection(): React.JSX.Element {
         </div>
 
         <div className="contact-form-block" data-reveal>
-          <form
-            onSubmit={handleFormSubmit}
-            className="interactive-contact-form"
-            noValidate={false}
-          >
+          <form onSubmit={handleFormSubmit} className="interactive-contact-form" noValidate={false}>
             <div
               style={{
                 position: "absolute",
@@ -188,12 +167,7 @@ export default function ContactSection(): React.JSX.Element {
               }}
               aria-hidden="true"
             >
-              <input
-                type="text"
-                name="_honeypot_clearance_"
-                tabIndex={-1}
-                autoComplete="off"
-              />
+              <input type="text" name="_honeypot_clearance_" tabIndex={-1} autoComplete="off" />
             </div>
 
             <div className="form-group-row">
@@ -228,10 +202,7 @@ export default function ContactSection(): React.JSX.Element {
             <div className="form-input-wrapper">
               <div className="textarea-label-row">
                 <label htmlFor="user-message">Message</label>
-                <span
-                  className={`char-counter ${messageLength > 400 ? "limit-near" : ""}`}
-                  aria-live="polite"
-                >
+                <span className={`char-counter ${messageLength > 400 ? "limit-near" : ""}`} aria-live="polite">
                   ({messageLength} / 500)
                 </span>
               </div>
@@ -255,9 +226,7 @@ export default function ContactSection(): React.JSX.Element {
               disabled={formStatus === "submitting" || isPending}
               aria-busy={formStatus === "submitting"}
             >
-              {formStatus === "submitting"
-                ? "Sending Message..."
-                : "Send Message ↗"}
+              {formStatus === "submitting" ? "Sending Message..." : "Send Message ↗"}
             </button>
 
             {formStatus === "success" && (

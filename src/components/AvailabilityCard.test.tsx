@@ -2,13 +2,7 @@
 // @vitest-pool threads:false
 
 import { describe, it, expect, vi, afterEach } from "vitest";
-import {
-  render,
-  screen,
-  fireEvent,
-  act,
-  cleanup,
-} from "@testing-library/react";
+import { render, screen, fireEvent, act, cleanup } from "@testing-library/react";
 import AvailabilityCard from "./AvailabilityCard";
 import { CONFIG } from "../core/config";
 
@@ -24,9 +18,7 @@ describe("⚡ AVAILABILITY CARD COMPONENT TEST MATRIX", () => {
 
     expect(screen.getByText(/Available for select projects/i)).toBeDefined();
     expect(screen.getByText(/Have a thoughtful idea\?/i)).toBeDefined();
-    expect(
-      screen.getByRole("button", { name: /Copy my email/i }),
-    ).toBeDefined();
+    expect(screen.getByRole("button", { name: /Copy my email/i })).toBeDefined();
   });
 
   it("updates localized clock interval text when time passes", () => {

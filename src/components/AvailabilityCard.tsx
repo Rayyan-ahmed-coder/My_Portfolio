@@ -70,11 +70,7 @@ export default function AvailabilityCard(): React.JSX.Element {
   };
 
   return (
-    <aside
-      className="availability-card"
-      id="availability-card"
-      aria-label="Current availability"
-    >
+    <aside className="availability-card" id="availability-card" aria-label="Current availability">
       <div className="availability-card-header">
         <span className="availability-status">
           <span aria-hidden="true" /> Available for select projects
@@ -83,8 +79,7 @@ export default function AvailabilityCard(): React.JSX.Element {
       </div>
       <p className="availability-title">Have a thoughtful idea?</p>
       <p className="availability-copy">
-        I am currently open to focused frontend work, collaborations and
-        ambitious experiments.
+        I am currently open to focused frontend work, collaborations and ambitious experiments.
       </p>
       <div className="availability-meta">
         <span>
@@ -94,16 +89,8 @@ export default function AvailabilityCard(): React.JSX.Element {
           <Mail size={14} aria-hidden="true" /> Usually replies in 24h
         </span>
       </div>
-      <button
-        className="availability-copy-button"
-        type="button"
-        onClick={copyEmail}
-      >
-        {copied ? (
-          <Check size={16} aria-hidden="true" />
-        ) : (
-          <Copy size={16} aria-hidden="true" />
-        )}
+      <button className="availability-copy-button" type="button" onClick={copyEmail}>
+        {copied ? <Check size={16} aria-hidden="true" /> : <Copy size={16} aria-hidden="true" />}
         {copied ? "Email copied" : "Copy my email"}
       </button>
     </aside>

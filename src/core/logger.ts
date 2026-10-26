@@ -21,9 +21,7 @@ const isDev = (): boolean => {
 };
 
 export const toError = (value: unknown): Error =>
-  value instanceof Error
-    ? value
-    : new Error(typeof value === "string" ? value : JSON.stringify(value));
+  value instanceof Error ? value : new Error(typeof value === "string" ? value : JSON.stringify(value));
 
 export const debug = (scope: string, ...args: unknown[]): void => {
   if (isDev()) console.debug(`[${scope}]`, ...args);
@@ -33,11 +31,7 @@ export const warn = (scope: string, message: string, error?: unknown): void => {
   console.warn(`[${scope}] ${message}`, error ?? "");
 };
 
-export const reportError = (
-  scope: string,
-  message: string,
-  error: unknown,
-): void => {
+export const reportError = (scope: string, message: string, error: unknown): void => {
   console.error(`[${scope}] ${message}`, error);
 
   try {
@@ -52,11 +46,7 @@ export const reportError = (
 };
 
 /** Runs `task` and reports instead of propagating, so one module cannot abort another. */
-export const guard = <T>(
-  scope: string,
-  message: string,
-  task: () => T,
-): T | undefined => {
+export const guard = <T>(scope: string, message: string, task: () => T): T | undefined => {
   try {
     return task();
   } catch (error) {
@@ -66,11 +56,7 @@ export const guard = <T>(
 };
 
 /** Promise-returning counterpart of `guard`. */
-export const guardAsync = async <T>(
-  scope: string,
-  message: string,
-  task: () => Promise<T>,
-): Promise<T | undefined> => {
+export const guardAsync = async <T>(scope: string, message: string, task: () => Promise<T>): Promise<T | undefined> => {
   try {
     return await task();
   } catch (error) {

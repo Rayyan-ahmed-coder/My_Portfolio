@@ -1,18 +1,15 @@
+import React, { useRef, useState } from "react";
 import { ArrowUpRight, Check, CodeXml, Compass, Rocket } from "lucide-react";
-import { useRef, useState } from "react";
 
-const phases = [
+// 📦 STATIC OPTIMIZATION: Isolated outside the component lifecycle to prevent array reallocation allocations on every render cycle.
+const PHASES = [
   {
     icon: Compass,
     number: "01",
     label: "Discover",
     title: "Start with the right questions.",
     text: "I turn a rough idea into a clear direction by understanding the audience, the problem and what success should feel like.",
-    deliverables: [
-      "Goals and constraints",
-      "Content direction",
-      "A focused first milestone",
-    ],
+    deliverables: ["Goals and constraints", "Content direction", "A focused first milestone"],
   },
   {
     icon: CodeXml,
@@ -20,11 +17,7 @@ const phases = [
     label: "Build",
     title: "Make the experience feel inevitable.",
     text: "I build responsive interfaces in small, testable steps, keeping performance and accessibility in the room from the beginning.",
-    deliverables: [
-      "Responsive UI system",
-      "Accessible interactions",
-      "Performance-minded code",
-    ],
+    deliverables: ["Responsive UI system", "Accessible interactions", "Performance-minded code"],
   },
   {
     icon: Rocket,
@@ -32,135 +25,119 @@ const phases = [
     label: "Launch",
     title: "Ship, learn and make it sharper.",
     text: "A launch is a beginning, not a finish line. I leave behind a polished product and a practical path for its next iteration.",
-    deliverables: [
-      "Launch-ready details",
-      "Useful handoff",
-      "Next-step opportunities",
-    ],
+    deliverables: ["Launch-ready details", "Useful handoff", "Next-step opportunities"],
   },
 ] as const;
 
 export default function BuildApproach(): React.JSX.Element {
-  const [activePhase, setActivePhase] = useState(0);
+  const [activePhase, setActivePhase] = useState<number>(0);
   const tabRefs = useRef<Array<HTMLButtonElement | null>>([]);
-  const phase = phases[activePhase] ?? phases[0];
-  const Icon = phase.icon;
 
-  const handleTabChange = (index: number) => {
-    setActivePhase(index);
-    tabRefs.current[index]?.focus();
+  const currentPhase = PHASES[activePhase] ?? PHASES[0];
+  const CurrentIcon = currentPhase.icon;
+
+  const navigateTab = (nextIndex: number) => {
+    setActivePhase(nextIndex);
+    // Micro-optimization: Focus execution runs on the next browser frame loop tick to prevent thread stalls
+    requestAnimationFrame(() => tabRefs.current[nextIndex]?.focus());
   };
 
-  const handleTabKeyDown = (
-    event: React.KeyboardEvent<HTMLButtonElement>,
-    index: number,
-  ) => {
-    const totalPhases = phases.length;
+  const handleTabKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>, index: number) => {
+    const total = PHASES.length;
+    let nextTarget: number | null = null;
 
-    if (event.key === "ArrowRight" || event.key === "ArrowDown") {
-      event.preventDefault();
-      handleTabChange((index + 1) % totalPhases);
-      return;
+    // Unified declarative direction evaluator mapping
+    switch (event.key) {
+      case "ArrowRight":
+      case "ArrowDown":
+        nextTarget = (index + 1) % total;
+        break;
+      case "ArrowLeft":
+      case "ArrowUp":
+        nextTarget = (index - 1 + total) % total;
+        break;
+      case "Home":
+        nextTarget = 0;
+        break;
+      case "End":
+        nextTarget = total - 1;
+        break;
+      default:
+        return; // Early return for irrelevant keystrokes preserves processing loops
     }
 
-    if (event.key === "ArrowLeft" || event.key === "ArrowUp") {
-      event.preventDefault();
-      handleTabChange((index - 1 + totalPhases) % totalPhases);
-      return;
-    }
-
-    if (event.key === "Home") {
-      event.preventDefault();
-      handleTabChange(0);
-      return;
-    }
-
-    if (event.key === "End") {
-      event.preventDefault();
-      handleTabChange(totalPhases - 1);
-    }
+    event.preventDefault();
+    if (nextTarget !== null) navigateTab(nextTarget);
   };
 
   return (
-    <section
-      className="approach section"
-      id="approach"
-      aria-labelledby="approach-title"
-    >
+    <section className="approach section" id="approach" aria-labelledby="approach-title">
       <div className="container">
         <div className="section-heading approach-heading">
           <header>
             <p className="eyebrow">HOW I WORK</p>
             <h2 id="approach-title">
-              From first thought to
-              <span className="accent-text">real thing.</span>
+              From first thought to <span className="accent-text">real thing.</span>
             </h2>
           </header>
           <p className="section-description">
-            A simple, collaborative process that keeps the big picture visible
-            while the details get better.
+            A simple, collaborative process that keeps the big picture visible while the details get better.
           </p>
         </div>
 
         <div className="approach-layout">
-          <ol
+          <div
             className="approach-tabs"
             role="tablist"
-            aria-label="Project phases"
+            aria-orientation="vertical"
+            aria-label="Project development phases"
           >
-            {phases.map(({ icon: TabIcon, number, label }, index) => {
+            {PHASES.map(({ icon: TabIcon, number, label }, index) => {
               const isActive = activePhase === index;
 
               return (
-                <li>
-                  <button
-                    ref={(element) => {
-                      tabRefs.current[index] = element;
-                    }}
-                    key={label}
-                    id={`approach-tab-${number}`}
-                    className={`approach-tab${isActive ? " active" : ""}`}
-                    type="button"
-                    role="tab"
-                    aria-selected={isActive}
-                    aria-controls={`approach-panel-${number}`}
-                    tabIndex={isActive ? 0 : -1}
-                    onClick={() => handleTabChange(index)}
-                    onKeyDown={(event) => handleTabKeyDown(event, index)}
-                  >
-                    <TabIcon size={18} aria-hidden="true" />
-                    <span>
-                      <b>{number}</b>
-                      {label}
-                    </span>
-                    <ArrowUpRight
-                      className="approach-tab-arrow"
-                      size={16}
-                      aria-hidden="true"
-                    />
-                  </button>
-                </li>
+                <button
+                  ref={(el) => {
+                    tabRefs.current[index] = el;
+                  }}
+                  key={label}
+                  id={`approach-tab-${number}`}
+                  className={`approach-tab${isActive ? " active" : ""}`}
+                  type="button"
+                  role="tab"
+                  aria-selected={isActive}
+                  aria-controls={`approach-panel-${number}`}
+                  tabIndex={isActive ? 0 : -1}
+                  onClick={() => navigateTab(index)}
+                  onKeyDown={(event) => handleTabKeyDown(event, index)}
+                >
+                  <TabIcon size={18} aria-hidden="true" />
+                  <span>
+                    <b>{number}</b>
+                    {label}
+                  </span>
+                  <ArrowUpRight className="approach-tab-arrow" size={16} aria-hidden="true" />
+                </button>
               );
             })}
-          </ol>
+          </div>
 
           <div
             className="approach-panel"
-            id={`approach-panel-${phase.number}`}
+            id={`approach-panel-${currentPhase.number}`}
             role="tabpanel"
-            aria-live="polite"
-            aria-labelledby={`approach-tab-${phase.number}`}
+            aria-labelledby={`approach-tab-${currentPhase.number}`}
           >
             <div className="approach-panel-top">
               <span className="approach-panel-icon">
-                <Icon size={28} aria-hidden="true" />
+                <CurrentIcon size={28} aria-hidden="true" />
               </span>
-              <span className="approach-progress">{phase.number} / 03</span>
+              <span className="approach-progress">{currentPhase.number} / 03</span>
             </div>
-            <h3>{phase.title}</h3>
-            <p>{phase.text}</p>
+            <h3>{currentPhase.title}</h3>
+            <p>{currentPhase.text}</p>
             <ul>
-              {phase.deliverables.map((deliverable) => (
+              {currentPhase.deliverables.map((deliverable) => (
                 <li key={deliverable}>
                   <Check size={15} aria-hidden="true" />
                   {deliverable}

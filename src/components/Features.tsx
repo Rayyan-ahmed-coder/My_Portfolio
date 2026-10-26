@@ -10,11 +10,7 @@ interface FeatureItem {
 
 export default function FeaturesSection(): React.JSX.Element {
   return (
-    <section
-      className="features section"
-      id="features"
-      aria-labelledby="features-title"
-    >
+    <section className="features section" id="features" aria-labelledby="features-title">
       <div className="container">
         <div className="section-heading">
           <div>
@@ -22,8 +18,7 @@ export default function FeaturesSection(): React.JSX.Element {
             <h2 id="features-title">Built with purpose.</h2>
           </div>
           <p className="section-description">
-            Every part of this site is designed around performance,
-            accessibility and a great user experience.
+            Every part of this site is designed around performance, accessibility and a great user experience.
           </p>
         </div>
         <div className="features-grid">
@@ -31,12 +26,7 @@ export default function FeaturesSection(): React.JSX.Element {
             const displayId = String(idx + 1).padStart(2, "0");
             const headerSlug = `feature-${feature.title.toLowerCase().replace(/\s+/g, "-")}`;
             return (
-              <article
-                key={headerSlug}
-                className="feature-card"
-                data-reveal
-                aria-labelledby={headerSlug}
-              >
+              <article key={headerSlug} className="feature-card" data-reveal aria-labelledby={headerSlug}>
                 <span className="feature-number" aria-hidden="true">
                   {displayId}
                 </span>

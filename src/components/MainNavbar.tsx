@@ -22,11 +22,7 @@ export default function MainNavbar(): React.JSX.Element {
         <ul className="nav-list">
           {navItems.map((item, index) => (
             <li key={item.id}>
-              <a
-                className={`nav-link ${index === 0 ? "active" : ""}`}
-                href={`#${item.id}`}
-                data-section={item.id}
-              >
+              <a className={`nav-link ${index === 0 ? "active" : ""}`} href={`#${item.id}`} data-section={item.id}>
                 {item.label}
               </a>
             </li>

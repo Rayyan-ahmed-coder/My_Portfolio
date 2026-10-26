@@ -1,7 +1,7 @@
 /// <reference types="vite/client" />
 
 interface ImportMetaEnv {
-  readonly VITE_WEB3FORMS_ACCESS_KEY?: string;
+  readonly VITE_WEB3FORMS_KEY?: string;
 }
 
 interface ImportMeta {
@@ -50,9 +50,7 @@ declare module "*.webp" {
 // Handle SVG files as both standard URLs and React components (if using vite-plugin-svgr)
 declare module "*.svg" {
   import * as React from "react";
-  export const ReactComponent: React.FunctionComponent<
-    React.SVGProps<SVGSVGElement> & { title?: string }
-  >;
+  export const ReactComponent: React.FunctionComponent<React.SVGProps<SVGSVGElement> & { title?: string }>;
   const src: string;
   export default src;
 }

@@ -4,9 +4,7 @@ import App from "./App.tsx";
 
 const rootElement = document.getElementById("root");
 if (!rootElement) {
-  throw new Error(
-    "Critical Boot Failure: Target element '#root' was not found in the DOM.",
-  );
+  throw new Error("Critical Boot Failure: Target element '#root' was not found in the DOM.");
 }
 
 createRoot(rootElement).render(

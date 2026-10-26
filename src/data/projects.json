@@ -23,7 +23,7 @@
       "description": "A browser game featuring animation, collision detection, particles and dynamic environments."
     },
     "category": "game javascript",
-    "tags": ["HTML canvas", "JavaScript"],
+    "tags": ["HTML canvas", "TypeScript"],
     "link": "https://rayyan-ahmed-coder.github.io/Air_jumper.game/",
     "target": "_blank"
   },
@@ -37,7 +37,7 @@
       "description": "A responsive portfolio focused on clean design, performance and interactive experiences."
     },
     "category": "web javascript",
-    "tags": ["HTML", "CSS", "JavaScript"],
+    "tags": ["React", "CSS", "TypeScript"],
     "link": "https://github.com/Rayyan-ahmed-coder/My_Portfolio",
     "target": "_blank"
   }

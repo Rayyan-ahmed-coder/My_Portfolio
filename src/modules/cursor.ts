@@ -1,9 +1,4 @@
-import {
-  FINE_POINTER_QUERY,
-  listen,
-  matchesMedia,
-  type Unsubscribe,
-} from "../../src/core/utilities.js";
+import { FINE_POINTER_QUERY, listen, matchesMedia, type Unsubscribe } from "../../src/core/utilities.js";
 import type { Disposable } from "../../src/core/types.js";
 
 const CURSOR_SIZE_OFFSET = 10;
@@ -57,18 +52,8 @@ export default class CustomCursor implements Disposable {
   #init(): void {
     this.#lastMoveTime = performance.now();
     this.#teardown.push(
-      listen(
-        window,
-        "mousemove",
-        (event) => this.#onMouseMove(event as MouseEvent),
-        { passive: true },
-      ),
-      listen(
-        window,
-        "mouseover",
-        (event) => this.#handleInteractivity(event as MouseEvent),
-        { passive: true },
-      ),
+      listen(window, "mousemove", (event) => this.#onMouseMove(event as MouseEvent), { passive: true }),
+      listen(window, "mouseover", (event) => this.#handleInteractivity(event as MouseEvent), { passive: true }),
     );
   }
 
@@ -99,13 +84,9 @@ export default class CustomCursor implements Disposable {
     if (deltaX * deltaX + deltaY * deltaY < 0.01) {
       this.#isAnimating = false;
       this.#rafId = null;
-      const hideDelay = Math.max(
-        0,
-        IDLE_HIDE_DELAY_MS - (timestamp - this.#lastMoveTime),
-      );
+      const hideDelay = Math.max(0, IDLE_HIDE_DELAY_MS - (timestamp - this.#lastMoveTime));
       this.#hideTimeout = window.setTimeout(() => {
-        if (!this.#isAnimating && this.#cursor)
-          this.#cursor.style.display = "none";
+        if (!this.#isAnimating && this.#cursor) this.#cursor.style.display = "none";
         this.#hideTimeout = null;
       }, hideDelay);
       return;

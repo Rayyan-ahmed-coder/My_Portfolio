@@ -1,5 +1,5 @@
 import { constants as zlibConstants } from "node:zlib";
-import { defineConfig } from "vite";
+import { defineConfig } from "vitest/config"; // 🟢 Changed from "vite" to automatically handle the test block type!
 import react from "@vitejs/plugin-react-swc";
 import tsconfigPaths from "vite-tsconfig-paths";
 import { compression, defineAlgorithm } from "vite-plugin-compression2";
@@ -64,6 +64,20 @@ export default defineConfig({
         }),
     ],
 
+    test: {
+      environment: "jsdom",
+      globals: true,
+      pool: "forks",
+      fileParallelism: false, 
+      maxWorkers: 1,
+      // Extends the timeout barrier so your laptop has plenty of overhead
+      testTimeout: 32_000, 
+      hookTimeout: 32_000,
+      coverage: {
+        provider: "v8"
+      },
+    },
+
     esbuild: {
         legalComments: "none",
         treeShaking: true,
@@ -85,7 +99,7 @@ export default defineConfig({
                 entryFileNames: "assets/[name]-[hash].js",
                 chunkFileNames: "assets/[name]-[hash].js",
                 assetFileNames: "assets/[name]-[hash][extname]",
-                manualChunks(id) {
+                manualChunks(id: string) { // 🟢 Fixed: Explicitly typed 'id' as a string
                     const normalizedId = id.replaceAll("\\", "/");
                     if (/\/node_modules\/(react|react-dom|scheduler)\//.test(normalizedId)) {
                         return "vendor-react";
@@ -94,7 +108,7 @@ export default defineConfig({
             },
         },
     },
-
+    
     server: {
         port: 5173,
         strictPort: true,
@@ -109,4 +123,4 @@ export default defineConfig({
             clientFiles: ["./index.html", "./src/main.tsx"],
         },
     },
-});
+}); // 🟢 Fixed: Removed the type hack completely!

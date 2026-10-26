@@ -1,12 +1,5 @@
 import { CONFIG } from "../../src/core/config.js";
-import {
-  $,
-  DARK_SCHEME_QUERY,
-  listen,
-  mediaQuery,
-  matchesMedia,
-  type Unsubscribe,
-} from "../../src/core/utilities.js";
+import { $, DARK_SCHEME_QUERY, listen, mediaQuery, matchesMedia, type Unsubscribe } from "../../src/core/utilities.js";
 import { warn } from "../../src/core/logger.js";
 import type { Disposable, ThemeName } from "../../src/core/types.js";
 
@@ -20,8 +13,7 @@ const THEME_VARIABLES: Record<ThemeName, string> = {
   light: "--color-primary",
 };
 
-const isThemeName = (value: unknown): value is ThemeName =>
-  value === "dark" || value === "light";
+const isThemeName = (value: unknown): value is ThemeName => value === "dark" || value === "light";
 
 /** System-aware light/dark manager with tamper-resistant persistence. */
 export default class Theme implements Disposable {
@@ -32,9 +24,7 @@ export default class Theme implements Disposable {
   #teardown: Unsubscribe[] = [];
 
   constructor() {
-    this.#iconEl = this.#toggleButton
-      ? $(".theme-icon", this.#toggleButton)
-      : null;
+    this.#iconEl = this.#toggleButton ? $(".theme-icon", this.#toggleButton) : null;
     this.#initialize();
     this.#setupEventListeners();
   }
@@ -51,9 +41,7 @@ export default class Theme implements Disposable {
 
   #setupEventListeners(): void {
     if (this.#toggleButton) {
-      this.#teardown.push(
-        listen(this.#toggleButton, "click", () => this.toggleTheme()),
-      );
+      this.#teardown.push(listen(this.#toggleButton, "click", () => this.toggleTheme()));
     }
 
     const darkScheme = mediaQuery(DARK_SCHEME_QUERY);
@@ -63,10 +51,7 @@ export default class Theme implements Disposable {
     this.#teardown.push(
       listen(darkScheme, "change", (event) => {
         if (this.#readStoredTheme()) return;
-        this.#setTheme(
-          (event as MediaQueryListEvent).matches ? "dark" : "light",
-          false,
-        );
+        this.#setTheme((event as MediaQueryListEvent).matches ? "dark" : "light", false);
       }),
     );
   }
@@ -76,11 +61,7 @@ export default class Theme implements Disposable {
       const value = localStorage.getItem(this.#storageKey);
       return isThemeName(value) ? value : null;
     } catch (error) {
-      warn(
-        SCOPE,
-        "Storage access denied; falling back to system preference",
-        error,
-      );
+      warn(SCOPE, "Storage access denied; falling back to system preference", error);
       return null;
     }
   }
@@ -99,24 +80,15 @@ export default class Theme implements Disposable {
         }
       }
 
-      this.#toggleButton?.setAttribute(
-        "aria-pressed",
-        String(theme === "dark"),
-      );
+      this.#toggleButton?.setAttribute("aria-pressed", String(theme === "dark"));
 
-      if (this.#iconEl)
-        this.#iconEl.textContent = theme === "dark" ? "🌙" : "☀";
+      if (this.#iconEl) this.#iconEl.textContent = theme === "dark" ? "🌙" : "☀";
 
       const metaThemeColor = $<HTMLMetaElement>('meta[name="theme-color"]');
       if (!metaThemeColor) return;
 
-      const computedColor = getComputedStyle(this.#root)
-        .getPropertyValue(THEME_VARIABLES[theme])
-        .trim();
-      metaThemeColor.setAttribute(
-        "content",
-        computedColor || FALLBACK_COLORS[theme],
-      );
+      const computedColor = getComputedStyle(this.#root).getPropertyValue(THEME_VARIABLES[theme]).trim();
+      metaThemeColor.setAttribute("content", computedColor || FALLBACK_COLORS[theme]);
     });
   }
 

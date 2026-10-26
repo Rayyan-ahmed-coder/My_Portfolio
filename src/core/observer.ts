@@ -19,18 +19,15 @@ export default class ObserverManager implements Disposable {
 
   constructor(customConfig: IntersectionObserverInit = {}) {
     if (!("IntersectionObserver" in window)) {
-      warn(
-        "observer",
-        "IntersectionObserver unsupported; revealing everything eagerly",
-      );
+      warn("observer", "IntersectionObserver unsupported; revealing everything eagerly");
       this.#revealFallback();
       return;
     }
 
-    this.#observer = new IntersectionObserver(
-      (entries) => this.#handleReveal(entries),
-      { ...ObserverManager.defaultConfig, ...customConfig },
-    );
+    this.#observer = new IntersectionObserver((entries) => this.#handleReveal(entries), {
+      ...ObserverManager.defaultConfig,
+      ...customConfig,
+    });
 
     this.observe("[data-reveal]");
   }
@@ -69,18 +66,12 @@ export default class ObserverManager implements Disposable {
 
     // Callers reach this from untyped code (JSON payloads, event handlers),
     // so a non-iterable value must not throw inside the observer.
-    if (
-      target === null ||
-      typeof target !== "object" ||
-      !(Symbol.iterator in target)
-    ) {
+    if (target === null || typeof target !== "object" || !(Symbol.iterator in target)) {
       warn("observer", "Ignoring unsupported observe() target");
       return [];
     }
 
-    return Array.from(target).filter(
-      (element): element is Element => element instanceof Element,
-    );
+    return Array.from(target).filter((element): element is Element => element instanceof Element);
   }
 
   #revealFallback(target: ObserveTarget = "[data-reveal]"): void {

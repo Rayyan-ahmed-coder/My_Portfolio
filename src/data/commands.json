@@ -1,0 +1,170 @@
+[
+  {
+    "title": "Go to Home",
+    "subtitle": "Jump straight to the landing hero view context",
+    "category": "Navigation",
+    "shortcut": "1",
+    "type": "scroll",
+    "target": "#home"
+  },
+  {
+    "title": "Go to Work",
+    "subtitle": "See selected open-source project cards",
+    "category": "Navigation",
+    "shortcut": "2",
+    "type": "scroll",
+    "target": "#work"
+  },
+  {
+    "title": "Go to Features",
+    "subtitle": "Review what sets this structural engine apart",
+    "category": "Navigation",
+    "shortcut": "3",
+    "type": "scroll",
+    "target": "#features"
+  },
+  {
+    "title": "Go to About",
+    "subtitle": "Learn more about the developer profile",
+    "category": "Navigation",
+    "shortcut": "4",
+    "type": "scroll",
+    "target": "#about"
+  },
+  {
+    "title": "Go to Skills",
+    "subtitle": "View the specialized engineering toolkit",
+    "category": "Navigation",
+    "shortcut": "5",
+    "type": "scroll",
+    "target": "#skills"
+  },
+  {
+    "title": "Go to Contact",
+    "subtitle": "Open the secure communication form line",
+    "category": "Navigation",
+    "shortcut": "6",
+    "type": "scroll",
+    "target": "#contact"
+  },
+  {
+    "title": "Show all projects",
+    "subtitle": "Reset active filtering parameters",
+    "category": "Filters",
+    "shortcut": "f",
+    "type": "click",
+    "target": "[data-filter='all']"
+  },
+  {
+    "title": "Show web projects",
+    "subtitle": "Filter to interactive web applications",
+    "category": "Filters",
+    "shortcut": "w",
+    "type": "click",
+    "target": "[data-filter='web']"
+  },
+  {
+    "title": "Show games",
+    "subtitle": "Filter repository to pixel arcade mini-games",
+    "category": "Filters",
+    "shortcut": "g",
+    "type": "click",
+    "target": "[data-filter='game']"
+  },
+  {
+    "title": "Toggle theme mode",
+    "subtitle": "Switch between dark and light layout colors",
+    "category": "Actions",
+    "shortcut": "Alt+Shift+T",
+    "type": "click",
+    "target": "#theme-toggle"
+  },
+  {
+    "title": "Copy email address",
+    "subtitle": "Save contact email string securely to clipboard",
+    "category": "Actions",
+    "shortcut": "Alt+Shift+C",
+    "type": "copy",
+    "target": "rayyan.workhost@gmail.com"
+  },
+  {
+    "title": "Copy creator name",
+    "subtitle": "Save author identity signature to clipboard",
+    "category": "Actions",
+    "shortcut": "Alt+Shift+P",
+    "type": "copy",
+    "target": "Rayyan Khan"
+  },
+  {
+    "title": "Copy active URL",
+    "subtitle": "Save current window address token location",
+    "category": "Actions",
+    "shortcut": "Alt+Shift+U",
+    "type": "copy",
+    "target": "LOCATION_HREF"
+  },
+  {
+    "title": "Toggle high contrast",
+    "subtitle": "Enable enhanced accessibility layout outlines",
+    "category": "Accessibility",
+    "shortcut": "Alt+Shift+H",
+    "type": "class-toggle",
+    "target": "high-contrast"
+  },
+  {
+    "title": "Toggle motion speed",
+    "subtitle": "Switch page transition layout styles to static",
+    "category": "Accessibility",
+    "shortcut": "Alt+Shift+A",
+    "type": "class-toggle",
+    "target": "reduced-motion"
+  },
+  {
+    "title": "Print page structure",
+    "subtitle": "Open local browser rendering print canvas",
+    "category": "Tools",
+    "shortcut": "p",
+    "type": "print",
+    "target": ""
+  },
+  {
+    "title": "View source code",
+    "subtitle": "Launch public GitHub repository pipeline link",
+    "category": "Tools",
+    "shortcut": "v",
+    "type": "link",
+    "target": "https://github.com/Rayyan-ahmed-coder/My_Portfolio"
+  },
+  {
+    "title": "View LinkedIn Profile",
+    "subtitle": "Connect with Rayyan Khan for professional opportunities",
+    "category": "Social Connect",
+    "shortcut": "Alt+Shift+L",
+    "type": "link",
+    "target": "https://linkedin.com"
+  },
+  {
+    "title": "Download Production CV",
+    "subtitle": "Open direct print asset stream container file",
+    "category": "Tools",
+    "shortcut": "Alt+Shift+D",
+    "type": "link",
+    "target": "/resume.pdf"
+  },
+  {
+    "title": "Trigger System Self-Test",
+    "subtitle": "Validate structural nodes via internal integrity scanner",
+    "category": "Development",
+    "shortcut": "Alt+Shift+S",
+    "type": "click",
+    "target": "#trigger-diagnostic"
+  },
+  {
+    "title": "Clear Form Inputs",
+    "subtitle": "Wipe state buffers inside the contact module layout",
+    "category": "Development",
+    "shortcut": "Alt+Shift+X",
+    "type": "click",
+    "target": "#clear-contact-form"
+  }
+]

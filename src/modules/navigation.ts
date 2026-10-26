@@ -1,11 +1,4 @@
-import {
-  $,
-  $$,
-  MOBILE_QUERY,
-  listen,
-  mediaQuery,
-  type Unsubscribe,
-} from "../../src/core/utilities.js";
+import { $, $$, MOBILE_QUERY, listen, mediaQuery, type Unsubscribe } from "../../src/core/utilities.js";
 import { warn } from "../../src/core/logger.js";
 import type { Disposable } from "../../src/core/types.js";
 
@@ -28,10 +21,7 @@ export default class NavigationManager implements Disposable {
     this.#links = Array.from($$<HTMLAnchorElement>(".nav-link"));
 
     if (!this.#toggleButton || !this.#menu) {
-      warn(
-        SCOPE,
-        "Menu toggle or navigation container missing; mobile menu disabled",
-      );
+      warn(SCOPE, "Menu toggle or navigation container missing; mobile menu disabled");
       return;
     }
 
@@ -57,8 +47,7 @@ export default class NavigationManager implements Disposable {
 
     this.#teardown.push(
       listen(document, "keydown", (event) => {
-        if ((event as KeyboardEvent).key === "Escape" && this.#open)
-          this.close();
+        if ((event as KeyboardEvent).key === "Escape" && this.#open) this.close();
       }),
     );
 

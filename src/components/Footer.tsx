@@ -14,8 +14,7 @@ export default function SiteFooter(): React.JSX.Element {
 
         <div className="footer-right">
           <p>
-            <span aria-hidden="true">©</span> {new Date().getFullYear()} Rayyan
-            Khan. Built with care.
+            <span aria-hidden="true">©</span> {new Date().getFullYear()} Rayyan Khan. Built with care.
           </p>
           <a href="#home">Back to top ↑</a>
         </div>
