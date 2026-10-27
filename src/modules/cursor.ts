@@ -5,7 +5,10 @@ const CURSOR_SIZE_OFFSET = 10;
 const IDLE_HIDE_DELAY_MS = 1200;
 const INTERACTIVE_SELECTOR = "a, button, .interactive, [role='button']";
 
-/** Smoothed custom cursor, active only for fine pointers and motion-enabled visitors. */
+/**
+ * Smoothed custom cursor, active only for
+ * fine pointers and motion-enabled visitors.
+ */
 export default class CustomCursor implements Disposable {
   #cursor: HTMLElement | null = null;
   #mouseX = 0;

@@ -10,8 +10,9 @@ export default defineConfig([
   // 1. Global Exclusions: Instantly ignore build and cache artifacts to keep runs lightning fast
   { 
     ignores: [
-      "dist", 
-      "node_modules", 
+      "coverage/**",
+      "dist/**",
+      "node_modules/**",
       "vite.config.ts", 
       "sw.ts"
     ] 

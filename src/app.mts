@@ -140,18 +140,23 @@ export default class Portfolio implements Disposable {
     this.#initialized = false;
     this.#commandTriggersBound = false;
 
-    const activeModules = Object.values(this.modules);
-    const totalModules = activeModules.length;
+    // Fetch the active module keys to iterate and mutate the dictionary safely
+    const moduleKeys = Object.keys(this.modules) as Array<keyof Modules>;
+    const totalKeys = moduleKeys.length;
 
-    for (let i = 0; i < totalModules; i++) {
-      const m = activeModules[i];
+    for (let i = 0; i < totalKeys; i++) {
+      const key = moduleKeys[i];
+      const m = this.modules[key];
+
       if (m && typeof m.destroy === "function") {
         try {
           m.destroy();
         } catch (error) {
-          reportError(SCOPE, "Module teardown failed", error);
+          reportError(SCOPE, `Module "${key}" teardown failed`, error);
         }
       }
+
+      delete this.modules[key];
     }
   }
 }

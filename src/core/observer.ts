@@ -1,13 +1,17 @@
+/**
+ * @file observer.ts
+ * @description Viewport Intersection Management Engine for declarative layouts.
+ * @version 1.0.4
+ * @author Rayyan Khan
+ */
+
 import { $$ } from "./utilities.js";
 import { warn } from "./logger.js";
 import type { Disposable } from "./types.js";
 
 export type ObserveTarget = string | Element | Iterable<Element>;
 
-/**
- * Reveals `[data-reveal]` elements as they enter the viewport and unobserves
- * them straight away, so the observer set shrinks as the page is consumed.
- */
+/** Coordinates responsive element reveal sequences as nodes enter the viewport. */
 export default class ObserverManager implements Disposable {
   #elements = new Set<Element>();
   #observer: IntersectionObserver | null = null;
@@ -17,9 +21,13 @@ export default class ObserverManager implements Disposable {
     rootMargin: "0px 0px -50px 0px",
   };
 
+  /**
+   * Initializes structural Intersection Observers with default options fallback.
+   * @param customConfig Tailored overrides for viewport intersections bounds.
+   */
   constructor(customConfig: IntersectionObserverInit = {}) {
     if (!("IntersectionObserver" in window)) {
-      warn("observer", "IntersectionObserver unsupported; revealing everything eagerly");
+      warn("observer", "IntersectionObserver unsupported; revealing elements eagerly");
       this.#revealFallback();
       return;
     }
@@ -32,8 +40,14 @@ export default class ObserverManager implements Disposable {
     this.observe("[data-reveal]");
   }
 
+  /**
+   * Evaluates intersections and cleans queues to prevent memory accumulation.
+   * @param entries Active intersection updates batch list.
+   */
   #handleReveal(entries: IntersectionObserverEntry[]): void {
-    for (const entry of entries) {
+    const len = entries.length;
+    for (let i = 0; i < len; i++) {
+      const entry = entries[i];
       if (!entry.isIntersecting) continue;
 
       const { target } = entry;
@@ -43,45 +57,65 @@ export default class ObserverManager implements Disposable {
     }
   }
 
-  /** Tracks elements injected after construction; duplicates are ignored. */
+  /**
+   * Registers targets for automatic viewport reveal observation tracking.
+   * @param target DOM selector text, direct node element, or iterable group.
+   */
   observe(target: ObserveTarget): void {
     const targets = this.#resolveTargets(target);
-    if (!targets.length) return;
+    const len = targets.length;
+    if (!len) return;
 
     if (!this.#observer) {
       this.#reveal(targets);
       return;
     }
 
-    for (const element of targets) {
-      if (this.#elements.has(element)) continue;
-      this.#elements.add(element);
-      this.#observer.observe(element);
+    for (let i = 0; i < len; i++) {
+      const el = targets[i];
+      if (this.#elements.has(el)) continue;
+      this.#elements.add(el);
+      this.#observer.observe(el);
     }
   }
 
+  /**
+   * Normalizes dynamic text selectors, items, or iterables into element arrays.
+   * @param target Dynamic incoming structural mapping to parse.
+   * @returns Clean parsed element list array ready for subscription tracking.
+   */
   #resolveTargets(target: ObserveTarget): Element[] {
     if (typeof target === "string") return Array.from($$(target));
     if (target instanceof Element) return [target];
 
-    // Callers reach this from untyped code (JSON payloads, event handlers),
-    // so a non-iterable value must not throw inside the observer.
     if (target === null || typeof target !== "object" || !(Symbol.iterator in target)) {
-      warn("observer", "Ignoring unsupported observe() target");
+      warn("observer", "Ignoring unsupported observe target layout");
       return [];
     }
 
-    return Array.from(target).filter((element): element is Element => element instanceof Element);
+    return Array.from(target).filter((el): el is Element => el instanceof Element);
   }
 
+  /**
+   * Instantly reveals elements if intersection observation tools are missing.
+   * @param target Fallback selector query path.
+   */
   #revealFallback(target: ObserveTarget = "[data-reveal]"): void {
     this.#reveal(this.#resolveTargets(target));
   }
 
+  /**
+   * Appends layout classes directly to clear element transitions.
+   * @param elements Array collection of elements matching structural bounds.
+   */
   #reveal(elements: readonly Element[]): void {
-    for (const element of elements) element.classList.add("revealed");
+    const len = elements.length;
+    for (let i = 0; i < len; i++) {
+      elements[i].classList.add("revealed");
+    }
   }
 
+  /** Shuts down the observer network and purges residual memory items. */
   destroy(): void {
     this.#observer?.disconnect();
     this.#observer = null;

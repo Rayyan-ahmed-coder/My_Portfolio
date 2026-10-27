@@ -44,7 +44,7 @@ export default function BuildApproach(): React.JSX.Element {
 
   const handleTabKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>, index: number) => {
     const total = PHASES.length;
-    let nextTarget: number | null = null;
+    let nextTarget: number;
 
     // Unified declarative direction evaluator mapping
     switch (event.key) {
@@ -67,7 +67,7 @@ export default function BuildApproach(): React.JSX.Element {
     }
 
     event.preventDefault();
-    if (nextTarget !== null) navigateTab(nextTarget);
+    navigateTab(nextTarget);
   };
 
   return (

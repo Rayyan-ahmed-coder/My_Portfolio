@@ -86,7 +86,7 @@ describe("App Architecture & Layout", () => {
 
     // Clean up completely to log coverage data across teardown subroutines
     portfolio.destroy();
-    expect(portfolio.modules.theme).toBeUndefined;
+    expect(portfolio.modules.theme).toBeUndefined();
   });
 
   it("keeps section anchors clear of the fixed header when scrolling", () => {

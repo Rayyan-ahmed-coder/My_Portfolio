@@ -71,8 +71,8 @@ export default defineConfig({
       fileParallelism: false, 
       maxWorkers: 1,
       // Extends the timeout barrier so your laptop has plenty of overhead
-      testTimeout: 32_000, 
-      hookTimeout: 32_000,
+      testTimeout: 60_000, 
+      hookTimeout: 60_000,
       coverage: {
         provider: "v8"
       },

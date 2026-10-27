@@ -1,8 +1,14 @@
-/** Shared domain types for the portfolio runtime. */
+/**
+ * @file types.ts
+ * @description Standard common domain type models and system layout specifications.
+ * @version 1.0.4
+ * @author Rayyan Khan
+ */
+
 export type ThemeName = "light" | "dark";
 export type ScrollDirection = "up" | "down";
 
-/** Shape of a single entry in js/JSON/projects.json after validation. */
+/** Validated schema template for portfolio application project entries. */
 export interface Project {
   main: boolean;
   number: number;
@@ -19,6 +25,7 @@ export interface Project {
 
 export type CommandCategory = "Navigation" | "Actions" | "Filters" | "Social" | "Accessibility" | "Tools" | "Other";
 
+/** Command signature parameters for the control center registry matrix. */
 export interface Command {
   readonly title: string;
   readonly subtitle: string;
@@ -48,7 +55,7 @@ export type AnalyticsKey =
 
 export type AnalyticsData = Record<AnalyticsKey, AnalyticsStat>;
 
-/** Every long-lived module exposes a teardown hook so listeners never leak. */
+/** Standard interface contract for lifecycle memory teardown hooks. */
 export interface Disposable {
   destroy(): void;
 }

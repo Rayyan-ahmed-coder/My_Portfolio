@@ -12,6 +12,11 @@ export function getSectionScrollTop(target: HTMLElement, cachedHeaderHeight = 76
   return Math.min(Math.max(0, targetTop), maxScroll);
 }
 
+/**
+ * Handles global scrolling functionality
+ * such as navigation links and
+ * scroll to top button
+ */
 export default class ScrollManager implements Disposable {
   #scrollBtn = $(".scroll-top");
   #header = $(".site-header");

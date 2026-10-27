@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef } from "react";
+import React, { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { Search, Terminal, X, Zap, BarChart3, Activity } from "lucide-react";
 import { prefersReducedMotion } from "../core/utilities";
 import rawCommands from "../data/commands.json";
@@ -32,23 +32,24 @@ export function CommandPanel(): React.JSX.Element {
   }, []);
 
   // Universal Action Execution Engine
-  const runAction = async (cmd: CommandItem) => {
+  const runAction = useCallback(async (cmd: CommandItem) => {
     try {
-      const scrollBehaviorCheck = prefersReducedMotion() ? "auto" : "smooth";
       switch (cmd.type) {
-        case "scroll":
+        case "scroll": {
+          const scrollBehaviorCheck = prefersReducedMotion() ? "auto" : "smooth";
           document.querySelector(cmd.target)?.scrollIntoView({ behavior: scrollBehaviorCheck, block: "start" });
           break;
+        }
         case "click":
-          document.querySelector(cmd.target)?.scrollIntoView({ behavior: scrollBehaviorCheck, block: "start" });
           document.querySelector<HTMLElement>(cmd.target)?.click();
           break;
-        case "copy":
+        case "copy": {
           const textToCopy = cmd.target === "LOCATION_HREF" ? window.location.href : cmd.target;
           await navigator.clipboard.writeText(textToCopy);
           setToastMessage(`Copied text string safely: ${cmd.title}`);
           setTimeout(() => setToastMessage(null), 2000);
           return; // Stay open during clip confirmations
+        }
         case "class-toggle":
           document.documentElement.classList.toggle(cmd.target);
           break;
@@ -63,7 +64,7 @@ export function CommandPanel(): React.JSX.Element {
       console.error("Action execution exception channel:", err);
     }
     onClose();
-  };
+  }, []);
 
   // Telemetry Memoized Scanners
   const telemetry = useMemo(() => {
@@ -137,7 +138,7 @@ export function CommandPanel(): React.JSX.Element {
       cancelAnimationFrame(frameId);
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [isOpen, filteredCommands, selectedIndex]);
+  }, [isOpen, filteredCommands, selectedIndex, runAction]);
 
   // Tracks cursor motion states cleanly
   useEffect(() => {

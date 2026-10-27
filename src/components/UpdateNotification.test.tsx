@@ -6,8 +6,13 @@ import { render, screen, act } from "@testing-library/react";
 import UpdateNotification from "./UpdateNotification.tsx";
 
 describe("Components — UpdateNotification Toast", () => {
-  let capturedAnimationInstance = {
-    onfinish: null as (() => void) | null,
+  interface MockAnimationInstance {
+    onfinish: (() => void) | null;
+    cancel: ReturnType<typeof vi.fn>;
+  }
+
+  const capturedAnimationInstance: MockAnimationInstance = {
+    onfinish: null,
     cancel: vi.fn(),
   };
 
@@ -48,7 +53,7 @@ describe("Components — UpdateNotification Toast", () => {
 
   // 🎯 TEST 2: Synchronous Early Exit Dismissal Check
   it("should trigger fade animation and self-dismiss cleanly after the visible duration", async () => {
-    vi.stubGlobal("setTimeout", (cb: Function) => {
+    vi.stubGlobal("setTimeout", (cb: () => void) => {
       cb();
       return 1;
     });
@@ -61,10 +66,10 @@ describe("Components — UpdateNotification Toast", () => {
 
   // 🎯 TEST 3: Deep Animation Lifecycle Coverage Completion Check
   it("should execute the complete fade animation pipeline and update local storage", async () => {
-    let storedCallback: Function | null = null;
+    let storedCallback: (() => void) | null = null;
 
     // Capture the timer callback handle for execution post-paint
-    vi.stubGlobal("setTimeout", (cb: Function) => {
+    vi.stubGlobal("setTimeout", (cb: () => void) => {
       storedCallback = cb;
       return 1;
     });

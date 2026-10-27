@@ -1,3 +1,10 @@
+/**
+ * @file config.ts
+ * @description Frozen immutable runtime global configuration constants.
+ * @version 1.0.4
+ * @author Rayyan Khan
+ */
+
 export const CONFIG = Object.freeze({
   HEADER_HEIGHT: 76,
   MOBILE_BREAKPOINT: 850,
