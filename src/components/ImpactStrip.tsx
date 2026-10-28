@@ -24,7 +24,7 @@ export default function ImpactStrip(): React.JSX.Element {
       <div className="container impact-strip-grid">
         {principles.map(({ icon: Icon, label, text }) => (
           <article className="impact-item" key={label}>
-            <Icon className="impact-icon" size={20} aria-hidden="true" />
+            <Icon className="impact-icon" size={24} aria-hidden="true" />
             <div className="impact-content-wrapper">
               <h2>{label}</h2>
               <p>{text}</p>

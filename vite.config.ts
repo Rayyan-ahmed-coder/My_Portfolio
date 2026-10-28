@@ -112,7 +112,7 @@ export default defineConfig({
     server: {
         port: 5173,
         strictPort: true,
-        open: true,
+        open: false,
         hmr: {
             host: "localhost",
             port: 5173,
@@ -123,4 +123,4 @@ export default defineConfig({
             clientFiles: ["./index.html", "./src/main.tsx"],
         },
     },
-}); // 🟢 Fixed: Removed the type hack completely!
+});

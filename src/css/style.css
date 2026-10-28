@@ -221,7 +221,7 @@
   svg {
     display: block;
     max-width: 100%;
-    fill: currentColor;
+    fill: none;
   }
 
   button,
@@ -400,6 +400,16 @@
     &:focus {
       transform: translateY(0);
     }
+  }
+
+  .scroll-progress-indicator {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 0.3rem;
+    background: linear-gradient(90deg, var(--color-primary), red);
+    z-index: 1100;
+    will-change: width;
   }
 
   .site-header {
@@ -2501,7 +2511,7 @@
 
   .scroll-top {
     visibility: hidden;
-    background: #0f1324;
+    background: rgb(30, 71, 138);
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 50%;
     box-shadow: 0 16px 32px rgba(0, 0, 0, 0.24);
@@ -2733,11 +2743,7 @@
     }
 
     &.active {
-      background: linear-gradient(
-        135deg,
-        var(--color-primary-soft),
-        color-mix(in srgb, var(--color-primary-soft) 50%, var(--color-primary) 50%)
-      );
+      background: var(--color-surface-soft);
       box-shadow: var(--shadow-sm);
 
       .approach-tab-arrow {
@@ -2780,7 +2786,7 @@
     height: 58px;
     border: 1px solid var(--color-primary);
     border-radius: 18px;
-    background: var(--color-primary-soft);
+    background: var(--color-surface-strong);
     color: var(--color-primary);
   }
 
@@ -2894,6 +2900,14 @@
       }
     }
 
+    .approach-tab.active {
+      background: linear-gradient(
+        135deg,
+        var(--color-primary-soft),
+        color-mix(in srgb, var(--color-primary-soft) 50%, var(--color-primary) 50%)
+      );
+    }
+
     .filter-button.active {
       color: var(--color-black);
     }
@@ -3002,10 +3016,6 @@
       &::-webkit-scrollbar-thumb {
         background: rgba(255, 255, 255, 0.16);
       }
-    }
-
-    .scroll-top {
-      background-color: rgb(54, 57, 100);
     }
 
     .cursor {

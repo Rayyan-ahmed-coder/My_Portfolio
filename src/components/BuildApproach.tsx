@@ -111,7 +111,7 @@ export default function BuildApproach(): React.JSX.Element {
                   onClick={() => navigateTab(index)}
                   onKeyDown={(event) => handleTabKeyDown(event, index)}
                 >
-                  <TabIcon size={18} aria-hidden="true" />
+                  <TabIcon size={18} aria-hidden="true" fill="none" />
                   <span>
                     <b>{number}</b>
                     {label}
@@ -130,7 +130,7 @@ export default function BuildApproach(): React.JSX.Element {
           >
             <div className="approach-panel-top">
               <span className="approach-panel-icon">
-                <CurrentIcon size={28} aria-hidden="true" />
+                <CurrentIcon size={28} aria-hidden="true" fill="none" />
               </span>
               <span className="approach-progress">{currentPhase.number} / 03</span>
             </div>

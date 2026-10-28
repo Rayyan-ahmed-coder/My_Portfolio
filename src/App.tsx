@@ -1,5 +1,6 @@
 import React from "react";
 import UpdateNotification from "./components/UpdateNotification";
+import ScrollProgressIndicator from "./components/ScrollProgressIndicator";
 import MainNavbar from "./components/MainNavbar";
 import HeroSection from "./components/Hero";
 import ImpactStrip from "./components/ImpactStrip";
@@ -14,9 +15,15 @@ import { CommandPanel } from "./components/CommandPanel";
 import "./css/style.css";
 
 export default function App(): React.JSX.Element {
+  if (typeof window === "undefined" || typeof document === "undefined") {
+    console.warn("Window or Document is undefined");
+    return <></>;
+  }
+
   return (
     <>
       <UpdateNotification />
+      <ScrollProgressIndicator />
       <header className="site-header" id="site-header">
         <MainNavbar />
       </header>
