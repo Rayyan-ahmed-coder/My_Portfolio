@@ -110,6 +110,7 @@ export default function BuildApproach(): React.JSX.Element {
                   tabIndex={isActive ? 0 : -1}
                   onClick={() => navigateTab(index)}
                   onKeyDown={(event) => handleTabKeyDown(event, index)}
+                  data-reveal="slide-in-right"
                 >
                   <TabIcon size={18} aria-hidden="true" fill="none" />
                   <span>

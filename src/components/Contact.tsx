@@ -42,7 +42,7 @@ export default function ContactSection(): React.JSX.Element {
       copyTimeoutRef.current = setTimeout(() => {
         setEmailCopied(false);
         copyTimeoutRef.current = null;
-      }, 2000);
+      }, 2_000);
     } catch (error) {
       console.error("[Clipboard Pipeline Exception]:", error);
       setEmailCopied(false);
@@ -121,7 +121,7 @@ export default function ContactSection(): React.JSX.Element {
               hear from you.
             </p>
 
-            <div className="email-interactive-wrapper">
+            <div className="email-interactive-wrapper" data-reveal="slide-in-right">
               <a
                 className="contact-email"
                 href={`mailto:${EMAIL_ADDRESS}`}

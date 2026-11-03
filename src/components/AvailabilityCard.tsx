@@ -11,6 +11,7 @@ export default function AvailabilityCard(): React.JSX.Element {
     new Intl.DateTimeFormat(undefined, {
       hour: "numeric",
       minute: "2-digit",
+      second: "2-digit",
     }).format(),
   );
 
@@ -21,9 +22,10 @@ export default function AvailabilityCard(): React.JSX.Element {
         new Intl.DateTimeFormat(undefined, {
           hour: "numeric",
           minute: "2-digit",
+          second: "2-digit",
         }).format(),
       );
-    }, 60_000);
+    }, 1_000);
 
     return () => window.clearInterval(timer);
   }, []);
@@ -70,7 +72,7 @@ export default function AvailabilityCard(): React.JSX.Element {
   };
 
   return (
-    <aside className="availability-card" id="availability-card" aria-label="Current availability">
+    <aside className="availability-card" id="availability-card" aria-label="Current availability" data-reveal>
       <div className="availability-card-header">
         <span className="availability-status">
           <span aria-hidden="true" /> Available for select projects
