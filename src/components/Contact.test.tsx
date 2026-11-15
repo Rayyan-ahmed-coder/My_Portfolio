@@ -8,8 +8,9 @@ import Contact from "./Contact.tsx";
 describe("Components — Contact Form", () => {
   afterEach(() => {
     cleanup();
-    // 🧹 This resets any fake functions we create so they don't break subsequent tests
     vi.restoreAllMocks();
+    vi.unstubAllGlobals();
+    vi.unstubAllEnvs();
   });
 
   it("should display all our form boxes on the screen", () => {
@@ -41,7 +42,18 @@ describe("Components — Contact Form", () => {
     expect(emailInput.checkValidity()).toBe(false);
   });
 
-  it("should process submissions successfully when inputs are valid", () => {
+  it("should process submissions successfully when inputs are valid", async () => {
+    // Mock fetch (and any env vars your Contact form uses) so CI doesn't make a real network call
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(() =>
+        Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({ ok: true }),
+        }),
+      ),
+    );
+
     render(<Contact />);
 
     const nameInput = screen.getByLabelText("Name") as HTMLInputElement;
@@ -49,17 +61,18 @@ describe("Components — Contact Form", () => {
     const messageInput = screen.getByLabelText("Message") as HTMLTextAreaElement;
     const submitButton = screen.getByRole("button", { name: /Send my message/i });
 
-    act(() => {
-      fireEvent.change(nameInput, { target: { value: "Rayyan Ahmed" } });
-      fireEvent.change(emailInput, { target: { value: "rayyan@example.com" } });
-      fireEvent.change(messageInput, { target: { value: "Let's build an elite high-performance app bro!" } });
-
-      fireEvent.click(submitButton);
-    });
+    fireEvent.change(nameInput, { target: { value: "Rayyan Ahmed" } });
+    fireEvent.change(emailInput, { target: { value: "rayyan@example.com" } });
+    fireEvent.change(messageInput, { target: { value: "Let's build an elite high-performance app bro!" } });
 
     expect(nameInput.checkValidity()).toBe(true);
     expect(emailInput.checkValidity()).toBe(true);
     expect(messageInput.checkValidity()).toBe(true);
+
+    // Wrap the submit click in async act() so any async submit handler settles cleanly
+    await act(async () => {
+      fireEvent.click(submitButton);
+    });
   });
 
   // 👇 TEST 4: Your Custom Clipboard Action Engine!
