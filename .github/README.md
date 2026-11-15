@@ -5,7 +5,7 @@
   <img src="https://githubusercontent.com" width="96" height="96" alt="Engine Core Code" style="border-radius: 12px; box-shadow: 0px 8px 30px rgba(0, 255, 102, 0.25);" />
 </kbd>
 
-# ⚡ CORE ENGINE: ENGINE_RAYYAN_KHAN
+# ⚡ CORE ENGINE: ENGINE_RAYYAN_AHMED
 ### HIGH-PERFORMANCE FRONTEND ARCHITECTURE • REACT 19 • COMPRESSED DISTRIBUTION TREE
 
 [![Live Edge Deployment](https://shields.io)](https://github.io)
@@ -146,6 +146,6 @@ For deep core architectural audits, security vulnerability reviews, or system in
 
 <div align="center">
 <p style="font-size: 11px; color: #666666; font-family: monospace; letter-spacing: 2px;">
-[ENG_STATE: MAXIMUM_HARDENING] // SEC_HASH: e59752d // ARCHITECTED BY RAYYAN KHAN
+[ENG_STATE: MAXIMUM_HARDENING] // SEC_HASH: e59752d // ARCHITECTED BY RAYYAN AHMED
 </p>
 </div>

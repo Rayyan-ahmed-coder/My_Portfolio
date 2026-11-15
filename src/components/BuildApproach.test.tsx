@@ -18,13 +18,19 @@ describe("🏗️ BUILD APPROACH COMPONENT UNIT TESTING MATRIX", () => {
     expect(screen.getByRole("heading", { name: /From first thought to real thing/i })).toBeDefined();
     // Phase 1 should be the default active layout panel frame
     expect(screen.getByRole("tab", { name: /01 Discover/i })).toBeDefined();
+    expect(screen.getByText("Find the signal in the idea.")).toBeDefined();
     expect(screen.getByText("Start with the right questions.")).toBeDefined();
+    expect(screen.getByRole("tabpanel").id).toBe("approach-panel");
+    expect(
+      screen.getByRole("tabpanel").querySelector(".approach-progress-track span")?.getAttribute("style"),
+    ).toContain(`width: ${(1 / 3) * 100}%`);
   });
 
   it("swaps active panels fluidly when clicking on another tab element button", async () => {
     render(<BuildApproach />);
 
     const secondTab = screen.getByRole("tab", { name: /02 Build/i });
+    expect(screen.getAllByRole("tab").every((tab) => !tab.hasAttribute("data-reveal"))).toBe(true);
 
     // Simulate user clicking on the second tab entry point
     act(() => {
@@ -34,6 +40,11 @@ describe("🏗️ BUILD APPROACH COMPONENT UNIT TESTING MATRIX", () => {
     // The visual title string parameter must dynamically update on screen
     expect(screen.getByText("Make the experience feel inevitable.")).toBeDefined();
     expect(secondTab.getAttribute("aria-selected")).toBe("true");
+    expect(secondTab.hasAttribute("data-reveal")).toBe(false);
+    expect(screen.getAllByRole("tab")).toHaveLength(3);
+    expect(
+      screen.getByRole("tabpanel").querySelector(".approach-progress-track span")?.getAttribute("style"),
+    ).toContain(`width: ${(2 / 3) * 100}%`);
   });
 
   it("handles complex accessible keyboard keyboard arrow traversals correctly", () => {

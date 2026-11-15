@@ -2,7 +2,7 @@
  * @file utilities.ts
  * @description Micro-optimized DOM proxies, scheduling lifecycles, and fast event bridges.
  * @version 1.0.4
- * @author Rayyan Khan
+ * @author Rayyan Ahmed
  */
 
 export type ParentNodeLike = Document | DocumentFragment | Element;

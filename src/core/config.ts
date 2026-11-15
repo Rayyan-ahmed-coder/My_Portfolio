@@ -1,17 +1,10 @@
-/**
- * @file config.ts
- * @description Frozen immutable runtime global configuration constants.
- * @version 1.0.4
- * @author Rayyan Khan
- */
-
 export const CONFIG = Object.freeze({
   HEADER_HEIGHT: 76,
   MOBILE_BREAKPOINT: 850,
   OBSERVER_THRESHOLD: 0.15,
   OBSERVER_ROOT_MARGIN: "0px 0px -80px",
   STORAGE_THEME_KEY: "__portfolio_theme__",
-  EMAIL: "rayyan.workhost@gmail.com",
+  PUBLIC_EMAIL: "rayyan.workhost@gmail.com",
   SCROLL_TICK_RATE: 16,
   ACTIVE_SECTION_OFFSET: 140,
   SCROLL_TOP_THRESHOLD: 520,

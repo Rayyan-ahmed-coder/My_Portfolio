@@ -2,66 +2,60 @@ import { CONFIG } from "../core/config";
 import { Check, Clock3, Copy, Mail, Sparkles } from "lucide-react";
 import { useEffect, useState, useRef } from "react";
 
-const EMAIL = CONFIG.EMAIL;
+const EMAIL = CONFIG.PUBLIC_EMAIL;
+
+// Explicitly accept a Date object to allow pure, testable deterministic formatting
+const formatLocalTime = (date: Date): string => {
+  return new Intl.DateTimeFormat(undefined, {
+    hour: "numeric",
+    minute: "2-digit",
+  }).format(date);
+};
 
 export default function AvailabilityCard(): React.JSX.Element {
   const [copied, setEmailCopied] = useState(false);
-  const copyTimeoutRef = useRef<number | null>(null);
-  const [time, setTime] = useState(() =>
-    new Intl.DateTimeFormat(undefined, {
-      hour: "numeric",
-      minute: "2-digit",
-      second: "2-digit",
-    }).format(),
-  );
+  const copyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [time, setTime] = useState(() => formatLocalTime(new Date()));
 
-  // 🕒 Lifecycle Hook 1: Precise clock interval updates
+  // Clock Update Pipeline
   useEffect(() => {
     const timer = window.setInterval(() => {
-      setTime(
-        new Intl.DateTimeFormat(undefined, {
-          hour: "numeric",
-          minute: "2-digit",
-          second: "2-digit",
-        }).format(),
-      );
-    }, 1_000);
+      setTime(formatLocalTime(new Date()));
+    }, 60_000);
 
     return () => window.clearInterval(timer);
   }, []);
 
-  // 🧹 Lifecycle Hook 2: Memory leak prevention on component unmount
+  // Cleanup timeout references safely on unmount
   useEffect(() => {
     return () => {
       if (copyTimeoutRef.current) window.clearTimeout(copyTimeoutRef.current);
     };
   }, []);
 
-  // 📋 Core Pipeline Action: High-Performance Clipboard Management
   const copyEmail = async (): Promise<void> => {
     if (copyTimeoutRef.current) {
       window.clearTimeout(copyTimeoutRef.current);
     }
 
     try {
-      if (navigator.clipboard?.writeText && window.isSecureContext) {
+      if (navigator.clipboard?.writeText) {
         await navigator.clipboard.writeText(EMAIL);
       } else {
+        // Fallback fallback abstraction wrapper fallback logic only if standard is blocked
         const textArea = document.createElement("textarea");
         textArea.value = EMAIL;
-        Object.assign(textArea.style, {
-          position: "absolute",
-          opacity: "0",
-          pointerEvents: "none",
-        });
+        textArea.style.position = "fixed"; // Prevents layout shifts
+        textArea.style.opacity = "0";
         document.body.appendChild(textArea);
+        textArea.focus();
         textArea.select();
         document.execCommand("copy");
         document.body.removeChild(textArea);
       }
 
       setEmailCopied(true);
-      copyTimeoutRef.current = window.setTimeout(() => {
+      copyTimeoutRef.current = setTimeout(() => {
         setEmailCopied(false);
         copyTimeoutRef.current = null;
       }, 2000);
@@ -79,7 +73,7 @@ export default function AvailabilityCard(): React.JSX.Element {
         </span>
         <Sparkles size={16} aria-hidden="true" />
       </div>
-      <p className="availability-title">Have a thoughtful idea?</p>
+      <h2 className="availability-title">Have a thoughtful idea?</h2>
       <p className="availability-copy">
         I am currently open to focused frontend work, collaborations and ambitious experiments.
       </p>
@@ -91,9 +85,9 @@ export default function AvailabilityCard(): React.JSX.Element {
           <Mail size={14} aria-hidden="true" /> Usually replies in 24h
         </span>
       </div>
-      <button className="availability-copy-button" type="button" onClick={copyEmail}>
+      <button className="availability-copy-button" type="button" onClick={copyEmail} aria-live="polite">
         {copied ? <Check size={16} aria-hidden="true" /> : <Copy size={16} aria-hidden="true" />}
-        {copied ? "Email copied" : "Copy my email"}
+        <span>{copied ? "Email copied" : "Copy my email"}</span>
       </button>
     </aside>
   );

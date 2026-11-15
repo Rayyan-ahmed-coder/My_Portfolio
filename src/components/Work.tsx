@@ -111,6 +111,7 @@ export default function WorkSection(): React.JSX.Element {
                 className={project.main ? "project-card project-card-large" : "project-card"}
                 data-category={project.category}
                 data-reveal
+                aria-labelledby={`project-title-${number}`}
               >
                 <div className="project-preview" aria-hidden="true">
                   <div className="project-preview-top">

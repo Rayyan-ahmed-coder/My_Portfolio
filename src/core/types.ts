@@ -2,7 +2,7 @@
  * @file types.ts
  * @description Standard common domain type models and system layout specifications.
  * @version 1.0.4
- * @author Rayyan Khan
+ * @author Rayyan Ahmed
  */
 
 export type ThemeName = "light" | "dark";

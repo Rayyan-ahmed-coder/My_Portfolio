@@ -40,9 +40,9 @@ export default defineConfig({
             injectRegister: "inline",
             devOptions: { enabled: false },
             manifest: {
-                name: "Rayyan Khan — Frontend Developer",
-                short_name: "Rayyan Khan",
-                description: "Portfolio of Rayyan Khan, a Frontend Developer building fast, modern, and interactive web experiences.",
+                name: "Rayyan Ahmed — Frontend Developer",
+                short_name: "Rayyan Ahmed",
+                description: "Portfolio of Rayyan Ahmed, a Frontend Developer building fast, modern, and interactive web experiences.",
                 start_url: "/My_Portfolio/",
                 id: "/My_Portfolio/",
                 display: "standalone",
@@ -71,8 +71,8 @@ export default defineConfig({
       fileParallelism: false, 
       maxWorkers: 1,
       // Extends the timeout barrier so your laptop has plenty of overhead
-      testTimeout: 60_000, 
-      hookTimeout: 60_000,
+      testTimeout: 90_000, 
+      hookTimeout: 90_000,
       coverage: {
         provider: "v8"
       },

@@ -93,7 +93,7 @@
     "category": "Actions",
     "shortcut": "Alt+Shift+P",
     "type": "copy",
-    "target": "Rayyan Khan"
+    "target": "Rayyan Ahmed"
   },
   {
     "title": "Copy active URL",
@@ -137,7 +137,7 @@
   },
   {
     "title": "View LinkedIn Profile",
-    "subtitle": "Connect with Rayyan Khan for professional opportunities",
+    "subtitle": "Connect with Rayyan Ahmed for professional opportunities",
     "category": "Social Connect",
     "shortcut": "Alt+Shift+L",
     "type": "link",

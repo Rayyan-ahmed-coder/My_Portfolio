@@ -4,15 +4,17 @@ export default function MainNavbar(): React.JSX.Element {
   const navItems = [
     { id: "home", label: "Home" },
     { id: "work", label: "Work" },
-    { id: "features", label: "Features" },
     { id: "about", label: "About" },
     { id: "skills", label: "Skills" },
+    { id: "approach", label: "Process" },
+    { id: "features", label: "Features" },
+    { id: "analytics", label: "Analytics" },
     { id: "contact", label: "Contact" },
   ];
 
   return (
     <nav className="navbar container" aria-label="Primary navigation">
-      <a className="logo" href="#home" aria-label="Rayyan Khan home">
+      <a className="logo" href="#home" aria-label="Rayyan Ahmed home">
         <span className="logo-mark" aria-hidden="true">
           R
         </span>

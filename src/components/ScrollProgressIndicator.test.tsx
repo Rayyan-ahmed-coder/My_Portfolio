@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, act } from "@testing-library/react";
+import { render, act } from "@testing-library/react";
 import ScrollProgressIndicator from "./ScrollProgressIndicator";
 
 describe("ScrollProgressIndicator Core Calculation Engine", () => {
@@ -27,30 +27,31 @@ describe("ScrollProgressIndicator Core Calculation Engine", () => {
     });
   };
 
-  it("should check the width to be 0 at the top of the website", () => {
-    render(<ScrollProgressIndicator />);
+  it("keeps the progress at zero at the top of the website", () => {
+    const { container } = render(<ScrollProgressIndicator />);
 
     mockScrollPercentage(0);
 
-    const indicator = screen.getByLabelText("Scrolled percentage indicator");
-    expect(indicator.style.width).toBe("0%");
+    const indicator = container.querySelector(".scroll-progress-indicator");
+    expect(indicator?.getAttribute("aria-hidden")).toBe("true");
+    expect(indicator?.getAttribute("style")).toContain("--scroll-progress: 0");
   });
 
-  it("should calculate exact width constraints when scrolled to 50% depth", () => {
-    render(<ScrollProgressIndicator />);
+  it("updates the composited progress scale at 50% depth", () => {
+    const { container } = render(<ScrollProgressIndicator />);
 
     mockScrollPercentage(50);
 
-    const indicator = screen.getByLabelText("Scrolled percentage indicator");
-    expect(indicator.style.width).toBe("50%");
+    const indicator = container.querySelector(".scroll-progress-indicator");
+    expect(indicator?.getAttribute("style")).toContain("--scroll-progress: 0.5");
   });
 
-  it("should stretch to full workspace bounds matching 100% completion layout lines", () => {
-    render(<ScrollProgressIndicator />);
+  it("caps progress at the end of the document", () => {
+    const { container } = render(<ScrollProgressIndicator />);
 
     mockScrollPercentage(100);
 
-    const indicator = screen.getByLabelText("Scrolled percentage indicator");
-    expect(indicator.style.width).toBe("100%");
+    const indicator = container.querySelector(".scroll-progress-indicator");
+    expect(indicator?.getAttribute("style")).toContain("--scroll-progress: 1");
   });
 });

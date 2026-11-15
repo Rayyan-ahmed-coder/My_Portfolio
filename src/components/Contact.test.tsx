@@ -18,7 +18,7 @@ describe("Components — Contact Form", () => {
     const nameInput = screen.getByLabelText("Name");
     const emailInput = screen.getByLabelText("Email");
     const messageInput = screen.getByLabelText("Message");
-    const submitButton = screen.getByRole("button", { name: /Send Message/i });
+    const submitButton = screen.getByRole("button", { name: /Send my message/i });
 
     expect(nameInput).toBeDefined();
     expect(emailInput).toBeDefined();
@@ -31,7 +31,7 @@ describe("Components — Contact Form", () => {
 
     const nameInput = screen.getByLabelText("Name") as HTMLInputElement;
     const emailInput = screen.getByLabelText("Email") as HTMLInputElement;
-    const submitButton = screen.getByRole("button", { name: /Send Message/i });
+    const submitButton = screen.getByRole("button", { name: /Send my message/i });
 
     act(() => {
       fireEvent.click(submitButton);
@@ -47,10 +47,10 @@ describe("Components — Contact Form", () => {
     const nameInput = screen.getByLabelText("Name") as HTMLInputElement;
     const emailInput = screen.getByLabelText("Email") as HTMLInputElement;
     const messageInput = screen.getByLabelText("Message") as HTMLTextAreaElement;
-    const submitButton = screen.getByRole("button", { name: /Send Message/i });
+    const submitButton = screen.getByRole("button", { name: /Send my message/i });
 
     act(() => {
-      fireEvent.change(nameInput, { target: { value: "Rayyan Khan" } });
+      fireEvent.change(nameInput, { target: { value: "Rayyan Ahmed" } });
       fireEvent.change(emailInput, { target: { value: "rayyan@example.com" } });
       fireEvent.change(messageInput, { target: { value: "Let's build an elite high-performance app bro!" } });
 
@@ -95,7 +95,7 @@ describe("Components — Contact Form", () => {
     expect(mockWriteText).toHaveBeenCalled();
 
     // Check that your text state dynamically changed to your success check mark!
-    expect(copyButton.textContent).toBe("Copied! ✓");
+    expect(copyButton.textContent).toBe("Copied");
 
     // 4. Act: Fast-forward your 2000ms custom timeout macro task to test the reset loop!
     act(() => {
@@ -106,5 +106,31 @@ describe("Components — Contact Form", () => {
     expect(copyButton.textContent).toBe("Copy");
 
     vi.useRealTimers(); // Restore global clocks back to standard
+  });
+
+  it("should report when the browser blocks copying the email", async () => {
+    Object.defineProperty(navigator, "clipboard", {
+      value: undefined,
+      writable: true,
+      configurable: true,
+    });
+    Object.defineProperty(window, "isSecureContext", {
+      value: false,
+      writable: true,
+      configurable: true,
+    });
+    Object.defineProperty(document, "execCommand", {
+      value: vi.fn(() => false),
+      configurable: true,
+    });
+    vi.spyOn(console, "error").mockImplementation(() => undefined);
+
+    render(<Contact />);
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: /Copy email address/i }));
+    });
+
+    expect(screen.getByRole("button", { name: /Copy email address/i }).textContent).toContain("Failed");
+    expect(screen.getByRole("status").textContent).toBe("Could not copy email address.");
   });
 });

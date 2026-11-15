@@ -1,12 +1,12 @@
 import React, { useRef, useState } from "react";
 import { ArrowUpRight, Check, CodeXml, Compass, Rocket } from "lucide-react";
 
-// 📦 STATIC OPTIMIZATION: Isolated outside the component lifecycle to prevent array reallocation allocations on every render cycle.
 const PHASES = [
   {
     icon: Compass,
     number: "01",
     label: "Discover",
+    summary: "Find the signal in the idea.",
     title: "Start with the right questions.",
     text: "I turn a rough idea into a clear direction by understanding the audience, the problem and what success should feel like.",
     deliverables: ["Goals and constraints", "Content direction", "A focused first milestone"],
@@ -15,6 +15,7 @@ const PHASES = [
     icon: CodeXml,
     number: "02",
     label: "Build",
+    summary: "Turn direction into a product.",
     title: "Make the experience feel inevitable.",
     text: "I build responsive interfaces in small, testable steps, keeping performance and accessibility in the room from the beginning.",
     deliverables: ["Responsive UI system", "Accessible interactions", "Performance-minded code"],
@@ -23,6 +24,7 @@ const PHASES = [
     icon: Rocket,
     number: "03",
     label: "Launch",
+    summary: "Ship it, then make it sharper.",
     title: "Ship, learn and make it sharper.",
     text: "A launch is a beginning, not a finish line. I leave behind a polished product and a practical path for its next iteration.",
     deliverables: ["Launch-ready details", "Useful handoff", "Next-step opportunities"],
@@ -36,17 +38,15 @@ export default function BuildApproach(): React.JSX.Element {
   const currentPhase = PHASES[activePhase] ?? PHASES[0];
   const CurrentIcon = currentPhase.icon;
 
-  const navigateTab = (nextIndex: number) => {
+  const navigateTab = (nextIndex: number): void => {
     setActivePhase(nextIndex);
-    // Micro-optimization: Focus execution runs on the next browser frame loop tick to prevent thread stalls
-    requestAnimationFrame(() => tabRefs.current[nextIndex]?.focus());
+    tabRefs.current[nextIndex]?.focus();
   };
 
-  const handleTabKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>, index: number) => {
+  const handleTabKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>, index: number): void => {
     const total = PHASES.length;
     let nextTarget: number;
 
-    // Unified declarative direction evaluator mapping
     switch (event.key) {
       case "ArrowRight":
       case "ArrowDown":
@@ -63,7 +63,7 @@ export default function BuildApproach(): React.JSX.Element {
         nextTarget = total - 1;
         break;
       default:
-        return; // Early return for irrelevant keystrokes preserves processing loops
+        return;
     }
 
     event.preventDefault();
@@ -92,7 +92,7 @@ export default function BuildApproach(): React.JSX.Element {
             aria-orientation="vertical"
             aria-label="Project development phases"
           >
-            {PHASES.map(({ icon: TabIcon, number, label }, index) => {
+            {PHASES.map(({ icon: TabIcon, number, label, summary }, index) => {
               const isActive = activePhase === index;
 
               return (
@@ -106,16 +106,16 @@ export default function BuildApproach(): React.JSX.Element {
                   type="button"
                   role="tab"
                   aria-selected={isActive}
-                  aria-controls={`approach-panel-${number}`}
+                  aria-controls="approach-panel"
                   tabIndex={isActive ? 0 : -1}
                   onClick={() => navigateTab(index)}
                   onKeyDown={(event) => handleTabKeyDown(event, index)}
-                  data-reveal="slide-in-right"
                 >
                   <TabIcon size={18} aria-hidden="true" fill="none" />
-                  <span>
+                  <span className="approach-tab-copy">
                     <b>{number}</b>
-                    {label}
+                    <strong>{label}</strong>
+                    <small>{summary}</small>
                   </span>
                   <ArrowUpRight className="approach-tab-arrow" size={16} aria-hidden="true" />
                 </button>
@@ -124,16 +124,28 @@ export default function BuildApproach(): React.JSX.Element {
           </div>
 
           <div
+            key={currentPhase.number}
             className="approach-panel"
-            id={`approach-panel-${currentPhase.number}`}
+            id="approach-panel"
             role="tabpanel"
             aria-labelledby={`approach-tab-${currentPhase.number}`}
+            aria-live="polite"
           >
             <div className="approach-panel-top">
-              <span className="approach-panel-icon">
-                <CurrentIcon size={28} aria-hidden="true" fill="none" />
+              <span className="approach-panel-icon" aria-hidden="true">
+                <CurrentIcon size={26} />
               </span>
-              <span className="approach-progress">{currentPhase.number} / 03</span>
+              <div className="approach-panel-phase">
+                <span>PHASE {currentPhase.number}</span>
+                <strong>{currentPhase.label}</strong>
+              </div>
+              <span className="approach-progress">
+                {currentPhase.number}
+                <span> / 03</span>
+              </span>
+            </div>
+            <div className="approach-progress-track" aria-hidden="true">
+              <span style={{ width: `${((activePhase + 1) / PHASES.length) * 100}%` }} />
             </div>
             <h3>{currentPhase.title}</h3>
             <p>{currentPhase.text}</p>

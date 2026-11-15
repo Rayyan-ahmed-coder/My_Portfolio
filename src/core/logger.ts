@@ -2,7 +2,7 @@
  * @file logger.ts
  * @description Robust structural application error monitoring and diagnostics funnel.
  * @version 1.0.4
- * @author Rayyan Khan
+ * @author Rayyan Ahmed
  */
 
 export const ERROR_EVENT = "portfolio:error";

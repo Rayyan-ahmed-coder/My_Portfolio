@@ -1,8 +1,7 @@
 /**
  * @file observer.ts
- * @description Viewport Intersection Management Engine for declarative layouts.
- * @version 1.0.4
- * @author Rayyan Khan
+ * @description Viewport reveal observer for declarative layouts.
+ * @version 1.0.5
  */
 
 import { $$ } from "./utilities.js";
@@ -11,114 +10,154 @@ import type { Disposable } from "./types.js";
 
 export type ObserveTarget = string | Element | Iterable<Element>;
 
-/** Coordinates responsive element reveal sequences as nodes enter the viewport. */
+const REVEAL_SELECTOR = "[data-reveal]";
+
+/** Reveals elements as they approach the viewport without continuous scroll work. */
 export default class ObserverManager implements Disposable {
   #elements = new Set<Element>();
   #observer: IntersectionObserver | null = null;
+  #rootObserver: MutationObserver | null = null;
+  #revealImmediately = false;
+  #destroyed = false;
 
   static readonly defaultConfig: IntersectionObserverInit = {
-    threshold: 0.2,
-    rootMargin: "0px 0px -50px 0px",
+    threshold: 0,
+    rootMargin: "0px 0px 160px 0px",
   };
 
-  /**
-   * Initializes structural Intersection Observers with default options fallback.
-   * @param customConfig Tailored overrides for viewport intersections bounds.
-   */
   constructor(customConfig: IntersectionObserverInit = {}) {
-    if (!("IntersectionObserver" in window)) {
-      warn("observer", "IntersectionObserver unsupported; revealing elements eagerly");
-      this.#revealFallback();
+    if (typeof window === "undefined" || typeof document === "undefined") {
+      this.#revealImmediately = true;
       return;
     }
 
-    this.#observer = new IntersectionObserver((entries) => this.#handleReveal(entries), {
-      ...ObserverManager.defaultConfig,
-      ...customConfig,
-    });
+    const prefersReducedMotion =
+      typeof window.matchMedia === "function" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const IntersectionObserverConstructor = window.IntersectionObserver;
+    const supportsIntersectionObserver = typeof IntersectionObserverConstructor === "function";
 
-    this.observe("[data-reveal]");
+    this.#revealImmediately = prefersReducedMotion || !supportsIntersectionObserver;
+
+    if (!supportsIntersectionObserver && !prefersReducedMotion) {
+      warn("observer", "IntersectionObserver unsupported; revealing elements eagerly");
+    }
+
+    if (!this.#revealImmediately) {
+      this.#observer = new IntersectionObserverConstructor((entries) => this.#handleReveal(entries), {
+        ...ObserverManager.defaultConfig,
+        ...customConfig,
+      });
+    }
+
+    this.observe(REVEAL_SELECTOR);
+    this.#observeRoot();
   }
 
-  /**
-   * Evaluates intersections and cleans queues to prevent memory accumulation.
-   * @param entries Active intersection updates batch list.
-   */
   #handleReveal(entries: IntersectionObserverEntry[]): void {
-    const len = entries.length;
-    for (let i = 0; i < len; i++) {
-      const entry = entries[i];
+    if (this.#destroyed) return;
+
+    for (const entry of entries) {
+      const { target } = entry;
+      if (!this.#elements.has(target)) continue;
+      if (!target.isConnected) {
+        this.#untrack(target);
+        continue;
+      }
       if (!entry.isIntersecting) continue;
 
-      const { target } = entry;
       target.classList.add("revealed");
-      this.#observer?.unobserve(target);
-      this.#elements.delete(target);
+      this.#untrack(target);
     }
   }
 
-  /**
-   * Registers targets for automatic viewport reveal observation tracking.
-   * @param target DOM selector text, direct node element, or iterable group.
-   */
   observe(target: ObserveTarget): void {
-    const targets = this.#resolveTargets(target);
-    const len = targets.length;
-    if (!len) return;
+    if (this.#destroyed) return;
 
-    if (!this.#observer) {
-      this.#reveal(targets);
+    if (typeof target === "string") {
+      this.#observeElements($$(target));
       return;
     }
 
-    for (let i = 0; i < len; i++) {
-      const el = targets[i];
-      if (this.#elements.has(el)) continue;
-      this.#elements.add(el);
-      this.#observer.observe(el);
+    if (typeof Element !== "undefined" && target instanceof Element) {
+      this.#observeElement(target);
+      return;
+    }
+
+    if (target !== null && typeof target === "object" && Symbol.iterator in target) {
+      for (const element of target as Iterable<Element>) this.#observeElement(element);
+      return;
+    }
+
+    warn("observer", "Ignoring unsupported observe target");
+  }
+
+  #observeElements(elements: Iterable<Element>): void {
+    for (const element of elements) this.#observeElement(element);
+  }
+
+  #observeElement(element: Element): void {
+    if (typeof Element === "undefined" || !(element instanceof Element)) return;
+
+    if (this.#revealImmediately) {
+      element.classList.add("revealed");
+      return;
+    }
+
+    if (!element.isConnected || element.classList.contains("revealed") || this.#elements.has(element)) return;
+    this.#elements.add(element);
+    this.#observer?.observe(element);
+  }
+
+  #observeRoot(): void {
+    const MutationObserverConstructor = window.MutationObserver;
+    if (typeof MutationObserverConstructor !== "function") return;
+
+    const root = document.getElementById("root") ?? document.body;
+    if (!root) return;
+
+    this.#rootObserver = new MutationObserverConstructor((records) => {
+      if (this.#destroyed) return;
+
+      const added = new Set<Element>();
+
+      for (const record of records) {
+        for (const node of record.removedNodes) {
+          if (!(node instanceof Element)) continue;
+          this.#untrackSubtree(node);
+        }
+
+        for (const node of record.addedNodes) {
+          if (!(node instanceof Element)) continue;
+          if (node.matches(REVEAL_SELECTOR)) added.add(node);
+          for (const descendant of node.querySelectorAll(REVEAL_SELECTOR)) added.add(descendant);
+        }
+      }
+
+      if (added.size) this.observe(added);
+    });
+
+    this.#rootObserver.observe(root, { childList: true, subtree: true });
+  }
+
+  #untrackSubtree(root: Element): void {
+    for (const element of this.#elements) {
+      if (element === root || root.contains(element)) this.#untrack(element);
     }
   }
 
-  /**
-   * Normalizes dynamic text selectors, items, or iterables into element arrays.
-   * @param target Dynamic incoming structural mapping to parse.
-   * @returns Clean parsed element list array ready for subscription tracking.
-   */
-  #resolveTargets(target: ObserveTarget): Element[] {
-    if (typeof target === "string") return Array.from($$(target));
-    if (target instanceof Element) return [target];
-
-    if (target === null || typeof target !== "object" || !(Symbol.iterator in target)) {
-      warn("observer", "Ignoring unsupported observe target layout");
-      return [];
-    }
-
-    return Array.from(target).filter((el): el is Element => el instanceof Element);
+  #untrack(element: Element): void {
+    if (!this.#elements.delete(element)) return;
+    this.#observer?.unobserve(element);
   }
 
-  /**
-   * Instantly reveals elements if intersection observation tools are missing.
-   * @param target Fallback selector query path.
-   */
-  #revealFallback(target: ObserveTarget = "[data-reveal]"): void {
-    this.#reveal(this.#resolveTargets(target));
-  }
-
-  /**
-   * Appends layout classes directly to clear element transitions.
-   * @param elements Array collection of elements matching structural bounds.
-   */
-  #reveal(elements: readonly Element[]): void {
-    const len = elements.length;
-    for (let i = 0; i < len; i++) {
-      elements[i].classList.add("revealed");
-    }
-  }
-
-  /** Shuts down the observer network and purges residual memory items. */
   destroy(): void {
+    if (this.#destroyed) return;
+
+    this.#destroyed = true;
     this.#observer?.disconnect();
+    this.#rootObserver?.disconnect();
     this.#observer = null;
+    this.#rootObserver = null;
     this.#elements.clear();
   }
 }

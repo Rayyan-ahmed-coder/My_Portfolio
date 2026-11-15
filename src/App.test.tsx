@@ -1,7 +1,7 @@
 import { describe, expect, it, vi, afterEach } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
 import App from "./App.tsx";
-import Portfolio from "./app.mts";
+import Portfolio from "./app.ts";
 import { getSectionScrollTop } from "./modules/scroll.js";
 
 // Mock out dynamic modules so Vitest processes imports instantly

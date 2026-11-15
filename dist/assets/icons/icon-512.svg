@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <!-- Deep Navy Radial Background -->
+    <radialGradient id="navyBg" cx="50%" cy="45%" r="65%">
+      <stop offset="0%" stop-color="#1f3b61" />
+      <stop offset="100%" stop-color="#11223a" />
+    </radialGradient>
+
+    <!-- Electric Cyan Linear Gradient -->
+    <linearGradient id="cyanStroke" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8" />
+      <stop offset="50%" stop-color="#11aee8" />
+      <stop offset="100%" stop-color="#0284c7" />
+    </linearGradient>
+
+    <!-- Crisp Glow Filter -->
+    <filter id="neonGlow" x="-15%" y="-15%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="6" stdDeviation="10" flood-color="#11aee8" flood-opacity="0.3" />
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="512" height="512" fill="url(#navyBg)" />
+
+  <!-- Logo Group -->
+  <g filter="url(#neonGlow)" fill="url(#cyanStroke)" fill-rule="evenodd">
+    <!-- Outer R Outline -->
+    <path d="
+      M 128 114
+      H 300
+      C 356 114, 384 146, 384 202
+      C 384 248, 362 278, 314 287
+      L 384 398
+      H 314
+      L 246 290
+      H 192
+      V 398
+      H 128
+      Z
+
+      M 140 126
+      V 386
+      H 180
+      V 278
+      H 253
+      L 321 386
+      H 362
+      L 296 280
+      C 348 273, 372 246, 372 202
+      C 372 152, 348 126, 300 126
+      Z
+    " />
+
+    <!-- Inner Bowl Counter -->
+    <path d="
+      M 178 162
+      H 294
+      C 322 162, 336 176, 336 202
+      C 336 228, 322 242, 294 242
+      H 178
+      Z
+
+      M 190 174
+      V 230
+      H 294
+      C 314 230, 324 220, 324 202
+      C 324 184, 314 174, 294 174
+      Z
+    " />
+
+    <!-- Interlocking Diagonal Bridge -->
+    <path d="
+      M 232 242
+      H 247
+      L 276 288
+      H 261
+      Z
+    " />
+  </g>
+</svg>

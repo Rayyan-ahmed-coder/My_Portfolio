@@ -4,11 +4,12 @@ import ScrollProgressIndicator from "./components/ScrollProgressIndicator";
 import MainNavbar from "./components/MainNavbar";
 import HeroSection from "./components/Hero";
 import ImpactStrip from "./components/ImpactStrip";
-import BuildApproach from "./components/BuildApproach";
 import WorkSection from "./components/Work";
-import AboutSection from "./components/About";
-import FeaturesSection from "./components/Features";
 import TechnologiesSection from "./components/Technologies";
+import AboutSection from "./components/About";
+import BuildApproach from "./components/BuildApproach";
+import FeaturesSection from "./components/Features";
+import AnalyticsSection from "./components/Analytics";
 import ContactSection from "./components/Contact";
 import SiteFooter from "./components/Footer";
 import { CommandPanel } from "./components/CommandPanel";
@@ -24,20 +25,21 @@ export default function App(): React.JSX.Element {
     <>
       <UpdateNotification />
       <ScrollProgressIndicator />
-      <header className="site-header" id="site-header">
-        <MainNavbar />
-      </header>
       <a className="skip-link" href="#main-content">
         Skip to content
       </a>
+      <header className="site-header" id="site-header">
+        <MainNavbar />
+      </header>
       <main id="main-content">
         <HeroSection />
         <ImpactStrip />
-        <BuildApproach />
         <WorkSection />
-        <FeaturesSection />
         <AboutSection />
         <TechnologiesSection />
+        <BuildApproach />
+        <FeaturesSection />
+        <AnalyticsSection />
         <ContactSection />
       </main>
       <SiteFooter />

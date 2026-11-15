@@ -1,0 +1,150 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" width="192" height="192">
+  <defs>
+    <!-- Dark Navy Squircle Background Gradient -->
+    <linearGradient id="badgeBg" x1="20%" y1="0%" x2="80%" y2="100%">
+      <stop offset="0%" stop-color="#173859" />
+      <stop offset="50%" stop-color="#0b1d33" />
+      <stop offset="100%" stop-color="#040b14" />
+    </linearGradient>
+
+    <!-- Subtle Ambient Top-Left Cyan Glow Inside Badge -->
+    <radialGradient id="ambientGlow" cx="42%" cy="35%" r="55%">
+      <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.32" />
+      <stop offset="65%" stop-color="#0284c7" stop-opacity="0.08" />
+      <stop offset="100%" stop-color="#040b14" stop-opacity="0" />
+    </radialGradient>
+
+    <!-- Squircle Glass Rim Stroke -->
+    <linearGradient id="badgeStroke" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#7dd3fc" stop-opacity="0.55" />
+      <stop offset="40%" stop-color="#38bdf8" stop-opacity="0.18" />
+      <stop offset="100%" stop-color="#0f172a" stop-opacity="0.6" />
+    </linearGradient>
+
+    <!-- Luminous Cyan Core Fill -->
+    <linearGradient id="rCore" x1="20%" y1="0%" x2="80%" y2="100%">
+      <stop offset="0%" stop-color="#a5f3fc" />
+      <stop offset="30%" stop-color="#38bdf8" />
+      <stop offset="75%" stop-color="#00b4f0" />
+      <stop offset="100%" stop-color="#0284c7" />
+    </linearGradient>
+
+    <!-- Glossy Glass Bevel Outline -->
+    <linearGradient id="glassBevel" x1="15%" y1="0%" x2="85%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.95" />
+      <stop offset="35%" stop-color="#bae6fd" stop-opacity="0.65" />
+      <stop offset="70%" stop-color="#0284c7" stop-opacity="0.45" />
+      <stop offset="100%" stop-color="#7dd3fc" stop-opacity="0.8" />
+    </linearGradient>
+
+    <!-- Top Gloss Reflection Highlight -->
+    <linearGradient id="topGloss" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.7" />
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0" />
+    </linearGradient>
+
+    <!-- Outer Neon Cyan Aura Filter -->
+    <filter id="cyanAura" x="-25%" y="-25%" width="150%" height="150%">
+      <feDropShadow dx="0" dy="0" stdDeviation="6" flood-color="#00b8f4" flood-opacity="0.55" />
+      <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#020617" flood-opacity="0.75" />
+    </filter>
+
+    <!-- Clip Path for Top Glass Reflection -->
+    <clipPath id="rClip">
+      <path fill-rule="evenodd" d="
+        M 48 38
+        H 108
+        C 138 38, 152 54, 152 78
+        C 152 99, 138 113, 113 116
+        L 154 156
+        C 143 157, 133 153, 122 142
+        L 92 115
+        H 74
+        V 136
+        L 52 155
+        V 42
+        Z
+
+        M 74 58
+        V 95
+        H 105
+        C 120 95, 127 88, 127 76.5
+        C 127 65, 120 58, 105 58
+        Z
+      " />
+    </clipPath>
+  </defs>
+
+  <!-- 1. Rounded Squircle App Badge -->
+  <rect x="12" y="12" width="168" height="168" rx="38" fill="url(#badgeBg)" />
+  <rect x="12" y="12" width="168" height="168" rx="38" fill="url(#ambientGlow)" />
+  <rect x="12.75" y="12.75" width="166.5" height="166.5" rx="37.25" fill="none" stroke="url(#badgeStroke)" stroke-width="1.5" />
+
+  <!-- 2. Glowing 3D Glass "R" Group -->
+  <g filter="url(#cyanAura)">
+    <!-- Outer Translucent Glass Casing -->
+    <path fill="url(#glassBevel)" fill-rule="evenodd" d="
+      M 45 35
+      H 109
+      C 141 35, 156 52, 156 78
+      C 156 100, 141 115, 118 118
+      L 159 158
+      C 145 161, 132 156, 119 144
+      L 90 118
+      H 77
+      V 138
+      L 49 161
+      V 39
+      Z
+
+      M 77 61
+      V 92
+      H 104
+      C 117 92, 123 86, 123 76.5
+      C 123 67, 117 61, 104 61
+      Z
+    " />
+
+    <!-- Inner Glowing Cyan Core -->
+    <path fill="url(#rCore)" fill-rule="evenodd" d="
+      M 49 39
+      H 108
+      C 137 39, 151 54, 151 78
+      C 151 98, 137 112, 112 115
+      L 152 154
+      C 142 155, 133 151, 122 141
+      L 92 114
+      H 73
+      V 135
+      L 53 153
+      V 43
+      Z
+
+      M 73 57
+      V 96
+      H 105
+      C 121 96, 128 89, 128 76.5
+      C 128 64, 121 57, 105 57
+      Z
+    " />
+
+    <!-- Specular Top Gloss Overlay -->
+    <ellipse cx="96" cy="52" rx="64" ry="26" fill="url(#topGloss)" clip-path="url(#rClip)" />
+
+    <!-- Crisp Inner Rim Highlight -->
+    <path fill="none" stroke="#ffffff" stroke-opacity="0.75" stroke-width="1.2" stroke-linejoin="round" d="
+      M 49 39
+      H 108
+      C 137 39, 151 54, 151 78
+      C 151 98, 137 112, 112 115
+      L 152 154
+      C 142 155, 133 151, 122 141
+      L 92 114
+      H 73
+      V 135
+      L 53 153
+      V 43
+      Z
+    " />
+  </g>
+</svg>

@@ -1,5 +1,13 @@
 import React from "react";
 import AvailabilityCard from "./AvailabilityCard";
+import projectsData from "../data/projects.json";
+import technologiesData from "../data/technologies.json";
+
+const STATS = [
+  { value: String(projectsData.length).padStart(2, "0"), label: "Projects" },
+  { value: String(technologiesData.length).padStart(2, "0"), label: "Technologies" },
+  { value: "∞", label: "Curiosity" },
+] as const;
 
 export default function HeroSection(): React.JSX.Element {
   return (
@@ -14,10 +22,11 @@ export default function HeroSection(): React.JSX.Element {
         <div className="hero-content">
           <p className="eyebrow">FRONTEND DEVELOPER</p>
           <h1 className="hero-title" id="hero-title">
-            I build <span className="accent-text hero-accent-text">thoughtful experiences</span> for the web.
+            I build <span className="accent-text hero-accent-text">digital experiences</span> that feel effortless.
           </h1>
           <p className="hero-description">
-            I'm Rayyan Khan, a frontend developer building responsive interfaces with React, TypeScript and JavaScript.
+            I'm Rayyan Ahmed. I turn ideas into responsive, accessible interfaces with React, TypeScript and thoughtful
+            interaction design.
           </p>
 
           <div className="hero-actions">
@@ -30,29 +39,23 @@ export default function HeroSection(): React.JSX.Element {
           </div>
 
           <div className="hero-stats">
-            <div className="stat">
-              <strong>03</strong>
-              <span>Projects</span>
-            </div>
-            <div className="stat">
-              <strong>09</strong>
-              <span>Technologies</span>
-            </div>
-            <div className="stat">
-              <strong>∞</strong>
-              <span>Curiosity</span>
-            </div>
+            {STATS.map(({ value, label }) => (
+              <div className="stat" key={label}>
+                <strong>{value}</strong>
+                <span>{label}</span>
+              </div>
+            ))}
           </div>
         </div>
 
         <div className="hero-visual">
           <div className="hero-card" aria-hidden="true">
             <div className="hero-card-top">
-              <span></span>
-              <span></span>
-              <span></span>
+              <span />
+              <span />
+              <span />
             </div>
-            <h1 className="hero-letter">R</h1>
+            <h2 className="hero-letter">R</h2>
             <ul className="hero-card-bottom">
               <li>React</li>
               <li>CSS</li>

@@ -1,10 +1,14 @@
 // @vitest-environment jsdom
 // @vitest-pool threads:false
 
-import { describe, it, expect, vi, afterEach } from "vitest";
+import { describe, it, expect, vi, afterEach, beforeEach } from "vitest";
 import { render, screen, fireEvent, act, cleanup } from "@testing-library/react";
 import AvailabilityCard from "./AvailabilityCard";
 import { CONFIG } from "../core/config";
+
+beforeEach(() => {
+  vi.useFakeTimers();
+});
 
 afterEach(() => {
   cleanup(); // Cleanly wipes your virtual browser document canvas completely clear
@@ -21,16 +25,17 @@ describe("⚡ AVAILABILITY CARD COMPONENT TEST MATRIX", () => {
     expect(screen.getByRole("button", { name: /Copy my email/i })).toBeDefined();
   });
 
-  it("updates localized clock interval text when time passes", () => {
-    vi.useFakeTimers();
+  it("updates localized clock interval text when time passes", async () => {
     vi.setSystemTime(new Date("2026-10-18T16:00:00.000Z"));
 
     render(<AvailabilityCard />);
     const clockLabel = screen.getByText(/Local time/i);
     const initialTime = clockLabel.textContent;
 
-    act(() => {
-      vi.advanceTimersByTime(2 * 60 * 60 * 1000);
+    vi.setSystemTime(new Date("2026-10-18T18:00:00.000Z"));
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(60_000);
     });
 
     const updatedTime = screen.getByText(/Local time/i).textContent;
@@ -63,7 +68,7 @@ describe("⚡ AVAILABILITY CARD COMPONENT TEST MATRIX", () => {
     });
 
     // Check that the clipboard received the exact email configuration variable
-    expect(writeTextMock).toHaveBeenCalledWith(CONFIG.EMAIL);
+    expect(writeTextMock).toHaveBeenCalledWith(CONFIG.PUBLIC_EMAIL);
 
     // Verify the visual state flips to give real-time confirmation back to the user
     expect(screen.getByText(/Email copied/i)).toBeDefined();

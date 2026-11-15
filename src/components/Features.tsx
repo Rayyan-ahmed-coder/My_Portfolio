@@ -14,11 +14,11 @@ export default function FeaturesSection(): React.JSX.Element {
       <div className="container">
         <div className="section-heading">
           <div>
-            <p className="eyebrow">WHY THIS PORTFOLIO</p>
-            <h2 id="features-title">Built with purpose.</h2>
+            <p className="eyebrow">THE EXPERIENCE, BY DESIGN</p>
+            <h2 id="features-title">Good work is more than good looks.</h2>
           </div>
           <p className="section-description">
-            Every part of this site is designed around performance, accessibility and a great user experience.
+            Four principles guide how I shape an interface—from its first impression to every detail in between.
           </p>
         </div>
         <div className="features-grid">
@@ -27,19 +27,24 @@ export default function FeaturesSection(): React.JSX.Element {
             const headerSlug = `feature-${feature.title.toLowerCase().replace(/\s+/g, "-")}`;
             return (
               <article key={headerSlug} className="feature-card" data-reveal aria-labelledby={headerSlug}>
-                <span className="feature-number" aria-hidden="true">
-                  {displayId}
-                </span>
-                <div className="feature-icon" aria-hidden="true">
-                  {feature.icon}
+                <div className="feature-card-heading">
+                  <span className="feature-number">PRINCIPLE / {displayId}</span>
+                  <div className="feature-icon" aria-hidden="true">
+                    {feature.icon}
+                  </div>
                 </div>
-                <h3 id={headerSlug}>{feature.title}</h3>
-                <p>{feature.description}</p>
-                <ul>
-                  {feature.bullets.map((bullet, bulletIdx) => (
-                    <li key={bulletIdx}>{bullet}</li>
+                <div className="feature-card-copy">
+                  <h3 id={headerSlug}>{feature.title}</h3>
+                  <p>{feature.description}</p>
+                </div>
+                <ul aria-label={`${feature.title} principles`}>
+                  {feature.bullets.map((bullet) => (
+                    <li key={bullet}>{bullet}</li>
                   ))}
                 </ul>
+                <span className="feature-card-index" aria-hidden="true">
+                  {displayId}
+                </span>
               </article>
             );
           })}

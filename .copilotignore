@@ -1,2 +1,10 @@
-.env*
+# Block the main raw secret environment files completely
+.env
 *.local
+*.production
+*.development
+.env.*
+*.env
+
+# Do not ignore example file
+!.env.example
